@@ -280,10 +280,6 @@ class CheckoutController extends Controller
                 return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => "分期手續費計算錯誤"]);
             }
         }
-        /* test
-        $data = $this->apiOrderService->setOrders($response['result'], $request, $campaign, $campaign_gift);
-        return response()->json(['status' => true, 'error_code' => null, 'error_msg' => null, 'result' => $data['payment_url']]);
-         */
         if ($response['status'] == '404') {
             $data = [];
             $status = false;

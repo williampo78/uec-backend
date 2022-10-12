@@ -156,7 +156,7 @@ class OrderService
             'returnOrderDetails.productItem',
             'returnOrderDetails.productItem.product',
             'returnOrderDetails.promotionalCampaign',
-            ]);
+        ]);
 
         $order = $order->find($id);
 
@@ -817,10 +817,10 @@ class OrderService
             $shipment_status['can_return_order']['type'] = $can_return_order['type'];
             $shipment_status['can_return_order']['status'] = $can_return_order['status'];
         }
-
         if (isset($return_examination_info)) {
             $voided_count = 0;
             $exam_count = 0;
+            $closed_count = 0;
             foreach ($return_examination_info as $return_detail) {
                 $return_type = false;
                 if ($return_detail->return_requests_status != 'COMPLETED' && $return_detail->return_requests_status != 'VOIDED') { //未結案，退貨取消
@@ -829,6 +829,9 @@ class OrderService
                 if ($return_detail->return_requests_status == 'VOIDED') { //退貨取消，狀態回復出貨狀態
                     $voided_count++;
                     continue;
+                }
+                if ($return_detail->return_requests_status == 'CLOSED') { //退貨取消，狀態回復出貨狀態
+                    $closed_count++;
                 }
                 $T21 = ($return_detail->created_at) ? Carbon::parse($return_detail->created_at)->format('Y-m-d H:i') : null;//退貨檢驗單 產生時間
                 if ($order->ship_from_whs == 'SELF') {
@@ -921,12 +924,12 @@ class OrderService
                     }
                 }
             }
-            if ($can_return_order['type'] == 2 && $return_examination_info->count() == $voided_count) { //已取消退貨 (進入挑品頁)
+            if (($can_return_order['type'] == 2 && $return_examination_info->count() == $voided_count) || $closed_count >0) { //已取消退貨 (進入挑品頁)
                 $shipment_status['can_return_order']['type'] = 3;
                 $shipment_status['can_return_order']['status'] = true;
             } elseif ($exam_count > 0) { //有退貨申請未完成的
                 $shipment_status['can_return_order']['type'] = 2;
-                $shipment_status['can_return_order']['status'] = false;
+                $shipment_status['can_return_order']['status'] = true;
             }
         }
 
@@ -1132,8 +1135,8 @@ class OrderService
                             'updated_by' => -1,
                         ]);
                         $returnable['amount'][$supplier] += ($orderDetail->subtotal + $orderDetail->point_discount);
-                        $returnable['points'][$supplier] += $orderDetail->points;
-                        $returnable['point_discount'][$supplier] += $orderDetail->point_discount;
+                        $returnable['points'][$supplier] += abs($orderDetail->points); //正數呈現
+                        $returnable['point_discount'][$supplier] += abs($orderDetail->point_discount); ////正數呈現
                         $returnable['item_id'][$orderDetail->product_item_id] = $supplier;
                         $returnable['detail_id'][$orderDetail->product_item_id][$orderDetail->id] = $return_request_detail->id;
                     }
@@ -1150,8 +1153,7 @@ class OrderService
             $exam_payload = [];
             foreach ($returnable['amount'] as $supplier_id => $returnableVal) {
                 // 新增退貨檢驗單
-                $random_string = Str::upper(Str::random(6));
-                $examination_no = 'RX' . $now->format('ymd') . $random_string;
+                $examination_no = ColumnNumberGenerator::make(new ReturnExamination(), 'examination_no')->generate('RX', 6, true, date("ymd"), 'number');
                 $returnExamination = ReturnExamination::create([
                     'return_request_id' => $returnRequest->id,
                     'examination_no' => $examination_no,
@@ -1163,6 +1165,9 @@ class OrderService
                     'returnable_amount' => ($returnable['amount'][$supplier_id] * -1),
                     'returnable_points' => $returnable['points'][$supplier_id],
                     'returnable_point_discount' => $returnable['point_discount'][$supplier_id],
+                    'expected_ret_amount' => ($returnable['amount'][$supplier_id] * -1),
+                    'expected_ret_points' => $returnable['points'][$supplier_id],
+                    'expected_ret_point_discount' => $returnable['point_discount'][$supplier_id],
                     'created_by' => -1,
                     'updated_by' => -1,
                 ]);
@@ -1199,7 +1204,7 @@ class OrderService
                     });
                 }
                 //依主從商品排序
-                array_multisort(array_column($msg['examination'][$returnExamination->examination_no], 'record_identity'), SORT_DESC,$msg['examination'][$returnExamination->examination_no]);
+                array_multisort(array_column($msg['examination'][$returnExamination->examination_no], 'record_identity'), SORT_DESC, $msg['examination'][$returnExamination->examination_no]);
             }
             // 更新訂單
             Order::findOrFail($order->id)
@@ -1244,5 +1249,38 @@ class OrderService
             ->where('orders.is_latest', 1)
             ->get();
         return $data;
+    }
+
+    /**
+     * 檢查會員訂單前一版訂單
+     *
+     * @param string $orderNo
+     * @return array|null
+     */
+    public function getMemberPreRevision(array $payload = []): ?array
+    {
+        $member = auth('api')->user();
+        $orders = Order::where('member_id', $member->member_id)
+            ->whereDate('ordered_date', '>=', $payload['ordered_date_start'])
+            ->whereDate('ordered_date', '<=', $payload['ordered_date_end'])
+            ->select('order_no', 'revision_no', 'refund_status', 'total_amount', 'shipping_fee', 'point_discount', 'cart_campaign_discount', 'points', 'paid_amount', 'fee_of_instal')
+            ->orderBy('order_no', 'asc')
+            ->orderBy('revision_no', 'asc')
+            ->get()->toArray();
+        //整理版本內容
+        $data = [];
+        foreach ($orders as $order) {
+            $data[$order['order_no']][] = $order;
+        }
+        foreach ($data as $order_no => $info) {
+            $vision_no = (count($info) - 1);
+            if ($vision_no == 0) {
+                $arr_data[$order_no] = $info[$vision_no];
+            } else {
+                $vision_no = ($vision_no-1);
+                $arr_data[$order_no] = $info[$vision_no];
+            }
+        }
+        return $arr_data;
     }
 }

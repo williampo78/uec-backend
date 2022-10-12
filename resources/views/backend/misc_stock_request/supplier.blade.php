@@ -74,33 +74,23 @@
                     <hr style="border-top: 1px solid gray;">
 
                     <h4>【@{{ modal.supplier.detail.supplierName }}】簽核結果</h4>
-                    <div class="row">
-                        <div class="col-sm-4">
-                            <div class="form-group">
-                                <label class="control-label">簽核時間</label>
-                                <p class="form-control-static">@{{ modal.supplier.detail.reviewAt }}</p>
+                    <div class="stock-viewer d-block d-md-grid">
+                            <div class="form-group viewer-title mb-0">
+                                <label class="control-label label-title">簽核時間</label>
+                                <p class="form-control-static label-content">@{{ modal.supplier.detail.reviewAt }}</p>
                             </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="form-group">
-                                <label class="control-label">簽核人員</label>
-                                <p class="form-control-static">@{{ modal.supplier.detail.reviewerName }}</p>
+                            <div class="form-group viewer-title mb-0">
+                                <label class="control-label  label-title">簽核人員</label>
+                                <p class="form-control-static label-content">@{{ modal.supplier.detail.reviewerName }}</p>
                             </div>
-                        </div>
-                        <div class="col-sm-4">
-                            <div class="form-group">
-                                <label class="control-label">簽核結果</label>
-                                <p class="form-control-static">@{{ modal.supplier.detail.reviewResult }}</p>
+                            <div class="form-group viewer-title mb-0">
+                                <label class="control-label  label-title">簽核結果</label>
+                                <p class="form-control-static label-content">@{{ modal.supplier.detail.reviewResult }}</p>
                             </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <div class="form-group">
-                                <label class="control-label">簽核備註</label>
-                                <p class="form-control-static" style="white-space: pre-wrap">@{{ modal.supplier.detail.reviewRemark }}</p>
+                            <div class="form-group viewer-title mb-0 column-full border-0">
+                                <label class="control-label label-title">簽核備註</label>
+                                <p class="form-control-static label-content">@{{ modal.supplier.detail.reviewRemark }}</p>
                             </div>
-                        </div>
                     </div>
                 </div>
             </div>

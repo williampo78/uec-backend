@@ -155,6 +155,12 @@ class MemberController extends Controller
             'ordered_date_end' => $orderedDateEnd,
         ]);
 
+        //前一版訂單
+        $preOrders = $this->orderService->getMemberPreRevision([
+            'ordered_date_start' => $orderedDateStart,
+            'ordered_date_end' => $orderedDateEnd,
+        ]);
+
         // 訂單總數
         $orderTotals = $orders->count();
         // 沒有任何訂單
@@ -176,7 +182,7 @@ class MemberController extends Controller
         ];
 
         // 訂單
-        $orders->each(function ($order) use (&$payload) {
+        $orders->each(function ($order) use (&$payload, &$preOrders) {
             //訂單狀態
             $order_status_desc = $this->universalService->getOrderStatus($order->status_code, $order->pay_status, $order->refund_status);
             $orderPayload = [
@@ -229,13 +235,13 @@ class MemberController extends Controller
                 $orderPayload['spec_2_value'] = $orderDetail->productItem->spec_2_value;
 
                 // 數量
-                $orderPayload['qty'] = $orderDetail->qty;
+                $orderPayload['qty'] = ($orderDetail->qty - $orderDetail->returned_qty);
 
                 // 單價 (單品折扣後的單價，即前台購物車呈現的單價)
                 $orderPayload['unit_price'] = number_format($orderDetail->unit_price);
 
                 // 小計
-                $orderPayload['subtotal'] = number_format($orderDetail->subtotal);
+                $orderPayload['subtotal'] = number_format(($orderDetail->subtotal - $orderDetail->returned_subtotal));
 
 
                 //商品圖 以規格圖為優先，否則取商品封面圖
@@ -245,7 +251,7 @@ class MemberController extends Controller
                 //售價
                 $orderPayload['selling_price'] = number_format($orderDetail->selling_price);
                 //折抵合計
-                $orderPayload['total_discount'] = number_format($orderDetail->campaign_discount + $orderDetail->cart_p_discount);
+                $orderPayload['total_discount'] = number_format(($orderDetail->campaign_discount - $orderDetail->returned_campaign_discount) + ($orderDetail->cart_p_discount - $orderDetail->returned_cart_p_discount));
 
             }
 
@@ -256,6 +262,17 @@ class MemberController extends Controller
 
                 // 託運單號
                 $orderPayload['package_no'] = $shipment->package_no;
+            }
+
+            //金流相關數字
+            if ($order->status_code == 'CANCELLED' && $order->is_paid == 1 && $order->refund_status == 'COMPLETED') {   //若訂單已取消且已付款且完成退款
+                $orderPayload['paid_amount'] = 0;
+            } elseif ($order->status_code == 'CANCELLED' && $order->is_paid == 0) {  //若訂單已取消且未付款
+                $orderPayload['paid_amount'] = 0;
+            } elseif ($order->status_code == 'VOIDED') {
+                $orderPayload['paid_amount'] = 0;
+            } elseif ($order->revision_no > 0 && $order->refund_status != 'COMPLETED') { //還沒完成退款，須抓前一版本的order資訊呈現
+                $orderPayload['paid_amount'] = $preOrders[$order->order_no]['paid_amount'];
             }
 
             $payload['results']['orders'][] = $orderPayload;
@@ -447,8 +464,29 @@ class MemberController extends Controller
         }
 
         //金流相關數字
-        if ($order->revision_no > 0 && $order->refund_status != 'COMPLETED') { //還沒完成退款，須抓前一版本的order資訊呈現
-            //最新版訂單
+        if ($order->status_code == 'CANCELLED' && $order->is_paid == 1 && $order->refund_status == 'COMPLETED') {   //若訂單已取消且已付款且完成退款
+            $payload['results']['total_amount'] = 0;
+            $payload['results']['shipping_fee'] = 0;
+            $payload['results']['point_discount'] = 0;
+            $payload['results']['cart_campaign_discount'] = 0;
+            $payload['results']['points'] = 0;
+            $payload['results']['paid_amount'] = 0;
+        } elseif ($order->status_code == 'CANCELLED' && $order->is_paid == 0) {  //若訂單已取消且未付款
+            $payload['results']['total_amount'] = 0;
+            $payload['results']['shipping_fee'] = 0;
+            $payload['results']['point_discount'] = 0;
+            $payload['results']['cart_campaign_discount'] = 0;
+            $payload['results']['points'] = 0;
+            $payload['results']['paid_amount'] = 0;
+        } elseif ($order->status_code == 'VOIDED') {
+            $payload['results']['total_amount'] = 0;
+            $payload['results']['shipping_fee'] = 0;
+            $payload['results']['point_discount'] = 0;
+            $payload['results']['cart_campaign_discount'] = 0;
+            $payload['results']['points'] = 0;
+            $payload['results']['paid_amount'] = 0;
+        } elseif ($order->revision_no > 0 && $order->refund_status != 'COMPLETED') { //還沒完成退款，須抓前一版本的order資訊呈現
+            //前一版訂單
             $preOrder = $this->orderService->getMemberPreRevisionByOrderNo($request->order_no, $order->revision_no);
             $payload['results']['total_amount'] = $preOrder->total_amount;
             $payload['results']['shipping_fee'] = number_format($preOrder->shipping_fee);

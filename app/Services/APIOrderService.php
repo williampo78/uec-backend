@@ -920,6 +920,7 @@ class APIOrderService
             $paymantData['number_of_instal'] = $webData['number_of_instal'];
             $paymantData['interest_rate_of_instal'] = $webData['interest_rate_of_instal'];
             $paymantData['min_consumption_of_instal'] = $webData['min_consumption_of_instal'];
+            $paymantData['fee_of_instal'] = $interest_fee;
             $newOrderPayment = OrderPayment::create($paymantData);
             //訂單單身
             $seq = 0;

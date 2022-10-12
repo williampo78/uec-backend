@@ -8,14 +8,13 @@
             /* background: #ce1f59 !important; */
         }
 
-        .elements-box > tr > td > * {
+        .elements-box>tr>td>* {
             pointer-events: none;
         }
 
         .modal-dialog {
             max-width: 100%;
         }
-
     </style>
     <div class="sysinfo">
         <div class="sysinfo-title theme-color">基本檔</div>
@@ -56,8 +55,8 @@
             <div class="panel-heading">請輸入下列欄位資料</div>
             <div class="panel-body" id="CategoryHierarchyContentInput" v-cloak>
                 <form role="form" id="new-form" method="POST"
-                      action="{{ route('products_mall.update', $products->id) }}"
-                      enctype="multipart/form-data" novalidaten="ovalidate">
+                    action="{{ route('products_mall.update', $products->id) }}" enctype="multipart/form-data"
+                    novalidaten="ovalidate">
                     @csrf
                     @method('PUT')
                     <div class="form-horizontal">
@@ -100,7 +99,7 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control" name="product_no"
-                                                   value="{{ $products->product_no }}" readonly>
+                                                value="{{ $products->product_no }}" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -113,7 +112,7 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control" name="supplier_name"
-                                                   value="{{ $products->supplier_name }}" readonly>
+                                                value="{{ $products->supplier_name }}" readonly>
                                         </div>
                                     </div>
                                 </div>
@@ -124,7 +123,7 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control" name="product_name"
-                                                   value="{{ $products->product_name }}">
+                                                value="{{ $products->product_name }}">
                                         </div>
                                     </div>
                                 </div>
@@ -135,219 +134,234 @@
                                         <div class="col-sm-12">
                                             <label class="control-label">
                                                 <a href="{{ route('products.show', $products->id) }}"
-                                                   target="_blank">查看基本資訊</a>
+                                                    target="_blank">查看基本資訊</a>
                                             </label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-sm-12" id="category_products">
+                            <div class="row" style="margin-bottom: 16px">
+                                <div class="col-sm-10" id="category_products">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">前台分類<span class="text-red">*</span></label>
-                                        </div>
-                                        <div class="col-sm-11">
-                                            <button class="btn btn-large btn-warning btn-sm" type="button"
+                                        <div class="col-sm-2 text-left">
+                                            <label style="width: 125px" class="control-label">前台分類<span
+                                                    class="text-red">*</span></label>
+                                            <div style="width: 125px" class="text-right">
+                                                <button class="btn btn-large btn-warning btn-sm" type="button"
                                                     data-toggle="modal" data-target="#model_category">新增分類
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <table class="table table-striped table-bordered table-hover">
-                                            <thead>
-                                            <tr>
-                                                <th class="col-sm-11">名稱</th>
-                                                <th class="col-sm-1">功能</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr class="CategoryHierarchyProducts"
-                                                v-for="(Category, CategoryKey) in CategoryHierarchyProducts"
-                                                @dragstart="drag" @dragover='dragover' @dragleave='dragleave'
-                                                @drop="drop" draggable="true" :data-index="CategoryKey"
-                                                :data-type="'Category'">
-                                                <td style="vertical-align:middle">
-                                                    <i class="fa-solid fa-list"></i>
-                                                    @{{ Category.category_name }}
-                                                </td>
-                                                <td>
-                                                    <button type="button" class="btn btn-danger"
-                                                            @click="Del(Category,CategoryKey,'Category')"
-                                                            v-show="RoleAuthJson.auth_delete">刪除
-                                                    </button>
-                                                </td>
-                                            </tr>
-
-                                            </tbody>
-                                        </table>
-                                        <span id="CategoryHierarchyProducts_error_msg" style="display: none"
-                                              class="text-red">必須填寫</span>
-                                    </div>
-                                    <textarea name="CategoryHierarchyProducts_Json" style="display: none" cols="30"
-                                              rows="10">@{{ CategoryHierarchyProducts }}</textarea>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">關聯關鍵字</label>
-                                        </div>
-                                        <div class="col-sm-11">
-                                            <input class="form-control" name="keywords"
-                                                   value="{{ $products->keywords }}">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">關聯性商品</label>
+                                                </button>
+                                            </div>
                                         </div>
                                         <div class="col-sm-10">
-                                            {{-- related_products table --}}
-                                            <button class="btn btn-large btn-warning btn-sm" type="button"
-                                                    data-toggle="modal" data-target="#model_related_products">新增商品
-                                            </button>
+                                            <table class="table table-striped table-bordered table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="col-sm-11">名稱</th>
+                                                        <th class="col-sm-1">功能</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="CategoryHierarchyProducts"
+                                                        v-for="(Category, CategoryKey) in CategoryHierarchyProducts"
+                                                        @dragstart="drag" @dragover='dragover' @dragleave='dragleave'
+                                                        @drop="drop" draggable="true" :data-index="CategoryKey"
+                                                        :data-type="'Category'">
+                                                        <td style="vertical-align:middle">
+                                                            <i class="fa-solid fa-list"></i>
+                                                            @{{ Category.category_name }}
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-danger"
+                                                                @click="Del(Category,CategoryKey,'Category')"
+                                                                v-show="RoleAuthJson.auth_delete">刪除
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+                                            <span id="CategoryHierarchyProducts_error_msg" style="display: none"
+                                                class="text-red">必須填寫</span>
+                                        </div>
+                                        <textarea name="CategoryHierarchyProducts_Json" style="display: none" cols="30" rows="10">@{{ CategoryHierarchyProducts }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-bottom:16px">
+                                <div class="col-sm-10">
+                                    <div class="form-group">
+                                        <div class="col-sm-2">
+                                            <label style="width: 125px" class="control-label">關聯關鍵字</label>
+                                        </div>
+                                        <div class="col-sm-10">
+                                            <input class="form-control" name="keywords"
+                                                value="{{ $products->keywords }}">
                                         </div>
                                     </div>
-                                    <div class="col-sm-12">
-                                        <table class="table table-striped table-bordered table-hover">
-                                            <thead>
-                                            <tr>
-                                                <th class="col-sm-8">名稱</th>
-                                                <th class="col-sm-3">商品編號</th>
-                                                <th class="col-sm-1">功能</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr v-for="(Product, key) in RelatedProducts" @dragstart="drag"
-                                                @dragover='dragover' @dragleave='dragleave' @drop="drop"
-                                                draggable="true" :data-index="key" :data-type="'Products'">
-                                                <td style="vertical-align:middle">
-                                                    <i class="fa-solid fa-list"></i>
-                                                    @{{ Product.product_name }}
-                                                </td>
-                                                <td>
-                                                    @{{ Product.product_no }}
-                                                </td>
-                                                <td>
-                                                    <button type="button" class="btn btn-danger"
-                                                            @click="Del(Product ,key ,'Products')">刪除
-                                                    </button>
-                                                </td>
-                                            </tr>
+                                </div>
+                            </div>
+                            <div class="row" style="margon-bottom:16px">
+                                <div class="col-sm-10">
+                                    <div class="form-group">
+                                        <div class="col-sm-2">
+                                            <label style="width: 125px" class="control-label">關聯性商品</label>
+                                            <div style="width: 125px" class="text-right">
+                                                {{-- related_products table --}}
+                                                <button class="btn btn-large btn-warning btn-sm" type="button"
+                                                    data-toggle="modal" data-target="#model_related_products">新增商品
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-10">
+                                            <table class="table table-striped table-bordered table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th class="col-sm-8">名稱</th>
+                                                        <th class="col-sm-3">商品編號</th>
+                                                        <th class="col-sm-1">功能</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(Product, key) in RelatedProducts" @dragstart="drag"
+                                                        @dragover='dragover' @dragleave='dragleave' @drop="drop"
+                                                        draggable="true" :data-index="key" :data-type="'Products'">
+                                                        <td style="vertical-align:middle">
+                                                            <i class="fa-solid fa-list"></i>
+                                                            @{{ Product.product_name }}
+                                                        </td>
+                                                        <td>
+                                                            @{{ Product.product_no }}
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-danger"
+                                                                @click="Del(Product ,key ,'Products')">刪除
+                                                            </button>
+                                                        </td>
+                                                    </tr>
 
-                                            </tbody>
-                                        </table>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <textarea name="RelatedProducts_Json" style="display: none" id="" cols="30" rows="10">@{{ RelatedProducts }}</textarea>
                                     </div>
-                                    <textarea name="RelatedProducts_Json" style="display: none" id="" cols="30"
-                                              rows="10">@{{ RelatedProducts }}</textarea>
 
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-sm-12">
+                            <div class="row" style="margin-bottom: 16px">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-12">
+                                        <div class="col-sm-2 text-right">
                                             <label class="control-label">認證：</label>
                                         </div>
-                                        @foreach ($product_attribute_lov['CERTIFICATE'] as $key => $obj)
-                                        <div class="col-sm-2">
-                                            <label class="radio-inline">
-                                                <input class="CERTIFICATE" type="checkbox" name="CERTIFICATE[]"
-                                                    value="{{ $obj->id }}"
-                                                    {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}>
-                                                {{ $obj->description }}
-                                            </label>
+                                        <div class="col-sm-10">
+                                            <div style="width:50%;display:flex; flex-wrap:wrap;gap:10px">
+                                                @foreach ($product_attribute_lov['CERTIFICATE'] as $key => $obj)
+                                                    <div style="width:48%">
+                                                        <label class="radio-inline">
+                                                            <input class="CERTIFICATE" type="checkbox"
+                                                                name="CERTIFICATE[]" value="{{ $obj->id }}"
+                                                                {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}>
+                                                            {{ $obj->description }}
+                                                        </label>
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         </div>
-                                    @endforeach
+
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-sm-12">
+                            <div class="row" style="margin-bottom: 16px">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-12">
+                                        <div class="col-sm-2 text-right">
                                             <label class="control-label">成分：</label>
                                         </div>
-                                        @foreach ($product_attribute_lov['INGREDIENT'] as $key => $obj)
-                                        <div class="col-sm-2">
-                                            <label class="radio-inline">
-                                                <input class="INGREDIENT" type="checkbox" name="INGREDIENT[]"
-                                                    value="{{ $obj->id }}"
-                                                    {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}>
-                                                {{ $obj->description }}
-                                            </label>
+                                        <div class="col-sm-10">
+                                            <div style="width:50%;display:flex; flex-wrap:wrap;gap:10px">
+                                                @foreach ($product_attribute_lov['INGREDIENT'] as $key => $obj)
+                                                    <div  style="width:48%">
+                                                        <label class="radio-inline">
+                                                            <input class="INGREDIENT" type="checkbox" name="INGREDIENT[]"
+                                                                value="{{ $obj->id }}"
+                                                                {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}>
+                                                            {{ $obj->description }}
+                                                        </label>
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         </div>
-                                    @endforeach
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-sm-12">
+                            <div class="row" style="margin-bottom: 16px">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-12">
+                                        <div class="col-sm-2 text-right">
                                             <label class="control-label">適用族群：</label>
                                         </div>
+                                        <div class="col-sm-10">
+                                            <div style="width:50%;display:flex; flex-wrap:wrap;gap:10px">
                                         @foreach ($product_attribute_lov['GROUP'] as $key => $obj)
-                                        <div class="col-sm-2">
-                                            <label class="radio-inline">
-                                                <input class="GROUP" type="checkbox" name="GROUP[]"
-                                                    value="{{ $obj->id }}"
-                                                    {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}>
-                                                {{ $obj->description }}
-                                            </label>
-                                        </div>
-                                    @endforeach
+                                            <div style="width:48%">
+                                                <label class="radio-inline">
+                                                    <input class="GROUP" type="checkbox" name="GROUP[]"
+                                                        value="{{ $obj->id }}"
+                                                        {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}>
+                                                    {{ $obj->description }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-sm-12">
+                            <div class="row" style="margin-bottom: 16px">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-12">
+                                        <div class="col-sm-2 text-right">
                                             <label class="control-label">劑型：</label>
                                         </div>
+                                        <div class="col-sm-10">
+                                            <div style="width:50%;display:flex; flex-wrap:wrap;gap:10px">
                                         @foreach ($product_attribute_lov['DOSAGE_FORM'] as $key => $obj)
-                                        <div class="col-sm-2">
-                                            <label class="radio-inline">
-                                                <input class="DOSAGE_FORM" type="checkbox" name="DOSAGE_FORM[]"
-                                                    value="{{ $obj->id }}"
-                                                    {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}>
-                                                {{ $obj->description }}
-                                            </label>
-                                        </div>
-                                    @endforeach
+                                            <div style="width:48%">
+                                                <label class="radio-inline">
+                                                    <input class="DOSAGE_FORM" type="checkbox" name="DOSAGE_FORM[]"
+                                                        value="{{ $obj->id }}"
+                                                        {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }}>
+                                                    {{ $obj->description }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-sm-6">
+                            <div class="row" style="margin-bottom: 16px">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-2 ">
-                                            <label class="control-label ">商品序號</label><span
-                                                class="text-red">*</span>
+                                        <div class="col-sm-2 text-right">
+                                            <label class="control-label ">商品序號</label><span class="text-red">*</span>
                                         </div>
                                         <div class="col-sm-9">
                                             <input class="form-control" name="product_no"
-                                                   value="{{ $products->product_no }}" readonly>
+                                                value="{{ $products->product_no }}" readonly>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">每單限購數量<span
-                                                    class="text-red">*</span></label>
+                                        <div class="col-sm-2 text-right">
+                                            <label class="control-label">每單限購數量<span class="text-red">*</span></label>
                                         </div>
                                         <div class="col-sm-2">
-                                            <input class="form-control" name="order_limited_qty" value="{{ $products->order_limited_qty }}">
+                                            <input class="form-control" name="order_limited_qty"
+                                                value="{{ $products->order_limited_qty }}">
                                         </div>
                                     </div>
                                 </div>
@@ -355,29 +369,31 @@
                         </section>
                         <hr>
                         <section id="page-2">
-                            <div class="row">
-                                <div class="col-sm-12">
+                            <div class="row" style="margin-bottom: 16px">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
+                                        <div class="col-sm-2 text-right">
                                             <label class="control-label">促銷小標</label>
                                         </div>
                                         <div class="col-sm-6">
                                             <input class="form-control" name="promotion_desc"
-                                                   value="{{ $products->promotion_desc }}">
+                                                value="{{ $products->promotion_desc }}">
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-sm-12">
+                            <div class="row" style="margin-bottom: 16px">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
+                                        <div class="col-sm-2 text-right">
                                             <label class="control-label">促銷小標生效時間
                                             </label>
                                         </div>
-                                        <div class="col-sm-2">
+                                        <div class="col-sm-3">
                                             <div class="input-group" id="promotion_start_at_flatpickr">
-                                                <input type="text" class="form-control" name="promotion_start_at" id="promotion_start_at" value="{{ $products->promotion_start_at }}" autocomplete="off" data-input />
+                                                <input type="text" class="form-control" name="promotion_start_at"
+                                                    id="promotion_start_at" value="{{ $products->promotion_start_at }}"
+                                                    autocomplete="off" data-input />
                                                 <span class="input-group-btn" data-toggle>
                                                     <button class="btn btn-default" type="button">
                                                         <i class="fa-solid fa-calendar-days"></i>
@@ -388,9 +404,11 @@
                                         <div class="col-sm-1" style="padding: 0px;width: 2%;">
                                             <label class="control-label">~</label>
                                         </div>
-                                        <div class="col-sm-2">
+                                        <div class="col-sm-3">
                                             <div class="input-group" id="promotion_end_at_flatpickr">
-                                                <input type="text" class="form-control" name="promotion_end_at" id="promotion_end_at" value="{{ $products->promotion_end_at }}" autocomplete="off" data-input />
+                                                <input type="text" class="form-control" name="promotion_end_at"
+                                                    id="promotion_end_at" value="{{ $products->promotion_end_at }}"
+                                                    autocomplete="off" data-input />
                                                 <span class="input-group-btn" data-toggle>
                                                     <button class="btn btn-default" type="button">
                                                         <i class="fa-solid fa-calendar-days"></i>
@@ -402,33 +420,29 @@
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">商品內容<span
-                                                    class="text-red">*</span></label>
+                                        <div class="col-sm-2 text-right">
+                                            <label class="control-label">商品內容<span class="text-red">*</span></label>
                                         </div>
-                                        <div class="col-sm-11">
-                                            <textarea id="description" name="description"
-                                                      placeholder="請在這裡填寫內容">{{ $products->description }}</textarea>
+                                        <div class="col-sm-10">
+                                            <textarea id="description" name="description" placeholder="請在這裡填寫內容">{{ $products->description }}</textarea>
                                             <span id="description_error_msg" style="display: none"
-                                                  class="text-red">必須填寫</span>
+                                                class="text-red">必須填寫</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">商品規格<span
-                                                    class="text-red">*</span></label>
+                                        <div class="col-sm-2 text-right">
+                                            <label class="control-label">商品規格<span class="text-red">*</span></label>
                                         </div>
-                                        <div class="col-sm-11">
-                                            <textarea id="specification" name="specification" placeholder="請在這裡填寫內容"
-                                                      accept=".jpg,.jpeg,.png">{{ $products->specification }}</textarea>
+                                        <div class="col-sm-10">
+                                            <textarea id="specification" name="specification" placeholder="請在這裡填寫內容" accept=".jpg,.jpeg,.png">{{ $products->specification }}</textarea>
                                             <span id="specification_error_msg" style="display: none"
-                                                  class="text-red">必須填寫</span>
+                                                class="text-red">必須填寫</span>
                                         </div>
                                     </div>
                                 </div>
@@ -437,94 +451,91 @@
                         <hr>
                         <section id="page-3">
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
+                                        <div class="col-sm-2 text-right">
                                             <label class="control-label">Google Shop圖檔
                                             </label>
                                         </div>
-                                        <div class="col-sm-2">
+                                        <div class="col-sm-3">
                                             <input type="file" name="google_shop_photo_name" accept="image/*"
-                                                   @change="google_shop"
+                                                @change="google_shop"
                                                 {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
                                             <input type="hidden" name="google_shop_photo_name_old"
-                                                   value="{{ $products->google_shop_photo_name }}">
+                                                value="{{ $products->google_shop_photo_name }}">
                                         </div>
                                         <div class="col-sm-3">
-                                            @if($products->google_shop_photo_name == null || $products->google_shop_photo_name == "")
-                                            <img class="show_GoogleShopPhoto" :ref="'GoogleShopPhoto'"
-                                            src="{{asset('asset/img/default_item.png')}}"
-                                            style="max-width:40%;">
+                                            @if ($products->google_shop_photo_name == null || $products->google_shop_photo_name == '')
+                                                <img class="show_GoogleShopPhoto" :ref="'GoogleShopPhoto'"
+                                                    src="{{ asset('asset/img/default_item.png') }}"
+                                                    style="max-width:40%;">
                                             @else
-                                            <img class="show_GoogleShopPhoto" :ref="'GoogleShopPhoto'"
-                                            src="{{config('filesystems.disks.s3.url') . $products->google_shop_photo_name}}"
-                                            style="max-width:40%;">
+                                                <img class="show_GoogleShopPhoto" :ref="'GoogleShopPhoto'"
+                                                    src="{{ config('filesystems.disks.s3.url') . $products->google_shop_photo_name }}"
+                                                    style="max-width:40%;">
                                             @endif
 
                                         </div>
                                         <button v-if="products.google_shop_photo_name" type="button"
-                                                class="btn btn-large btn-danger btn-sm"
-                                                @click="DelGoogleShop()" {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
+                                            class="btn btn-large btn-danger btn-sm" @click="DelGoogleShop()"
+                                            {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
                                             刪除
                                         </button>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
-                                            <label class="control-label">Item圖示<span
-                                                    class="text-red">*</span></label>
+                                        <div class="col-sm-2 text-right">
+                                            <label class="control-label">Item圖示<span class="text-red">*</span></label>
                                             {{-- product_items --}}
                                         </div>
                                         <div class="col-sm-8">
                                             <table class="table table-striped table-bordered table-hover">
                                                 <thead>
-                                                <tr>
-                                                    <th class="col-sm-1">Item編號</th>
-                                                    <th class="col-sm-1">規格1</th>
-                                                    <th class="col-sm-1">規格2</th>
-                                                    <th class="col-sm-1">Item圖示</th>
-                                                    <th class="col-sm-1">功能</th>
-                                                </tr>
+                                                    <tr>
+                                                        <th class="col-sm-1">Item編號</th>
+                                                        <th class="col-sm-1">規格1</th>
+                                                        <th class="col-sm-1">規格2</th>
+                                                        <th class="col-sm-1">Item圖示</th>
+                                                        <th class="col-sm-1">功能</th>
+                                                    </tr>
                                                 </thead>
                                                 <tbody>
-                                                <tr v-for="(Item , key ) in ProductsItem">
-                                                    <td style="vertical-align:middle">
-                                                        @{{ Item.item_no }}
-                                                    </td>
-                                                    <td style="vertical-align:middle">
-                                                        @{{ Item.spec_1_value }}
-                                                    </td>
-                                                    <td style="vertical-align:middle">
-                                                        @{{ Item.spec_2_value }}
-                                                    </td>
-                                                    <td>
-                                                        <div v-if="Item.photo_name">
-                                                            <img :src="file_cdn + Item.photo_name"
-                                                                 style="max-width:40%;">
-                                                        </div>
-                                                        <input class="photo_name_hidden" type="hidden"
-                                                               :value="Item.photo_name">
-                                                    </td>
-                                                    <td>
-                                                        <button type="button" data-toggle="modal"
+                                                    <tr v-for="(Item , key ) in ProductsItem">
+                                                        <td style="vertical-align:middle">
+                                                            @{{ Item.item_no }}
+                                                        </td>
+                                                        <td style="vertical-align:middle">
+                                                            @{{ Item.spec_1_value }}
+                                                        </td>
+                                                        <td style="vertical-align:middle">
+                                                            @{{ Item.spec_2_value }}
+                                                        </td>
+                                                        <td>
+                                                            <div v-if="Item.photo_name">
+                                                                <img :src="file_cdn + Item.photo_name"
+                                                                    style="max-width:40%;">
+                                                            </div>
+                                                            <input class="photo_name_hidden" type="hidden"
+                                                                :value="Item.photo_name">
+                                                        </td>
+                                                        <td>
+                                                            <button type="button" data-toggle="modal"
                                                                 data-target="#item_photo_list"
                                                                 class="btn btn-large btn-warning btn-sm"
                                                                 @click="frombtn(Item,key)">選擇圖片
-                                                        </button>
-                                                        <button type="button" v-if="Item.photo_name"
+                                                            </button>
+                                                            <button type="button" v-if="Item.photo_name"
                                                                 class="btn btn-large btn-danger btn-sm"
                                                                 @click="DelItemPhotos(Item,key)">刪除
-                                                        </button>
-                                                    </td>
-                                                </tr>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
                                                 </tbody>
                                             </table>
-                                            <textarea id="ProductsItem_Json" name="ProductsItem_Json"
-                                                      style="display:none"
-                                                      cols="30" rows="10">@{{ ProductsItem }}</textarea>
+                                            <textarea id="ProductsItem_Json" name="ProductsItem_Json" style="display:none" cols="30" rows="10">@{{ ProductsItem }}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -533,40 +544,40 @@
                         <hr>
                         <section id="page-4">
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
+                                        <div class="col-sm-2 text-right">
                                             <label class="control-label">網頁標題</label>
                                         </div>
-                                        <div class="col-sm-11">
+                                        <div class="col-sm-10">
                                             <input class="form-control" name="meta_title"
-                                                   value="{{ $products->meta_title }}">
+                                                value="{{ $products->meta_title }}">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-1">
+                                        <div class="col-sm-2 text-right">
                                             <label class="control-label">網頁描述</label>
                                         </div>
-                                        <div class="col-sm-11">
+                                        <div class="col-sm-10">
                                             <input class="form-control" name="mata_description"
-                                                   value="{{ $products->mata_description }}">
+                                                value="{{ $products->mata_description }}">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-sm-12">
+                                <div class="col-sm-10">
                                     <div class="form-group">
-                                        <div class="col-sm-2">
-                                            <label class="control-label">網頁標籤(以半形逗號分隔)</label>
+                                        <div class="col-sm-2 text-right">
+                                            <label class="control-label">網頁標籤<br>(以半形逗號分隔)</label>
                                         </div>
                                         <div class="col-sm-10">
                                             <input class="form-control" name="mata_keywords"
-                                                   value="{{ $products->mata_keywords }}">
+                                                value="{{ $products->mata_keywords }}">
                                         </div>
                                     </div>
                                 </div>
@@ -592,15 +603,15 @@
 @section('js')
     <script>
         // Get all sections that have an ID defined
-        $(document).ready(function () {
+        $(document).ready(function() {
             $('#supplier').select2({
                 allowClear: true,
                 theme: "bootstrap",
                 placeholder: "請選擇"
             });
-            let product_photos_count = @json($product_photos_count) ;
-            if(product_photos_count == 0){
-                alert('尚無商品圖檔，請先到「商品基本資料維護」上傳圖檔！') ;
+            let product_photos_count = @json($product_photos_count);
+            if (product_photos_count == 0) {
+                alert('尚無商品圖檔，請先到「商品基本資料維護」上傳圖檔！');
             }
 
             let start_created_at_flatpickr = flatpickr("#start_created_at_flatpickr", {
@@ -669,140 +680,699 @@
             var ck_description;
             var ck_specification;
             ClassicEditor.create(document.querySelector('#description'), {
-                ckfinder: {
-                    uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&currentFolder=mall_description/&responseType=json&_token=" +
-                        document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
-                            'content'),
-                    }
+                    ckfinder: {
+                        uploadUrl: "/ckfinder/connector?command=QuickUpload&type=Images&currentFolder=mall_description/&responseType=json&_token=" +
+                            document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                'content'),
+                        }
 
-                },
-                mediaEmbed: {
-                    previewsInData: true
-                },
-                htmlSupport: {
-                    allow: [
-                        { name: 'a', attributes: true, classes: true, styles: true },
-                        { name: 'abbr', attributes: true, classes: true, styles: true },
-                        { name: 'acronym', attributes: true, classes: true, styles: true },
-                        { name: 'address', attributes: true, classes: true, styles: true },
-                        { name: 'applet', attributes: true, classes: true, styles: true },
-                        { name: 'area', attributes: true, classes: true, styles: true },
-                        { name: 'article', attributes: true, classes: true, styles: true },
-                        { name: 'aside', attributes: true, classes: true, styles: true },
-                        { name: 'audio', attributes: true, classes: true, styles: true },
-                        { name: 'b', attributes: true, classes: true, styles: true },
-                        { name: 'base', attributes: true, classes: true, styles: true },
-                        { name: 'basefont', attributes: true, classes: true, styles: true },
-                        { name: 'bdi', attributes: true, classes: true, styles: true },
-                        { name: 'bdo', attributes: true, classes: true, styles: true },
-                        { name: 'big', attributes: true, classes: true, styles: true },
-                        { name: 'blockquote', attributes: true, classes: true, styles: true },
-                        { name: 'br', attributes: true, classes: true, styles: true },
-                        { name: 'button', attributes: true, classes: true, styles: true },
-                        { name: 'canvas', attributes: true, classes: true, styles: true },
-                        { name: 'caption', attributes: true, classes: true, styles: true },
-                        { name: 'center', attributes: true, classes: true, styles: true },
-                        { name: 'cite', attributes: true, classes: true, styles: true },
-                        { name: 'code', attributes: true, classes: true, styles: true },
-                        { name: 'col', attributes: true, classes: true, styles: true },
-                        { name: 'colgroup', attributes: true, classes: true, styles: true },
-                        { name: 'data', attributes: true, classes: true, styles: true },
-                        { name: 'datalist', attributes: true, classes: true, styles: true },
-                        { name: 'dd', attributes: true, classes: true, styles: true },
-                        { name: 'del', attributes: true, classes: true, styles: true },
-                        { name: 'details', attributes: true, classes: true, styles: true },
-                        { name: 'dfn', attributes: true, classes: true, styles: true },
-                        { name: 'dialog', attributes: true, classes: true, styles: true },
-                        { name: 'dir', attributes: true, classes: true, styles: true },
-                        { name: 'div', attributes: true, classes: true, styles: true },
-                        { name: 'dl', attributes: true, classes: true, styles: true },
-                        { name: 'dt', attributes: true, classes: true, styles: true },
-                        { name: 'em', attributes: true, classes: true, styles: true },
-                        { name: 'embed', attributes: true, classes: true, styles: true },
-                        { name: 'fieldset', attributes: true, classes: true, styles: true },
-                        { name: 'figcaption', attributes: true, classes: true, styles: true },
-                        { name: 'figure', attributes: true, classes: true, styles: true },
-                        { name: 'font', attributes: true, classes: true, styles: true },
-                        { name: 'footer', attributes: true, classes: true, styles: true },
-                        { name: 'form', attributes: true, classes: true, styles: true },
-                        { name: 'frame', attributes: true, classes: true, styles: true },
-                        { name: 'frameset', attributes: true, classes: true, styles: true },
-                        { name: 'h1 to h6', attributes: true, classes: true, styles: true },
-                        { name: 'header', attributes: true, classes: true, styles: true },
-                        { name: 'hr', attributes: true, classes: true, styles: true },
-                        { name: 'i', attributes: true, classes: true, styles: true },
-                        { name: 'img', attributes: true, classes: true, styles: true },
-                        { name: 'input', attributes: true, classes: true, styles: true },
-                        { name: 'ins', attributes: true, classes: true, styles: true },
-                        { name: 'kbd', attributes: true, classes: true, styles: true },
-                        { name: 'label', attributes: true, classes: true, styles: true },
-                        { name: 'legend', attributes: true, classes: true, styles: true },
-                        { name: 'li', attributes: true, classes: true, styles: true },
-                        { name: 'link', attributes: true, classes: true, styles: true },
-                        { name: 'main', attributes: true, classes: true, styles: true },
-                        { name: 'map', attributes: true, classes: true, styles: true },
-                        { name: 'mark', attributes: true, classes: true, styles: true },
-                        { name: 'meta', attributes: true, classes: true, styles: true },
-                        { name: 'meter', attributes: true, classes: true, styles: true },
-                        { name: 'nav', attributes: true, classes: true, styles: true },
-                        { name: 'noframes', attributes: true, classes: true, styles: true },
-                        { name: 'noscript', attributes: true, classes: true, styles: true },
-                        { name: 'object', attributes: true, classes: true, styles: true },
-                        { name: 'ol', attributes: true, classes: true, styles: true },
-                        { name: 'optgroup', attributes: true, classes: true, styles: true },
-                        { name: 'option', attributes: true, classes: true, styles: true },
-                        { name: 'output', attributes: true, classes: true, styles: true },
-                        { name: 'p', attributes: true, classes: true, styles: true },
-                        { name: 'param', attributes: true, classes: true, styles: true },
-                        { name: 'picture', attributes: true, classes: true, styles: true },
-                        { name: 'pre', attributes: true, classes: true, styles: true },
-                        { name: 'progress', attributes: true, classes: true, styles: true },
-                        { name: 'q', attributes: true, classes: true, styles: true },
-                        { name: 'rp', attributes: true, classes: true, styles: true },
-                        { name: 'rt', attributes: true, classes: true, styles: true },
-                        { name: 'ruby', attributes: true, classes: true, styles: true },
-                        { name: 's', attributes: true, classes: true, styles: true },
-                        { name: 'samp', attributes: true, classes: true, styles: true },
-                        { name: 'section', attributes: true, classes: true, styles: true },
-                        { name: 'select', attributes: true, classes: true, styles: true },
-                        { name: 'small', attributes: true, classes: true, styles: true },
-                        { name: 'source', attributes: true, classes: true, styles: true },
-                        { name: 'span', attributes: true, classes: true, styles: true },
-                        { name: 'strike', attributes: true, classes: true, styles: true },
-                        { name: 'strong', attributes: true, classes: true, styles: true },
-                        { name: 'style', attributes: true, classes: true, styles: true },
-                        { name: 'sub', attributes: true, classes: true, styles: true },
-                        { name: 'summary', attributes: true, classes: true, styles: true },
-                        { name: 'sup', attributes: true, classes: true, styles: true },
-                        { name: 'svg', attributes: true, classes: true, styles: true },
-                        { name: 'table', attributes: true, classes: true, styles: true },
-                        { name: 'tbody', attributes: true, classes: true, styles: true },
-                        { name: 'td', attributes: true, classes: true, styles: true },
-                        { name: 'template', attributes: true, classes: true, styles: true },
-                        { name: 'textarea', attributes: true, classes: true, styles: true },
-                        { name: 'tfoot', attributes: true, classes: true, styles: true },
-                        { name: 'th', attributes: true, classes: true, styles: true },
-                        { name: 'thead', attributes: true, classes: true, styles: true },
-                        { name: 'time', attributes: true, classes: true, styles: true },
-                        { name: 'title', attributes: true, classes: true, styles: true },
-                        { name: 'tr', attributes: true, classes: true, styles: true },
-                        { name: 'track', attributes: true, classes: true, styles: true },
-                        { name: 'tt', attributes: true, classes: true, styles: true },
-                        { name: 'u', attributes: true, classes: true, styles: true },
-                        { name: 'ul', attributes: true, classes: true, styles: true },
-                        { name: 'var', attributes: true, classes: true, styles: true },
-                        { name: 'video', attributes: true, classes: true, styles: true },
-                        { name: 'wbr', attributes: true, classes: true, styles: true },
-                    ]
-                }
-            })
+                    },
+                    mediaEmbed: {
+                        previewsInData: true
+                    },
+                    htmlSupport: {
+                        allow: [{
+                                name: 'a',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'abbr',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'acronym',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'address',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'applet',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'area',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'article',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'aside',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'audio',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'b',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'base',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'basefont',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'bdi',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'bdo',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'big',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'blockquote',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'br',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'button',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'canvas',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'caption',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'center',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'cite',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'code',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'col',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'colgroup',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'data',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'datalist',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'dd',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'del',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'details',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'dfn',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'dialog',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'dir',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'div',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'dl',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'dt',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'em',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'embed',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'fieldset',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'figcaption',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'figure',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'font',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'footer',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'form',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'frame',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'frameset',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'h1 to h6',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'header',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'hr',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'i',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'img',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'input',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'ins',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'kbd',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'label',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'legend',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'li',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'link',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'main',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'map',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'mark',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'meta',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'meter',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'nav',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'noframes',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'noscript',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'object',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'ol',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'optgroup',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'option',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'output',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'p',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'param',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'picture',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'pre',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'progress',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'q',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'rp',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'rt',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'ruby',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 's',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'samp',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'section',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'select',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'small',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'source',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'span',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'strike',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'strong',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'style',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'sub',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'summary',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'sup',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'svg',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'table',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'tbody',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'td',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'template',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'textarea',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'tfoot',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'th',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'thead',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'time',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'title',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'tr',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'track',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'tt',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'u',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'ul',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'var',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'video',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                            {
+                                name: 'wbr',
+                                attributes: true,
+                                classes: true,
+                                styles: true
+                            },
+                        ]
+                    }
+                })
                 .then(editor => {
                     ck_description = editor; // Save for later use.
                 }).catch(error => {
-                console.error(error);
-            });
+                    console.error(error);
+                });
 
             ClassicEditor.create(document.querySelector('#specification'), {
                 ckfinder: {
@@ -817,119 +1387,678 @@
                     previewsInData: true
                 },
                 htmlSupport: {
-                    allow: [
-                        { name: 'a', attributes: true, classes: true, styles: true },
-                        { name: 'abbr', attributes: true, classes: true, styles: true },
-                        { name: 'acronym', attributes: true, classes: true, styles: true },
-                        { name: 'address', attributes: true, classes: true, styles: true },
-                        { name: 'applet', attributes: true, classes: true, styles: true },
-                        { name: 'area', attributes: true, classes: true, styles: true },
-                        { name: 'article', attributes: true, classes: true, styles: true },
-                        { name: 'aside', attributes: true, classes: true, styles: true },
-                        { name: 'audio', attributes: true, classes: true, styles: true },
-                        { name: 'b', attributes: true, classes: true, styles: true },
-                        { name: 'base', attributes: true, classes: true, styles: true },
-                        { name: 'basefont', attributes: true, classes: true, styles: true },
-                        { name: 'bdi', attributes: true, classes: true, styles: true },
-                        { name: 'bdo', attributes: true, classes: true, styles: true },
-                        { name: 'big', attributes: true, classes: true, styles: true },
-                        { name: 'blockquote', attributes: true, classes: true, styles: true },
-                        { name: 'br', attributes: true, classes: true, styles: true },
-                        { name: 'button', attributes: true, classes: true, styles: true },
-                        { name: 'canvas', attributes: true, classes: true, styles: true },
-                        { name: 'caption', attributes: true, classes: true, styles: true },
-                        { name: 'center', attributes: true, classes: true, styles: true },
-                        { name: 'cite', attributes: true, classes: true, styles: true },
-                        { name: 'code', attributes: true, classes: true, styles: true },
-                        { name: 'col', attributes: true, classes: true, styles: true },
-                        { name: 'colgroup', attributes: true, classes: true, styles: true },
-                        { name: 'data', attributes: true, classes: true, styles: true },
-                        { name: 'datalist', attributes: true, classes: true, styles: true },
-                        { name: 'dd', attributes: true, classes: true, styles: true },
-                        { name: 'del', attributes: true, classes: true, styles: true },
-                        { name: 'details', attributes: true, classes: true, styles: true },
-                        { name: 'dfn', attributes: true, classes: true, styles: true },
-                        { name: 'dialog', attributes: true, classes: true, styles: true },
-                        { name: 'dir', attributes: true, classes: true, styles: true },
-                        { name: 'div', attributes: true, classes: true, styles: true },
-                        { name: 'dl', attributes: true, classes: true, styles: true },
-                        { name: 'dt', attributes: true, classes: true, styles: true },
-                        { name: 'em', attributes: true, classes: true, styles: true },
-                        { name: 'embed', attributes: true, classes: true, styles: true },
-                        { name: 'fieldset', attributes: true, classes: true, styles: true },
-                        { name: 'figcaption', attributes: true, classes: true, styles: true },
-                        { name: 'figure', attributes: true, classes: true, styles: true },
-                        { name: 'font', attributes: true, classes: true, styles: true },
-                        { name: 'footer', attributes: true, classes: true, styles: true },
-                        { name: 'form', attributes: true, classes: true, styles: true },
-                        { name: 'frame', attributes: true, classes: true, styles: true },
-                        { name: 'frameset', attributes: true, classes: true, styles: true },
-                        { name: 'h1 to h6', attributes: true, classes: true, styles: true },
-                        { name: 'header', attributes: true, classes: true, styles: true },
-                        { name: 'hr', attributes: true, classes: true, styles: true },
-                        { name: 'i', attributes: true, classes: true, styles: true },
-                        { name: 'img', attributes: true, classes: true, styles: true },
-                        { name: 'input', attributes: true, classes: true, styles: true },
-                        { name: 'ins', attributes: true, classes: true, styles: true },
-                        { name: 'kbd', attributes: true, classes: true, styles: true },
-                        { name: 'label', attributes: true, classes: true, styles: true },
-                        { name: 'legend', attributes: true, classes: true, styles: true },
-                        { name: 'li', attributes: true, classes: true, styles: true },
-                        { name: 'link', attributes: true, classes: true, styles: true },
-                        { name: 'main', attributes: true, classes: true, styles: true },
-                        { name: 'map', attributes: true, classes: true, styles: true },
-                        { name: 'mark', attributes: true, classes: true, styles: true },
-                        { name: 'meta', attributes: true, classes: true, styles: true },
-                        { name: 'meter', attributes: true, classes: true, styles: true },
-                        { name: 'nav', attributes: true, classes: true, styles: true },
-                        { name: 'noframes', attributes: true, classes: true, styles: true },
-                        { name: 'noscript', attributes: true, classes: true, styles: true },
-                        { name: 'object', attributes: true, classes: true, styles: true },
-                        { name: 'ol', attributes: true, classes: true, styles: true },
-                        { name: 'optgroup', attributes: true, classes: true, styles: true },
-                        { name: 'option', attributes: true, classes: true, styles: true },
-                        { name: 'output', attributes: true, classes: true, styles: true },
-                        { name: 'p', attributes: true, classes: true, styles: true },
-                        { name: 'param', attributes: true, classes: true, styles: true },
-                        { name: 'picture', attributes: true, classes: true, styles: true },
-                        { name: 'pre', attributes: true, classes: true, styles: true },
-                        { name: 'progress', attributes: true, classes: true, styles: true },
-                        { name: 'q', attributes: true, classes: true, styles: true },
-                        { name: 'rp', attributes: true, classes: true, styles: true },
-                        { name: 'rt', attributes: true, classes: true, styles: true },
-                        { name: 'ruby', attributes: true, classes: true, styles: true },
-                        { name: 's', attributes: true, classes: true, styles: true },
-                        { name: 'samp', attributes: true, classes: true, styles: true },
-                        { name: 'section', attributes: true, classes: true, styles: true },
-                        { name: 'select', attributes: true, classes: true, styles: true },
-                        { name: 'small', attributes: true, classes: true, styles: true },
-                        { name: 'source', attributes: true, classes: true, styles: true },
-                        { name: 'span', attributes: true, classes: true, styles: true },
-                        { name: 'strike', attributes: true, classes: true, styles: true },
-                        { name: 'strong', attributes: true, classes: true, styles: true },
-                        { name: 'style', attributes: true, classes: true, styles: true },
-                        { name: 'sub', attributes: true, classes: true, styles: true },
-                        { name: 'summary', attributes: true, classes: true, styles: true },
-                        { name: 'sup', attributes: true, classes: true, styles: true },
-                        { name: 'svg', attributes: true, classes: true, styles: true },
-                        { name: 'table', attributes: true, classes: true, styles: true },
-                        { name: 'tbody', attributes: true, classes: true, styles: true },
-                        { name: 'td', attributes: true, classes: true, styles: true },
-                        { name: 'template', attributes: true, classes: true, styles: true },
-                        { name: 'textarea', attributes: true, classes: true, styles: true },
-                        { name: 'tfoot', attributes: true, classes: true, styles: true },
-                        { name: 'th', attributes: true, classes: true, styles: true },
-                        { name: 'thead', attributes: true, classes: true, styles: true },
-                        { name: 'time', attributes: true, classes: true, styles: true },
-                        { name: 'title', attributes: true, classes: true, styles: true },
-                        { name: 'tr', attributes: true, classes: true, styles: true },
-                        { name: 'track', attributes: true, classes: true, styles: true },
-                        { name: 'tt', attributes: true, classes: true, styles: true },
-                        { name: 'u', attributes: true, classes: true, styles: true },
-                        { name: 'ul', attributes: true, classes: true, styles: true },
-                        { name: 'var', attributes: true, classes: true, styles: true },
-                        { name: 'video', attributes: true, classes: true, styles: true },
-                        { name: 'wbr', attributes: true, classes: true, styles: true },
+                    allow: [{
+                            name: 'a',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'abbr',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'acronym',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'address',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'applet',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'area',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'article',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'aside',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'audio',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'b',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'base',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'basefont',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'bdi',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'bdo',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'big',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'blockquote',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'br',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'button',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'canvas',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'caption',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'center',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'cite',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'code',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'col',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'colgroup',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'data',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'datalist',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'dd',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'del',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'details',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'dfn',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'dialog',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'dir',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'div',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'dl',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'dt',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'em',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'embed',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'fieldset',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'figcaption',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'figure',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'font',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'footer',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'form',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'frame',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'frameset',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'h1 to h6',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'header',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'hr',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'i',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'img',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'input',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'ins',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'kbd',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'label',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'legend',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'li',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'link',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'main',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'map',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'mark',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'meta',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'meter',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'nav',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'noframes',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'noscript',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'object',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'ol',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'optgroup',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'option',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'output',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'p',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'param',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'picture',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'pre',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'progress',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'q',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'rp',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'rt',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'ruby',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 's',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'samp',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'section',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'select',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'small',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'source',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'span',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'strike',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'strong',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'style',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'sub',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'summary',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'sup',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'svg',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'table',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'tbody',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'td',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'template',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'textarea',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'tfoot',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'th',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'thead',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'time',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'title',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'tr',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'track',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'tt',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'u',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'ul',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'var',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'video',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
+                        {
+                            name: 'wbr',
+                            attributes: true,
+                            classes: true,
+                            styles: true
+                        },
                     ]
                 }
             }).then(editor => {
@@ -939,10 +2068,10 @@
             });
 
             $("#new-form").validate({
-                submitHandler: function (form) {
+                submitHandler: function(form) {
                     let ProductsItem_Json = JSON.parse($('#ProductsItem_Json').val());
                     var status = true;
-                    $.each(ProductsItem_Json, function (key, value) {
+                    $.each(ProductsItem_Json, function(key, value) {
                         if (value.photo_name == null) {
                             alert('每個item必須選擇圖示');
                             status = false;
@@ -990,7 +2119,7 @@
                 },
                 errorClass: "help-block",
                 errorElement: "span",
-                errorPlacement: function (error, element) {
+                errorPlacement: function(error, element) {
                     if (element.parent('.input-group').length || element.is(':radio')) {
                         error.insertAfter(element.parent());
                         return;
@@ -1003,20 +2132,20 @@
 
                     error.insertAfter(element);
                 },
-                highlight: function (element, errorClass, validClass) {
+                highlight: function(element, errorClass, validClass) {
                     $(element).closest(".form-group").addClass("has-error");
                 },
-                success: function (label, element) {
+                success: function(label, element) {
                     $(element).closest(".form-group").removeClass("has-error");
                 },
             });
-            $(document).on("click", "#save_data", function () {
+            $(document).on("click", "#save_data", function() {
                 $("#new-form").submit()
             })
 
         });
         var CategoryHierarchyContentInput = Vue.extend({
-            data: function () {
+            data: function() {
                 return {
                     CategoryHierarchyProducts: @json($web_category_hierarchy), //該商品原有的分類
                     CategoryHierarchyContent: @json($category_hierarchy_content), //所有分類的List
@@ -1067,13 +2196,14 @@
             },
             created() {
                 let vm = this;
-                this.CategoryHierarchyProducts.map(function (value, key) {
-                    isset = vm.CategoryHierarchyContent.filter(data => data.id === value.web_category_hierarchy_id);
-                    value.status = true ;
-                    if(isset.length == 0){
+                this.CategoryHierarchyProducts.map(function(value, key) {
+                    isset = vm.CategoryHierarchyContent.filter(data => data.id === value
+                        .web_category_hierarchy_id);
+                    value.status = true;
+                    if (isset.length == 0) {
                         value.category_name = 'error';
-                        value.status = false ;
-                    }else{
+                        value.status = false;
+                    } else {
                         value.category_name = isset[0].name;
                     }
                     value.status = 'old';
@@ -1086,15 +2216,15 @@
                         if (type == 'Category') {
                             if (obj.status == 'old') {
                                 axios.post('/backend/products_mall/ajax', {
-                                    product_id: this.products.id,
-                                    category_id: obj.web_category_hierarchy_id,
-                                    _token: '{{ csrf_token() }}',
-                                    type: 'DelCategoryInProduct',
-                                })
-                                    .then(function (response) {
+                                        product_id: this.products.id,
+                                        category_id: obj.web_category_hierarchy_id,
+                                        _token: '{{ csrf_token() }}',
+                                        type: 'DelCategoryInProduct',
+                                    })
+                                    .then(function(response) {
                                         console.log(response);
                                     })
-                                    .catch(function (error) {
+                                    .catch(function(error) {
                                         console.log(error);
                                     });
                             }
@@ -1103,14 +2233,14 @@
                         } else if (type == 'Products') {
                             if (obj.id !== '') {
                                 axios.post('/backend/products_mall/ajax', {
-                                    id: obj.id,
-                                    _token: '{{ csrf_token() }}',
-                                    type: 'DelRelatedProducts',
-                                })
-                                    .then(function (response) {
+                                        id: obj.id,
+                                        _token: '{{ csrf_token() }}',
+                                        type: 'DelRelatedProducts',
+                                    })
+                                    .then(function(response) {
                                         console.log(response);
                                     })
-                                    .catch(function (error) {
+                                    .catch(function(error) {
                                         console.log(error);
                                     });
                             }
@@ -1132,7 +2262,7 @@
                     let vm = this;
                     let isset = [];
                     let list = [];
-                    this.CategoryHierarchyContent.map(function (value, key) {
+                    this.CategoryHierarchyContent.map(function(value, key) {
                         isset = vm.CategoryHierarchyProducts.filter(data => data
                             .web_category_hierarchy_id === value.id);
                         if (isset.length == 0) {
@@ -1142,8 +2272,7 @@
                             list = list.filter(data =>
                                 data.name.toLowerCase().includes(vm.SelectCategoryName.toLowerCase())
                             )
-                        }
-                        ;
+                        };
                     })
                     this.CategoryList = list;
                 },
@@ -1198,7 +2327,7 @@
                             todo.del = 0;
                         }
                     })
-                    let new_array = this.result_products.filter(function (obj) {
+                    let new_array = this.result_products.filter(function(obj) {
                         return obj.del == 0;
                     });
                     this.result_products = new_array;
@@ -1275,14 +2404,14 @@
                     this.products.google_shop_photo_name = '';
                     if (check) {
                         axios.post('/backend/products_mall/ajax', {
-                            id: this.products.id,
-                            _token: '{{ csrf_token() }}',
-                            type: 'DelGoogleShopPhoto',
-                        })
-                            .then(function (response) {
+                                id: this.products.id,
+                                _token: '{{ csrf_token() }}',
+                                type: 'DelGoogleShopPhoto',
+                            })
+                            .then(function(response) {
 
                             })
-                            .catch(function (error) {
+                            .catch(function(error) {
                                 console.log(error);
                             });
                     }
@@ -1293,13 +2422,12 @@
                         this.ProductsItem[key].photo_name = '';
 
                         axios.post('/backend/products_mall/ajax', {
-                            item_id: item.id,
-                            _token: '{{ csrf_token() }}',
-                            type: 'DelItemPhotos',
-                        })
-                            .then(function (response) {
+                                item_id: item.id,
+                                _token: '{{ csrf_token() }}',
+                                type: 'DelItemPhotos',
                             })
-                            .catch(function (error) {
+                            .then(function(response) {})
+                            .catch(function(error) {
                                 console.log(error);
                             });
                     }
@@ -1322,6 +2450,5 @@
             },
         })
         new CategoryHierarchyContentInput().$mount('#CategoryHierarchyContentInput');
-
     </script>
 @endsection

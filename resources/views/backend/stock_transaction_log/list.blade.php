@@ -4,9 +4,8 @@
 
 @section('content')
     <style>
-        .stock-outer{ display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px; padding: 0 5px; }
+        .stock-outer{ grid-template-columns: 1fr 1fr 1fr; gap: 15px; padding: 0 5px; }
         .stock-title{ display: grid; grid-template-columns: 100px 1fr;  align-items: center; }
-        .flex-center{ display: flex; align-items: center; }
     </style>
     <div id="app" v-cloak>
         <div id="page-wrapper">
@@ -22,11 +21,11 @@
                         <!-- 功能按鈕 -->
                         <div class="panel-heading">
                             <form id="search-form" class="form-horizontal" method="GET" action="">
-                                <div class="block stock-outer" >
-                                    <div class="mb-1 stock-title" >
+                                <div class="d-block d-md-grid stock-outer" >
+                                    <div class="mb-4 stock-title" >
                                         <label>異動日期</label>
                                         <div>
-                                            <div class="flex-center">
+                                            <div class="d-flex align-items-center">
                                                 <vue-flat-pickr
                                                     :setting="searchParameters.dateStart" style="flex-grow:1"></vue-flat-pickr>
                                                 <label>～</label>
@@ -35,7 +34,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div  class="mb-1 stock-title">
+                                    <div  class="mb-4 stock-title">
                                         <label>倉庫</label>
                                         <div>
                                             <select2 class="form-control" :options="options.warehouses"
@@ -44,7 +43,7 @@
                                             </select2>
                                         </div>
                                     </div>
-                                    <div  class="mb-1 stock-title">
+                                    <div  class="mb-4 stock-title">
                                         <label>供應商</label>
                                         <div>
                                             <select2 class="form-control" :options="options.suppliers"
@@ -56,10 +55,10 @@
                                     </div>
                                 </div>
 
-                                <div class="block stock-outer">
-                                    <div  class="mb-1 stock-title">
+                                <div class="d-block d-md-grid stock-outer">
+                                    <div  class="mb-4 stock-title">
                                         <label>Item編號</label>
-                                        <div class="flex-center">
+                                        <div class="d-flex align-items-center">
                                             <input class="form-control" name="itemNoStart"
                                                 v-model="searchParameters.itemNoStart" autocomplete="off">
                                             <label>～</label>
@@ -67,7 +66,7 @@
                                                 v-model="searchParameters.itemNoEnd" autocomplete="off">
                                         </div>
                                     </div>
-                                    <div class="mb-1 stock-title">
+                                    <div class="mb-4 stock-title">
                                         <label>來源單據名稱</label>
                                         <select2 class="form-control"
                                                     :options="options.sourceTableNames"
@@ -76,17 +75,17 @@
                                             <option disabled value=""></option>
                                         </select2>
                                     </div>
-                                    <div class="mb-1 stock-title">
+                                    <div class="mb-4 stock-title">
                                         <label>來源單號</label>
                                         <input type="text" class="form-control" name="sourceDocNo"
                                                 v-model="searchParameters.sourceDocNo" autocomplete="off"
                                                 placeholder="模糊查詢">
                                     </div>
                                 </div>
-                                <div class="block stock-outer">
-                                    <div class="mb-1 stock-title">
+                                <div class="d-block d-md-grid stock-outer">
+                                    <div class="mb-4 stock-title">
                                         <label>商品序號</label>
-                                        <div class="flex-center">
+                                        <div class="d-flex align-items-center">
                                             <input type="text" class="form-control" name="productNoStart"
                                                     v-model="searchParameters.productNoStart"
                                                     autocomplete="off">
@@ -96,7 +95,7 @@
                                             autocomplete="off">
                                         </div>
                                     </div>
-                                    <div class="mb-1 stock-title">
+                                    <div class="mb-4 stock-title">
                                         <label>庫存類型
                                         </label>
                                         <select2 class="form-control" :options="options.stockTypes"
@@ -104,7 +103,7 @@
                                             <option disabled value=""></option>
                                         </select2>
                                     </div>
-                                    <div  class="mb-1 stock-title">
+                                    <div  class="mb-4 stock-title">
                                         <label>筆數限制
                                         </label>
                                         <input class="form-control search-limit-group" name="limit"

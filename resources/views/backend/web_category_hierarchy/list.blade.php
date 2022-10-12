@@ -507,15 +507,19 @@
                 },
                 createCategory() {
                     let formData = new FormData();
-                    formData.append("category_name", this.modal.categoryForm.categoryName);
-                    formData.append("category_level", this.modal.categoryForm.categoryLevel);
-                    formData.append("parent_id", this.modal.categoryForm.parentId ? this.modal.categoryForm.parentId : '');
+                    let data = {
+                        categoryName: this.modal.categoryForm.categoryName,
+                        categoryLevel: this.modal.categoryForm.categoryLevel,
+                        parentId: this.modal.categoryForm.parentId ? this.modal.categoryForm.parentId : null,
+                    };
 
                     if (this.modal.categoryForm.categoryLevel < 2) {
-                        formData.append("gross_margin_threshold", this.modal.categoryForm.grossMarginThreshold);
-                        formData.append("category_short_name", this.modal.categoryForm.categoryShortName);
+                        data.grossMarginThreshold = this.modal.categoryForm.grossMarginThreshold;
+                        data.categoryShortName = this.modal.categoryForm.categoryShortName;
                         formData.append("icon_name", this.$refs.icon.files[0] ? this.$refs.icon.files[0] : '');
                     }
+
+                    formData.append('data', JSON.stringify(snakecaseKeys(data)));
 
                     axios({
                         method: "post",
@@ -551,15 +555,19 @@
                 },
                 updateCategory() {
                     let formData = new FormData();
-                    formData.append("_method", "put");
-                    formData.append("category_name", this.modal.categoryForm.categoryName);
+                    let data = {
+                        categoryName: this.modal.categoryForm.categoryName,
+                    };
 
                     if (this.modal.categoryForm.categoryLevel < 2) {
-                        formData.append("gross_margin_threshold", this.modal.categoryForm.grossMarginThreshold);
-                        formData.append("category_short_name", this.modal.categoryForm.categoryShortName);
+                        data.grossMarginThreshold = this.modal.categoryForm.grossMarginThreshold;
+                        data.categoryShortName = this.modal.categoryForm.categoryShortName;
+                        data.isIconDeleted = !this.modal.categoryForm.icon.showDeleteButton;
                         formData.append("icon_name", this.$refs.icon.files[0] ? this.$refs.icon.files[0] : '');
-                        formData.append("is_icon_deleted", !this.modal.categoryForm.icon.showDeleteButton);
                     }
+
+                    formData.append("_method", "put");
+                    formData.append('data', JSON.stringify(snakecaseKeys(data)));
 
                     axios({
                         method: "post",
