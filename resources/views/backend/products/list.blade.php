@@ -233,7 +233,7 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-3" style="padding:0 ">
                                         <label class="control-label">查詢筆數上限</label>
                                     </div>
                                     <div class="col-sm-9">
