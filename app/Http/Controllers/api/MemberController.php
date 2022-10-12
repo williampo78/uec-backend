@@ -447,7 +447,28 @@ class MemberController extends Controller
         }
 
         //金流相關數字
-        if ($order->revision_no > 0 && $order->refund_status != 'COMPLETED') { //還沒完成退款，須抓前一版本的order資訊呈現
+        if ($order->status_code == 'CANCELLED' && $order->is_paid == 1 && $order->refund_status == 'COMPLETED') {   //若訂單已取消且已付款且完成退款
+            $payload['results']['total_amount'] = 0;
+            $payload['results']['shipping_fee'] = 0;
+            $payload['results']['point_discount'] = 0;
+            $payload['results']['cart_campaign_discount'] = 0;
+            $payload['results']['points'] = 0;
+            $payload['results']['paid_amount'] = 0;
+        } elseif ($order->status_code == 'CANCELLED' && $order->is_paid == 0) {  //若訂單已取消且未付款
+            $payload['results']['total_amount'] = 0;
+            $payload['results']['shipping_fee'] = 0;
+            $payload['results']['point_discount'] = 0;
+            $payload['results']['cart_campaign_discount'] = 0;
+            $payload['results']['points'] = 0;
+            $payload['results']['paid_amount'] = 0;
+        } elseif ($order->status_code == 'VOIDED') {
+            $payload['results']['total_amount'] = 0;
+            $payload['results']['shipping_fee'] = 0;
+            $payload['results']['point_discount'] = 0;
+            $payload['results']['cart_campaign_discount'] = 0;
+            $payload['results']['points'] = 0;
+            $payload['results']['paid_amount'] = 0;
+        } elseif ($order->revision_no > 0 && $order->refund_status != 'COMPLETED') { //還沒完成退款，須抓前一版本的order資訊呈現
             //最新版訂單
             $preOrder = $this->orderService->getMemberPreRevisionByOrderNo($request->order_no, $order->revision_no);
             $payload['results']['total_amount'] = $preOrder->total_amount;
