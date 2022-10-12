@@ -1246,4 +1246,37 @@ class OrderService
             ->get();
         return $data;
     }
+
+    /**
+     * 檢查會員訂單前一版訂單
+     *
+     * @param string $orderNo
+     * @return array|null
+     */
+    public function getMemberPreRevision(array $payload = []): ?array
+    {
+        $member = auth('api')->user();
+        $orders = Order::where('member_id', $member->member_id)
+            ->whereDate('ordered_date', '>=', $payload['ordered_date_start'])
+            ->whereDate('ordered_date', '<=', $payload['ordered_date_end'])
+            ->select('order_no', 'revision_no', 'refund_status', 'total_amount', 'shipping_fee', 'point_discount', 'cart_campaign_discount', 'points', 'paid_amount', 'fee_of_instal')
+            ->orderBy('order_no', 'asc')
+            ->orderBy('revision_no', 'asc')
+            ->get()->toArray();
+        //整理版本內容
+        $data = [];
+        foreach ($orders as $order) {
+            $data[$order['order_no']][] = $order;
+        }
+        foreach ($data as $order_no => $info) {
+            $vision_no = (count($info) - 1);
+            if ($vision_no == 0) {
+                $arr_data[$order_no] = $info[$vision_no];
+            } else {
+                $vision_no = ($vision_no-1);
+                $arr_data[$order_no] = $info[$vision_no];
+            }
+        }
+        return $arr_data;
+    }
 }
