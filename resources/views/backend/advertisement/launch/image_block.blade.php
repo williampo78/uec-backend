@@ -5,7 +5,7 @@
                 <tr>
                     <th class="text-nowrap">排序 <span class="text-red">*</span></th>
                     <th class="text-nowrap">圖片 <span class="text-red">*</span>
-                        <span class="show_size" style="background-color:#4682B4;color:#FFFFFF;font-weight:bold"></span></th>
+                        <span class="show_size" style="background-color:#4682B4;color:#FFFFFF;font-weight:bold;"></span></th>
                     <th class="text-nowrap">alt</th>
                     <th class="text-nowrap">標題</th>
                     <th class="text-nowrap">摘要</th>

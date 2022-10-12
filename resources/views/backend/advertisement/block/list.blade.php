@@ -36,10 +36,10 @@
                             <div class="row">
                                 <div class="col-sm-3">
                                     <div class="form-group">
-                                        <div class="col-sm-3">
+                                        <div class="col-sm-4">
                                             <label class="control-label">適用頁面</label>
                                         </div>
-                                        <div class="col-sm-9">
+                                        <div class="col-sm-8">
                                             <select class="form-control js-select2-applicable-page" name="applicable_page"
                                                 id="applicable_page">
                                                 <option></option>
@@ -55,10 +55,10 @@
 
                                 <div class="col-sm-3">
                                     <div class="form-group">
-                                        <div class="col-sm-3">
+                                        <div class="col-sm-4">
                                             <label class="control-label">適用設備</label>
                                         </div>
-                                        <div class="col-sm-9">
+                                        <div class="col-sm-8">
                                             <select class="form-control js-select2-device" name="device" id="device">
                                                 <option value=''></option>
                                                 <option value='desktop'
@@ -74,10 +74,10 @@
 
                                 <div class="col-sm-3">
                                     <div class="form-group">
-                                        <div class="col-sm-3">
+                                        <div class="col-sm-4">
                                             <label class="control-label">狀態</label>
                                         </div>
-                                        <div class="col-sm-9">
+                                        <div class="col-sm-8">
                                             <select class="form-control js-select2-active" name="active" id="active">
                                                 <option value=''></option>
                                                 <option value='enabled'
