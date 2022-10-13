@@ -24,8 +24,8 @@
                                         <div class="col-sm-3">
                                             <label class="control-label">日期</label>
                                         </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
+                                        <div class="col-sm-9 d-flex justify-content-between" >
+                                            <div class="form-group" style="width:46%; margin:0">
                                                 <div class="input-group" id="date_start_flatpickr">
                                                     <input type="text" class="form-control search-limit-group" name="date_start" id="date_start" value="{{ request()->input('date_start') }}" autocomplete="off" data-input />
                                                     <span class="input-group-btn" data-toggle>
@@ -35,12 +35,8 @@
                                                     </span>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="col-sm-1 text-center">
-                                            <label class="control-label">～</label>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
+                                            <label class="control-label">~</label>
+                                            <div class="form-group" style="width:46%;margin:0">
                                                 <div class="input-group" id="date_end_flatpickr">
                                                     <input type="text" class="form-control search-limit-group" name="date_end" id="date_end" value="{{ request()->input('date_end') }}" autocomplete="off" data-input />
                                                     <span class="input-group-btn" data-toggle>

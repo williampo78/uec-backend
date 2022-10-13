@@ -77,9 +77,9 @@
 
                                 <div class="col-sm-4">
                                     <div class="form-group">
-                                        <div class="col-sm-4"><label class="control-label">採購單號</label></div>
-                                        <div class="col-sm-8">
-                                            <div class='input-group'>
+                                        <div class="col-sm-3"><label class="control-label">採購單號</label></div>
+                                        <div class="col-sm-9">
+                                            <div class='input-group' style="width:100%">
                                                 <input class="form-control" name="order_supplier_number"
                                                     id="order_supplier_number"
                                                     value="{{ request()->input('company_number') }}">
@@ -114,7 +114,7 @@
                                     <div class="form-group">
                                         <div class="col-sm-3"><label class="control-label">商品名稱</label></div>
                                         <div class="col-sm-9">
-                                            <div class='input-group'>
+                                            <div class='input-group' style="width: 100%">
                                                 <input class="form-control" name="product_name" id="product_name"
                                                     value="{{ request()->input('product_name') }}">
                                             </div>
@@ -122,16 +122,12 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-4 text-right">
-                                    <div class="col-sm-9">
-                                        <a class="btn btn-info" target="_blank" href='{{ $excel_url ?? '' }} '
+                                        <a class="btn btn-primary" target="_blank" href='{{ $excel_url ?? '' }} '
                                             {{ $excel_url ?? 'disabled' }}>
                                             <i class="fa-solid fa-file-excel"></i>
                                             匯出EXCEL</a>
-                                    </div>
-                                    <div class="col-sm-3">
                                         <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i>
                                             查詢</button>
-                                    </div>
                                 </div>
                                 {{-- row 2 end --}}
                             </div>

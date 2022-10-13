@@ -88,16 +88,16 @@
                                             <label class="control-label">Item編號</label>
                                         </div>
                                         <div class="col-sm-9" style="display:flex;justify-content:space-between">
-                                            <div class='input-group'>
-                                                <input style="max-width:125px" type='text' class="form-control"
+                                            <div class='input-group' style="width:46%">
+                                                <input  type='text' class="form-control"
                                                     name="item_no_start" id="item_no_start"
                                                     value="{{ request()->input('item_no_start') }}" autocomplete="off" />
                                             </div>
                                             <div class="text-center">
                                                 <label class="control-label">~</label>
                                             </div>
-                                            <div class='input-group'>
-                                                <input style="max-width:125px" type='text' class="form-control"
+                                            <div class='input-group' style="width:46%">
+                                                <input type='text' class="form-control"
                                                     name="item_no_end" id="item_no_end"
                                                     value="{{ request()->input('item_no_end') }}" autocomplete="off" />
                                             </div>
