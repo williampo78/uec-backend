@@ -38,6 +38,8 @@ class OrderController extends Controller
             'product_no',
             'product_name',
             'campaign_name',
+            'order_ship_from_whs',
+            'data_range',
         ]);
 
         // 沒有查詢權限、網址列參數不足，直接返回列表頁
@@ -74,6 +76,9 @@ class OrderController extends Controller
                 });
             }
 
+            // 訂單類型
+            $order->ship_from_whs = config('uec.order_ship_from_whs_options')[$order->ship_from_whs] ?? null;
+
             return $order->only([
                 'id',
                 'ordered_date',
@@ -86,6 +91,7 @@ class OrderController extends Controller
                 'member_account',
                 'buyer_name',
                 'shipments',
+                'ship_from_whs',
             ]);
         });
 
@@ -156,10 +162,15 @@ class OrderController extends Controller
             'order_payments' => null,
             'order_campaign_discounts' => null,
             'cancelled_voided_at' => null,
+            'cancel_req_reason_code' => null,
+            'cancel_req_remark' => null,
             'shipped_at' => null,
             'arrived_store_at' => null,
             'home_dilivered_at' => null,
             'cvs_completed_at' => null,
+            'is_return' => 0,
+            'return_status_code' => null,
+            'return_order_details' => null,
         ];
 
         // 收件地址
@@ -181,6 +192,16 @@ class OrderController extends Controller
             $payload['cancelled_voided_at'] = Carbon::parse($order->cancelled_at)->format('Y-m-d H:i');
         } elseif (isset($order->voided_at)) {
             $payload['cancelled_voided_at'] = Carbon::parse($order->voided_at)->format('Y-m-d H:i');
+        }
+
+        // 取消原因
+        if (isset($order->cancel_req_reason_code)) {
+            $payload['cancel_req_reason_code'] = $order->cancel_req_reason_code ?? '';
+        }
+
+        // 取消備註
+        if (isset($order->cancel_req_remark)) {
+            $payload['cancel_req_remark'] = $order->cancel_req_remark ?? '';
         }
 
         // 出貨時間
@@ -227,13 +248,19 @@ class OrderController extends Controller
                     'subtotal' => null,
                     'cart_p_discount' => null,
                     'point_discount' => null,
-                    'record_identity' => null,
+                    'supplier_item_no' => $orderDetail->productItem->supplier_item_no ?? '',
+                    'supplier_product_no' => $orderDetail->product->supplier_product_no ?? '',
+                    'record_identity' => '',
                     'package_no' => null,
+                    'supplier_name' => '',
+                    'product_type' => config('uec.product_type_options')[$orderDetail->product->product_type] ?? '',
                     'returned_qty' => $orderDetail->returned_qty,
                     'returned_campaign_discount' => null,
                     'returned_subtotal' => null,
                     'returned_cart_p_discount' => null,
                     'returned_point_discount' => null,
+                    'shipment_no' => '',
+                    'status_code' => '',
                 ];
 
                 // 單位售價 (商品主檔維護的售價)
@@ -262,6 +289,11 @@ class OrderController extends Controller
                     $orderDetails['package_no'] = $orderDetail->shipmentDetail->shipment->package_no;
                 }
 
+                // 供應商名稱
+                if (isset($orderDetail->product->supplier)) {
+                    $orderDetails['supplier_name'] = $orderDetail->product->supplier->name ?? '';
+                }
+
                 // 累計已銷退的活動折扣金額
                 $orderDetails['returned_campaign_discount'] = number_format($orderDetail->returned_campaign_discount);
 
@@ -274,11 +306,22 @@ class OrderController extends Controller
                 // 累計已銷退的會員點數扣抵金額
                 $orderDetails['returned_point_discount'] = number_format($orderDetail->returned_point_discount);
 
+                // 出貨單號
+                if (isset($orderDetail->shipmentDetail)) {
+                    $orderDetails['shipment_no'] = $orderDetail->shipmentDetail->shipment->shipment_no;
+                }
+
+                // 出貨單狀態
+                if (isset($orderDetail->shipmentDetail)) {
+                    $orderDetails['status_code'] = config('uec.shipment_status_code_options')[$orderDetail->shipmentDetail->shipment->status_code];
+                }
+
                 $payload['order_details'][] = $orderDetails;
             });
         }
 
         // 發票資訊
+        //dd($order->combineInvoices);
         if ($order->combineInvoices->isNotEmpty()) {
             $order->combineInvoices->each(function ($combineInvoice) use (&$payload) {
                 $invoices = [
@@ -292,9 +335,14 @@ class OrderController extends Controller
                     'random_no' => null,
                     'order_no' => $combineInvoice->order_no,
                     'invoice_details' => null,
+                    'type_en' => null,
+                    'allowance_no' => null,
+                    'allowance_date' => null,
+                    'allowance_amount' => null,
                 ];
 
                 $tableName = $combineInvoice->getTable();
+                $invoices['type_en'] = $tableName;
 
                 if ($tableName == 'invoices') {
                     // 交易時間
@@ -345,6 +393,15 @@ class OrderController extends Controller
 
                     // 類型
                     $invoices['type'] = '發票折讓';
+
+                    // 折讓單號
+                    $invoices['allowance_no'] = $combineInvoice->allowance_no ?? '';
+
+                    // 折讓日期
+                    $invoices['allowance_date'] = $combineInvoice->allowance_date ?? '';
+
+                    // 折讓總金額
+                    $invoices['allowance_amount'] = $combineInvoice->allowance_amount ?? '';
 
                     // 課稅別
                     $invoices['tax_type'] = config('uec.tax_type_options')[$combineInvoice->invoice->tax_type] ?? null;
@@ -454,6 +511,61 @@ class OrderController extends Controller
                 $orderCampaignDiscounts['is_voided'] = $orderCampaignDiscount->is_voided == 1 ? '是' : '否';
 
                 $payload['order_campaign_discounts'][] = $orderCampaignDiscounts;
+            });
+        }
+
+        // 退貨
+        if ($order->returnRequests->isNotEmpty()) {
+            $returnRequests = $order->returnRequests->first();
+            $payload['is_return'] = isset($returnRequests->order_no) ? 1 : 0;
+            $payload['return_status_code'] = isset($returnRequests->status_code) ? $returnRequests->status_code : null;
+        }
+
+        // 退貨成功
+        if ($order->returnOrderDetails->isNotEmpty()) {
+            $order->returnOrderDetails->each(function ($returnOrderDetail) use (&$payload) {
+                $returnOrderDetails = [
+                    'request_no' => $returnOrderDetail->request_no,
+                    'data_type' => $returnOrderDetail->data_type,
+                    'dtl_desc' => null,
+                    'selling_price' => null,
+                    'qty' => $returnOrderDetail->qty,
+                    'subtotal' => null,
+                    'point_discount' => $returnOrderDetail->point_discount,
+                    'refund_amount' => null,
+                ];
+
+                if ($returnOrderDetail->data_type == 'PRD') {
+                    $temp = [];
+
+                    if (isset($returnOrderDetail->productItem)) {
+                        $temp['item_no'] = $returnOrderDetail->productItem->item_no;
+                        $temp['spec_1_value'] = $returnOrderDetail->productItem->spec_1_value;
+                        $temp['spec_2_value'] = $returnOrderDetail->productItem->spec_2_value;
+                    }
+                    if (isset($returnOrderDetail->productItem->product)) {
+                        $temp['product_name'] = $returnOrderDetail->productItem->product->product_name;
+                        $temp['spec_dimension'] = $returnOrderDetail->productItem->product->spec_dimension;
+                    }
+
+                    if ($temp['spec_dimension'] == 0) {
+                        $returnOrderDetails['dtl_desc'] = $temp['item_no'] . '_' . $temp['product_name'];
+                    } elseif ($temp['spec_dimension'] == 1) {
+                        $returnOrderDetails['dtl_desc'] = $temp['item_no'] . '_' . $temp['product_name'] . '_' . $temp['spec_1_value'];
+                    } elseif ($temp['spec_dimension'] == 2) {
+                        $returnOrderDetails['dtl_desc'] = $temp['item_no'] . '_' . $temp['product_name'] . '_' . $temp['spec_1_value'] . '/' . $temp['spec_2_value'];
+                    }
+                } elseif ($returnOrderDetail->data_type == 'CAMPAIGN') {
+                    if (isset($returnOrderDetail->promotionalCampaign)) {
+                        $returnOrderDetails['dtl_desc'] = $returnOrderDetail->promotionalCampaign->campaign_brief;
+                    }
+                }
+
+                $returnOrderDetails['selling_price'] = number_format($returnOrderDetail->selling_price);
+                $returnOrderDetails['subtotal'] = number_format($returnOrderDetail->subtotal);
+                $returnOrderDetails['refund_amount'] = number_format($returnOrderDetail->refund_amount);
+
+                $payload['return_order_details'][] = $returnOrderDetails;
             });
         }
 

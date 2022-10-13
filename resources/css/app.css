@@ -1,3 +1,11 @@
+/* bootstrap 3 */
+@import "~bootstrap-3/dist/css/bootstrap.css";
+
+/* bootstrap 5: grid system、flex utilities */
+@import "~bootstrap/dist/css/bootstrap-grid.css";
+/* bootstrap 5: utilities */
+@import "~bootstrap/dist/css/bootstrap-utilities.css";
+
 /* select2 */
 @import "~select2/dist/css/select2.css";
 @import "~select2-bootstrap-theme/dist/select2-bootstrap.css";
@@ -21,46 +29,11 @@
 
 @import "./page.css";
 @import "./draggable.css";
+@import "./sweetalert2.css";
+@import "./vue-collapse.css";
 
 body {
     font-family: Segoe UI Light, 微軟正黑體;
-    /* font-weight: bold; */
-    /*background-color: #eee;*/
-}
-
-/* 停用或作廢時顯示 */
-.tr-deactive {
-    background-color: #aaaaaa !important;
-    color: #ffffff !important;
-}
-
-.form-signin {
-    max-width: 330px;
-    padding: 15px;
-    margin: 0 auto;
-}
-
-.form-signin .form-signin-heading,
-.form-signin .checkbox {
-    margin-bottom: 10px;
-}
-
-.form-signin .checkbox {
-    font-weight: normal;
-}
-
-.form-signin .form-control {
-    position: relative;
-    height: auto;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    padding: 10px;
-    font-size: 1.2em;
-}
-
-.form-signin .form-control:focus {
-    z-index: 2;
 }
 
 table.dataTable thead .sorting {
@@ -85,32 +58,16 @@ span.select2-container {
     margin: 1rem auto;
 }
 
-.vcenter {
-    display: inline-block;
-    vertical-align: middle;
-    float: none;
-}
-
 span.error {
     color: red;
     display: inline-block;
     margin-left: 10px;
 }
 
-inline {
-    display: inline;
-}
-
 .add_row {
     margin-top: 5px;
     margin-bottom: 5px;
     border-left-width: 8px;
-}
-
-span .errorMsg {
-    color: red;
-    display: inline-block;
-    margin-left: 10px;
 }
 
 .text-red {
@@ -176,4 +133,7 @@ span .errorMsg {
     border-right: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
     padding: 30px;
+}
+.page-header{
+    font-size: 28px;
 }

@@ -164,7 +164,8 @@
                                         <label class="control-label">上架狀態</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <select class="form-control js-select2" name="approval_status" id="approval_status">
+                                        <select class="form-control js-select2" name="approval_status"
+                                            id="approval_status">
                                             <option value="">全部</option>
                                             <option value="NA"
                                                 {{ request()->input('approval_status') == 'NA' ? 'selected' : '' }}>
@@ -199,7 +200,10 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <div class="input-group" id="start_launched_at_start_flatpickr">
-                                                <input type="text" class="form-control" name="start_launched_at_start" id="start_launched_at_start" value="{{ request()->input('start_launched_at_start') }}" autocomplete="off" data-input />
+                                                <input type="text" class="form-control" name="start_launched_at_start"
+                                                    id="start_launched_at_start"
+                                                    value="{{ request()->input('start_launched_at_start') }}"
+                                                    autocomplete="off" data-input />
                                                 <span class="input-group-btn" data-toggle>
                                                     <button class="btn btn-default" type="button">
                                                         <i class="fa-solid fa-calendar-days"></i>
@@ -214,7 +218,10 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <div class="input-group" id="start_launched_at_end_flatpickr">
-                                                <input type="text" class="form-control" name="start_launched_at_end" id="start_launched_at_end" value="{{ request()->input('start_launched_at_end') }}" autocomplete="off" data-input />
+                                                <input type="text" class="form-control" name="start_launched_at_end"
+                                                    id="start_launched_at_end"
+                                                    value="{{ request()->input('start_launched_at_end') }}"
+                                                    autocomplete="off" data-input />
                                                 <span class="input-group-btn" data-toggle>
                                                     <button class="btn btn-default" type="button">
                                                         <i class="fa-solid fa-calendar-days"></i>
@@ -226,12 +233,12 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-3" style="padding:0 ">
                                         <label class="control-label">查詢筆數上限</label>
                                     </div>
                                     <div class="col-sm-9">
-                                        <input type="number" class="form-control" name="limit" id="limit" readonly
-                                            value="500">
+                                        <input type="number" class="form-control" name="limit" id="limit"
+                                            readonly value="500">
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
@@ -241,7 +248,10 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <div class="input-group" id="create_at_start_flatpickr">
-                                                <input type="text" class="form-control" name="create_at_start" id="create_at_start" value="{{ request()->input('create_at_start') }}" autocomplete="off" data-input />
+                                                <input type="text" class="form-control" name="create_at_start"
+                                                    id="create_at_start"
+                                                    value="{{ request()->input('create_at_start') }}" autocomplete="off"
+                                                    data-input />
                                                 <span class="input-group-btn" data-toggle>
                                                     <button class="btn btn-default" type="button">
                                                         <i class="fa-solid fa-calendar-days"></i>
@@ -256,7 +266,10 @@
                                     <div class="col-sm-4">
                                         <div class="form-group">
                                             <div class="input-group" id="create_at_start_end_flatpickr">
-                                                <input type="text" class="form-control" name="create_at_start_end" id="create_at_start_end" value="{{ request()->input('create_at_start_end') }}" autocomplete="off" data-input />
+                                                <input type="text" class="form-control" name="create_at_start_end"
+                                                    id="create_at_start_end"
+                                                    value="{{ request()->input('create_at_start_end') }}"
+                                                    autocomplete="off" data-input />
                                                 <span class="input-group-btn" data-toggle>
                                                     <button class="btn btn-default" type="button">
                                                         <i class="fa-solid fa-calendar-days"></i>
@@ -298,76 +311,80 @@
                         <div class="row">
                             <div class="col-sm-2">
                                 @if ($share_role_auth['auth_create'])
-
-                                <a class="btn btn-block btn-warning btn-sm" href="{{ route('products.create') }}">
-                                    <i class="fa-solid fa-plus"></i> 新增
-                                </a>
+                                    <a class="btn btn-block btn-warning btn-sm" href="{{ route('products.create') }}">
+                                        <i class="fa-solid fa-plus"></i> 新增
+                                    </a>
                                 @endif
                             </div>
                         </div>
                         <hr>
-                        <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
-                            <thead>
-                                <tr>
-                                    <th style="width: 10%">功能</th>
-                                    <th style="width: 1%">項次</th>
-                                    <th style="width: 10%">供應商</th>
-                                    <th style="width: 10%">商品序號</th>
-                                    <th style="width: 10%">商品名稱</th>
-                                    <th style="width: 5%">售價(含稅)</th>
-                                    <th style="width: 5%">成本(含稅)</th>
-                                    <th style="width: 5%">毛利(%)</th>
-                                    <th style="width: 5%">商品類型</th>
-                                    <th style="width: 5%">建檔日期</th>
-                                    <th style="width: 6%">上架狀態</th>
-                                    <th style="width: 10%">上架時間起</th>
-                                    <th style="width: 10%">上架時間訖</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($products as $key => $val)
+                        <div style="overflow:auto">
+                            <table class="table table-striped table-bordered table-hover" style="width:100%"
+                                id="table_list">
+                                <thead>
                                     <tr>
-                                        <td>
-                                            <a class="btn btn-info btn-sm"
-                                                href="{{ route('products.show', $val->id) }}">
-                                                <i class="fa-solid fa-magnifying-glass"></i></a>
-                                            <a class="btn btn-info btn-sm"
-                                                href="{{ route('products.edit', $val->id) }}">編輯</a>
-                                        </td>
-                                        <td>{{ $key += 1 }}</td>
-                                        <td>{{ $val->supplier_name }}</td>
-                                        <td>{{ $val->product_no }}</td>
-                                        <td>{{ $val->product_name }}</td>
-                                        <td>{{ $val->selling_price }}</td>
-                                        <td>{{ $val->item_cost }}</td>
-                                        <td>{{ $val->gross_margin }}</td>
-                                        <td>
-                                            @switch($val->product_type)
-                                                @case('N')
-                                                    一般品
-                                                @break
-                                                @case('G')
-                                                    贈品
-                                                @break
-                                                @case('A')
-                                                    加購品
-                                                @break
-                                            @endswitch
-                                        </td>
-                                        <td>
-                                            {{ $val->created_at }}
-                                        </td>
-                                        <td>
-                                            {{ $val->launched_status }}
-                                        </td>
-                                        <td>{{ $val->start_launched_at }}</td>
-                                        <td>{{ $val->end_launched_at }}</td>
+                                        <th class="text-nowrap">功能</th>
+                                        <th class="text-nowrap">項次</th>
+                                        <th class="text-nowrap">供應商</th>
+                                        <th class="text-nowrap">商品序號</th>
+                                        <th style="width: 300px; box-sizing:border-box" class="text-nowrap">商品名稱</th>
+                                        <th class="text-nowrap">售價(含稅)</th>
+                                        <th class="text-nowrap">成本(含稅)</th>
+                                        <th class="text-nowrap">毛利(%)</th>
+                                        <th class="text-nowrap">商品類型</th>
+                                        <th class="text-nowrap">建檔日期</th>
+                                        <th class="text-nowrap">上架狀態</th>
+                                        <th class="text-nowrap">上架時間起</th>
+                                        <th class="text-nowrap">上架時間訖</th>
                                     </tr>
-                                @endforeach
-                                {{-- {{$category_products_list}} --}}
+                                </thead>
+                                <tbody>
+                                    @foreach ($products as $key => $val)
+                                        <tr>
+                                            <td class="text-nowrap">
+                                                <a class="btn btn-info btn-sm"
+                                                    href="{{ route('products.show', $val->id) }}">
+                                                    <i class="fa-solid fa-magnifying-glass"></i></a>
+                                                <a class="btn btn-info btn-sm"
+                                                    href="{{ route('products.edit', $val->id) }}">編輯</a>
+                                            </td>
+                                            <td>{{ $key += 1 }}</td>
+                                            <td class="text-nowrap">{{ $val->supplier_name }}</td>
+                                            <td>{{ $val->product_no }}</td>
+                                            <td style="display:inline-block;width:300px;min-height:40px;white-space:pre-wrap">{{ $val->product_name }}</td>
+                                            <td>{{ $val->selling_price }}</td>
+                                            <td>{{ $val->item_cost }}</td>
+                                            <td>{{ $val->gross_margin }}</td>
+                                            <td>
+                                                @switch($val->product_type)
+                                                    @case('N')
+                                                        一般品
+                                                    @break
 
-                            </tbody>
-                        </table>
+                                                    @case('G')
+                                                        贈品
+                                                    @break
+
+                                                    @case('A')
+                                                        加購品
+                                                    @break
+                                                @endswitch
+                                            </td>
+                                            <td>
+                                                {{ $val->created_at }}
+                                            </td>
+                                            <td>
+                                                {{ $val->launched_status }}
+                                            </td>
+                                            <td>{{ $val->start_launched_at }}</td>
+                                            <td>{{ $val->end_launched_at }}</td>
+                                        </tr>
+                                    @endforeach
+                                    {{-- {{$category_products_list}} --}}
+
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

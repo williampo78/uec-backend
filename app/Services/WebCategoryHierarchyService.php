@@ -338,7 +338,7 @@ class WebCategoryHierarchyService
                     $category->update([
                         'icon_name' => $uploadFileResult['image'],
                     ]);
-                } elseif ($data['is_icon_deleted'] == 'true') {
+                } elseif ($data['is_icon_deleted']) {
                     // 移除舊圖片
                     if (
                         !empty($category->icon_name)

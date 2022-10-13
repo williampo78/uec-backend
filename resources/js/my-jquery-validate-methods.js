@@ -62,6 +62,66 @@ jQuery.validator.addMethod(
     $.validator.messages.compareDates
 );
 
+// 比較輸入值
+jQuery.validator.addMethod(
+    "compareValues",
+    function (value1, element, params) {
+        let defaultParams = {
+            value2: 0,
+            sign: ">",
+            dataType: "number",
+        };
+        let result;
+        let errorMessage = "";
+
+        params = Object.assign({}, defaultParams, params);
+
+        switch (params.dataType) {
+            case "string":
+                value1 = String(value1);
+                params.value2 = String(params.value2);
+                break;
+
+            default:
+                value1 = Number(value1);
+                params.value2 = Number(params.value2);
+                break;
+        }
+
+        switch (params.sign) {
+            case "<":
+                result = value1 < params.value2;
+                errorMessage = `必需小於`;
+                break;
+
+            case "<=":
+                result = value1 <= params.value2;
+                errorMessage = `必需小於等於`;
+                break;
+
+            case "=":
+                result = value1 == params.value2;
+                errorMessage = `必需等於`;
+                break;
+
+            case ">":
+                result = value1 > params.value2;
+                errorMessage = `必需大於`;
+                break;
+
+            case ">=":
+                result = value1 >= params.value2;
+                errorMessage = `必需大於等於`;
+                break;
+        }
+
+        $.validator.messages.compareValues = `${errorMessage} ${params.value2}`;
+
+        return result;
+    },
+    $.validator.messages.compareValues
+);
+
 // 比較輸入的兩個日期或兩個數字
 jQuery.validator.addMethod(
     "greaterThan",
@@ -320,4 +380,15 @@ jQuery.validator.addMethod(
         return regex.test(value);
     },
     "只能輸入英文、數字、下底線( _ )、連字號( - )"
+);
+
+// 驗證發票號碼格式
+jQuery.validator.addMethod(
+    "isInvoiceNumber",
+    function (value, element, params) {
+        let regex = /^[A-Z]{2}[0-9]{8}$/;
+
+        return regex.test(value);
+    },
+    "必須為前2碼大寫英文、後8碼數字"
 );

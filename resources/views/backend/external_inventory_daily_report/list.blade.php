@@ -20,13 +20,16 @@
                         <form id="search-form" class="form-horizontal" method="GET" action="">
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
-                                        <h5>庫存日期<span class="text-danger">*</span></h5>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <div class="form-group">
+                                    <div class="form-group">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">庫存日期<span class="text-danger">*</span></label>
+                                        </div>
+                                        <div class="col-sm-9">
                                             <div class="input-group" id="counting_date_flatpickr">
-                                                <input type="text" class="form-control" name="counting_date" id="counting_date" value="{{ empty(request()->input('counting_date')) ? date('Y-m-d', strtotime('-1 day')) : request()->input('counting_date') }}" autocomplete="off" data-input />
+                                                <input type="text" class="form-control" name="counting_date"
+                                                    id="counting_date"
+                                                    value="{{ empty(request()->input('counting_date')) ? date('Y-m-d', strtotime('-1 day')) : request()->input('counting_date') }}"
+                                                    autocomplete="off" data-input />
                                                 <span class="input-group-btn" data-toggle>
                                                     <button class="btn btn-default" type="button">
                                                         <i class="fa-solid fa-calendar-days"></i>
@@ -43,7 +46,7 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <select class="form-control select2-order-status-code" id="warehouse"
-                                                    name="warehouse">
+                                                name="warehouse">
                                                 <option value=""></option>
                                                 @foreach ($warehouses as $warehouse)
                                                     <option value='{{ $warehouse['id'] }}'
@@ -63,49 +66,40 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <select class="form-control select2-order-status-code" id="stock_type"
-                                                    name="stock_type">
+                                                name="stock_type">
                                                 <option value=""></option>
                                                 <option value="A"
                                                     {{ request()->input('stock_type') == 'A' ? 'selected' : '' }}>買斷[A]
                                                 </option>
                                                 <option value="B"
-                                                    {{ request()->input('stock_type') == 'B' ? 'selected' : '' }}>寄售[B]</option>
+                                                    {{ request()->input('stock_type') == 'B' ? 'selected' : '' }}>寄售[B]
+                                                </option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <br />
 
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <div class="row">
+                                    <div class="form-group">
+
                                         <div class="col-sm-3">
                                             <label class="control-label">Item編號</label>
                                         </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <div class='input-group'>
-                                                    <input type='text'
-                                                           class="form-control"
-                                                           name="item_no_start" id="item_no_start"
-                                                           value="{{ request()->input('item_no_start') }}"
-                                                           autocomplete="off" />
-                                                </div>
+                                        <div class="col-sm-9" style="display:flex;justify-content:space-between">
+                                            <div class='input-group'>
+                                                <input style="max-width:125px" type='text' class="form-control"
+                                                    name="item_no_start" id="item_no_start"
+                                                    value="{{ request()->input('item_no_start') }}" autocomplete="off" />
                                             </div>
-                                        </div>
-                                        <div class="col-sm-1 text-center">
-                                            <label class="control-label">～</label>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <div class='input-group'>
-                                                    <input type='text'
-                                                           class="form-control"
-                                                           name="item_no_end" id="item_no_end"
-                                                           value="{{ request()->input('item_no_end') }}"
-                                                           autocomplete="off" />
-                                                </div>
+                                            <div class="text-center">
+                                                <label class="control-label">~</label>
+                                            </div>
+                                            <div class='input-group'>
+                                                <input style="max-width:125px" type='text' class="form-control"
+                                                    name="item_no_end" id="item_no_end"
+                                                    value="{{ request()->input('item_no_end') }}" autocomplete="off" />
                                             </div>
                                         </div>
                                     </div>
@@ -117,8 +111,9 @@
                                             </label>
                                         </div>
                                         <div class="col-sm-9">
-                                            <input class="form-control search-limit-group" name="product_name" id="product_name"
-                                                   value="{{ request()->input('product_name') }}" placeholder="模糊查詢"/>
+                                            <input class="form-control search-limit-group" name="product_name"
+                                                id="product_name" value="{{ request()->input('product_name') }}"
+                                                placeholder="模糊查詢" />
                                         </div>
                                     </div>
                                 </div>
@@ -129,10 +124,14 @@
                                         </div>
                                         <div class="col-sm-9">
                                             <select class="form-control select2-order-status-code" id="is_dangerous"
-                                                    name="is_dangerous">
+                                                name="is_dangerous">
                                                 <option></option>
-                                                <option value='0' {{ request()->input('is_dangerous') == '0' ? 'selected' : '' }}>正常</option>
-                                                <option value='1' {{ request()->input('is_dangerous') == '1' ? 'selected' : '' }}>低於正常庫存量</option>
+                                                <option value='0'
+                                                    {{ request()->input('is_dangerous') == '0' ? 'selected' : '' }}>正常
+                                                </option>
+                                                <option value='1'
+                                                    {{ request()->input('is_dangerous') == '1' ? 'selected' : '' }}>低於正常庫存量
+                                                </option>
                                             </select>
                                         </div>
                                     </div>
@@ -145,8 +144,8 @@
                                             <label class="control-label">供應商</label>
                                         </div>
                                         <div class="col-sm-9">
-                                            <select class="form-control select2-shipment-status-code"
-                                                    id="supplier_id" name="supplier_id">
+                                            <select class="form-control select2-shipment-status-code" id="supplier_id"
+                                                name="supplier_id">
                                                 <option value=""></option>
                                                 @foreach ($supplier as $v)
                                                     <option value='{{ $v['id'] }}'
@@ -158,25 +157,15 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <br />
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3">
-                                        <label class="control-label">庫存總量：{{ number_format($dailyReports->sum('original_stock_qty')) }}</label>
-                                    </div>
-                                    <div class="col-sm-9"></div>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3"></div>
-                                    <div class="col-sm-9"></div>
-                                </div>
+                                <div class="col-sm-4"></div>
                                 <div class="col-sm-4">
                                     <div class="form-group">
                                         <div class="col-sm-3"></div>
                                         <div class="col-sm-9 text-right">
                                             @if ($share_role_auth['auth_export'])
-                                                <button data-url="{{ route('external_inventory_daily_report.export_excel') }}" class="btn btn-primary" id="btn-export-excel" type="button">
+                                                <button
+                                                    data-url="{{ route('external_inventory_daily_report.export_excel') }}"
+                                                    class="btn btn-primary" id="btn-export-excel" type="button">
                                                     <i class="fa-solid fa-file-excel"></i> 匯出EXCEL
                                                 </button>
                                             @endif
@@ -190,6 +179,34 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-sm-2 text-left">
+                                        <label
+                                            class="control-label">庫存總量：{{ number_format($dailyReports->sum('original_stock_qty')) }}</label>
+                                    <div class="col-sm-9"></div>
+                                </div>
+
+                                {{-- <div class="col-sm-4">
+                                    <div class="form-group">
+                                        <div class="col-sm-3"></div>
+                                        <div class="col-sm-9 text-right">
+                                            @if ($share_role_auth['auth_export'])
+                                                <button
+                                                    data-url="{{ route('external_inventory_daily_report.export_excel') }}"
+                                                    class="btn btn-primary" id="btn-export-excel" type="button">
+                                                    <i class="fa-solid fa-file-excel"></i> 匯出EXCEL
+                                                </button>
+                                            @endif
+
+                                            @if ($share_role_auth['auth_query'])
+                                                <button class="btn btn-warning" id="btn-search">
+                                                    <i class="fa-solid fa-magnifying-glass"></i> 查詢
+                                                </button>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div> --}}
+                            </div>
                         </form>
                     </div>
 
@@ -197,7 +214,7 @@
                     <div class="panel-body">
                         <div class="dataTables_wrapper form-inline dt-bootstrap no-footer table-responsive">
                             <table class="table table-striped table-bordered table-hover" style="width:100%"
-                                   id="table_list">
+                                id="table_list">
                                 <thead>
                                     <tr>
                                         <th class="text-nowrap">庫存日期</th>
@@ -220,7 +237,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($dailyReports as $dailyReport)
+                                    @foreach ($dailyReports as $dailyReport)
                                         <tr>
                                             <td>{{ $dailyReport->counting_date }}</td>
                                             <td>{{ $dailyReport->warehouse_name }}</td>
@@ -235,11 +252,11 @@
                                             <td>{{ $dailyReport->is_additional_purchase }}</td>
                                             <td>{{ $dailyReport->safty_qty }}</td>
                                             <td>
-                                                @if($dailyReport->is_dangerous == 1)
-                                                <span class="label-danger text-white" style="color: #fff;">
-                                                    <i class="fa-solid fa-triangle-exclamation"></i>
-                                                    {{ $dailyReport->stock_qty }}
-                                                </span>
+                                                @if ($dailyReport->is_dangerous == 1)
+                                                    <span class="label-danger text-white" style="color: #fff;">
+                                                        <i class="fa-solid fa-triangle-exclamation"></i>
+                                                        {{ $dailyReport->stock_qty }}
+                                                    </span>
                                                 @else
                                                     {{ $dailyReport->stock_qty }}
                                                 @endif
@@ -261,7 +278,6 @@
 @endsection
 
 @section('js')
-    <script src="{{ mix('js/external_inventory_daily_report.js') }}"></script>
     <script>
         $(function() {
             flatpickr("#counting_date_flatpickr", {
@@ -315,24 +331,24 @@
                 let url = $(this).data('url');
 
                 axios.get(url, {
-                    params: {
-                        counting_date:$('#counting_date').val(),
-                        warehouse:$('#warehouse').val(),
-                        stock_type:$('#stock_type').val(),
-                        item_no_start:$('#item_no_start').val(),
-                        item_no_end:$('#item_no_end').val(),
-                        product_name:$('#product_name').val(),
-                        is_dangerous:$('#is_dangerous').val(),
-                        supplier_id:$('#supplier_id').val(),
-                    },
-                    responseType: 'blob',
-                })
-                .then(function(response) {
-                    saveAs(response.data, "external_inventory_daily_reports.xlsx");
-                })
-                .catch(function(error) {
-                    console.log(error);
-                });
+                        params: {
+                            counting_date: $('#counting_date').val(),
+                            warehouse: $('#warehouse').val(),
+                            stock_type: $('#stock_type').val(),
+                            item_no_start: $('#item_no_start').val(),
+                            item_no_end: $('#item_no_end').val(),
+                            product_name: $('#product_name').val(),
+                            is_dangerous: $('#is_dangerous').val(),
+                            supplier_id: $('#supplier_id').val(),
+                        },
+                        responseType: 'blob',
+                    })
+                    .then(function(response) {
+                        saveAs(response.data, "external_inventory_daily_reports.xlsx");
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
             });
         });
     </script>

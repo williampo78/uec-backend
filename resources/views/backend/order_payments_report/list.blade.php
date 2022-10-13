@@ -94,8 +94,6 @@
                                     </div>
                                 </div>
                             </div>
-                            <br />
-                            <br />
                             <div class="row">
                                 <div class="col-sm-4">
                                     <div class="col-sm-3"></div>
@@ -178,7 +176,6 @@
 @endsection
 
 @section('js')
-    <script src="{{ mix('js/order_payments_report.js') }}"></script>
     <script>
         $(function() {
             let date_start_flatpickr = flatpickr("#date_start_flatpickr", {

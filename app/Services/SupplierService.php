@@ -18,28 +18,21 @@ class SupplierService
     /**
      * 取得所有供應商
      *
-     * @param array $queryData
+     * @param array $filter
      * @return Collection
      */
-    public function getSuppliers(array $queryData = []): Collection
+    public function getSuppliers(array $filter = []): Collection
     {
         $user = auth()->user();
-        $suppliers = new Supplier ;
-        if($user !== null){
-            $suppliers = $suppliers->where('agent_id', $user->agent_id);
-        }
-        // 檢查使用者是否為供應商
-        if (!empty($queryData['check_user_is_supplier'])) {
-            if (isset($user->supplier_id)) {
-                $suppliers = $suppliers->where('id', $user->supplier_id);
-            }
-        }
-        // 狀態
-        if (isset($queryData['active'])) {
-            $suppliers = $suppliers->where('active', $queryData['active']);
-        }
 
-        return $suppliers->get();
+        return Supplier::when(isset($user), function ($query) use ($user) {
+                $query->where('agent_id', $user->agent_id);
+            })
+            // 狀態
+            ->when(isset($filter['active']), function ($query) use ($filter) {
+                $query->where('active', $filter['active']);
+            })
+            ->get();
     }
 
     /**
@@ -78,6 +71,7 @@ class SupplierService
                 'address5' => $data['address5'] ?? null,
                 'bank_name' => $data['bank_name'] ?? null,
                 'bank_branch' => $data['bank_branch'] ?? null,
+                'bank_account_number' => $data['bank_account_number'] ?? null,
                 'remark' => $data['remark'] ?? null,
                 'active' => $data['active'],
                 'created_by' => $user->id,
@@ -197,6 +191,7 @@ class SupplierService
                 'address5' => $data['address5'] ?? null,
                 'bank_name' => $data['bank_name'] ?? null,
                 'bank_branch' => $data['bank_branch'] ?? null,
+                'bank_account_number' => $data['bank_account_number'] ?? null,
                 'remark' => $data['remark'] ?? null,
                 'active' => $data['active'],
                 'updated_by' => $user->id,
@@ -312,38 +307,38 @@ class SupplierService
     }
 
     /**
-     * 取得供應商table列表
+     * 取得供應商列表
      *
-     * @param array $queryData
+     * @param array $filter
      * @return Collection
      */
-    public function getTableList(array $queryData = []): Collection
+    public function getList(array $filter = []): Collection
     {
         $user = auth()->user();
-        $suppliers = Supplier::with(['paymentTerm'])->where('agent_id', $user->agent_id);
 
-        if (isset($queryData['supplier_type_id'])) {
-            $suppliers = $suppliers->whereHas('supplierType', function (Builder $query) use ($queryData) {
-                return $query->where('id', $queryData['supplier_type_id']);
-            });
-        }
-
-        if (isset($queryData['display_number_or_name'])) {
-            $suppliers = $suppliers->where(function ($query) use ($queryData) {
-                return $query->where('display_number', 'LIKE', '%' . $queryData['display_number_or_name'] . '%')
-                    ->orWhere('name', 'LIKE', '%' . $queryData['display_number_or_name'] . '%');
-            });
-        }
-
-        if (isset($queryData['company_number'])) {
-            $suppliers = $suppliers->where('company_number', $queryData['company_number']);
-        }
-
-        if (isset($queryData['active'])) {
-            $suppliers = $suppliers->where('active', $queryData['active']);
-        }
-
-        return $suppliers->oldest('display_number')->get();
+        return Supplier::with([
+            'paymentTerm',
+        ])
+            ->where('agent_id', $user->agent_id)
+            ->when(isset($filter['supplier_type_id']), function ($query) use ($filter) {
+                $query->whereHas('supplierType', function (Builder $query) use ($filter) {
+                    $query->where('id', $filter['supplier_type_id']);
+                });
+            })
+            ->when(isset($filter['display_number_or_name']), function ($query) use ($filter) {
+                $query->where(function ($query) use ($filter) {
+                    $query->where('display_number', 'LIKE', "%{$filter['display_number_or_name']}%")
+                        ->orWhere('name', 'LIKE', "%{$filter['display_number_or_name']}%");
+                });
+            })
+            ->when(isset($filter['company_number']), function ($query) use ($filter) {
+                $query->where('company_number', $filter['company_number']);
+            })
+            ->when(isset($filter['active']), function ($query) use ($filter) {
+                $query->where('active', $filter['active']);
+            })
+            ->oldest('display_number')
+            ->get();
     }
 
     /**

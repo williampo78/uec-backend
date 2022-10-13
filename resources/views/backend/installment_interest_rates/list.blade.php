@@ -1,6 +1,6 @@
 @extends('backend.layouts.master')
 
-@section('title', '信用卡分期設定')
+@section('title', '全站式分期利率維護')
 
 @section('content')
     <div id="app" v-cloak>
@@ -8,7 +8,7 @@
             <!-- 表頭名稱 -->
             <div class="row">
                 <div class="col-sm-12">
-                    <h1 class="page-header"><i class="fa-solid fa-list"></i> 信用卡分期設定</h1>
+                    <h1 class="page-header"><i class="fa-solid fa-list"></i> 全站式分期利率維護</h1>
                 </div>
             </div>
             <div class="row">
@@ -60,8 +60,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <br/>
-                                <br/>
                                 <div class="row">
                                     <div class="col-sm-4">
                                     </div>
@@ -199,7 +197,7 @@
                                             <div class="row">
                                                 <div class="col-sm-5">
                                                     <vue-flat-pickr name="started_at"
-                                                                    :value.sync="modal.startedAt.date"
+                                                                    v-model="modal.startedAt.date"
                                                                     :config="modal.startedAt.config"
                                                                     @on-change="onStartedAtChange"
                                                                     :disabled="modal.startedAt.disabled">
@@ -210,7 +208,7 @@
                                                 </div>
                                                 <div class="col-sm-5">
                                                     <vue-flat-pickr name="ended_at"
-                                                                    :value.sync="modal.endedAt.date"
+                                                                    v-model="modal.endedAt.date"
                                                                     :config="modal.endedAt.config"
                                                                     @on-change="onEndedAtChange"
                                                                     :disabled="modal.endedAt.disabled">

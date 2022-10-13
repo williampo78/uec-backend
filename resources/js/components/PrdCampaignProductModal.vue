@@ -34,6 +34,7 @@
                                                 :options="suppliers"
                                                 v-model="form.supplierId"
                                                 :allow-clear="false"
+                                                :disabled="supplier.isDisabled"
                                             >
                                                 <option
                                                     disabled
@@ -447,7 +448,7 @@ export default {
     data() {
         return {
             form: {
-                supplierId: "",
+                supplierId: "all",
                 productNo: "",
                 productName: "",
                 sellingPriceMin: "",
@@ -458,9 +459,18 @@ export default {
                 startLaunchedAtEnd: "",
                 productType: "",
                 limit: 100,
+                stockType: "",
                 excludeProductIds: [],
             },
-            suppliers: [],
+            supplier: {
+                isDisabled: false,
+            },
+            suppliers: [
+                {
+                    text: "全部",
+                    id: "all",
+                },
+            ],
             productTypeOptions: [],
             products: [],
             limitOptions: [100, 300, 500],
@@ -468,6 +478,12 @@ export default {
     },
     async created() {
         let self = this;
+
+        if (this.modal.supplier) {
+            if (typeof this.modal.supplier.isDisabled !== "undefined") {
+                this.supplier.isDisabled = this.modal.supplier.isDisabled;
+            }
+        }
 
         if (this.modal.productType) {
             if (this.modal.productType.id) {
@@ -513,11 +529,23 @@ export default {
         }
     },
     computed: {
+        modalSupplierId() {
+            return this.modal.supplier.id;
+        },
+        modalStockType() {
+            return this.modal.stockType;
+        },
         modalExcludeProductIds() {
             return this.modal.excludeProductIds;
         },
     },
     watch: {
+        modalSupplierId(newValue, oldValue) {
+            this.form.supplierId = newValue;
+        },
+        modalStockType(newValue, oldValue) {
+            this.form.stockType = newValue;
+        },
         modalExcludeProductIds(newValue, oldValue) {
             this.form.excludeProductIds = newValue;
         },
@@ -587,6 +615,7 @@ export default {
                 });
         },
         async search() {
+            let stockTypes = this.form.stockType.split("_");
             let data = {
                 supplier_id: this.form.supplierId,
                 product_no: this.form.productNo,
@@ -599,6 +628,7 @@ export default {
                 start_launched_at_end: this.form.startLaunchedAtEnd,
                 product_type: this.form.productType,
                 limit: this.form.limit,
+                stock_types: stockTypes,
                 exclude_product_ids: this.form.excludeProductIds,
             };
 

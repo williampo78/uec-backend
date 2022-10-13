@@ -1,9 +1,10 @@
 import lodash from "lodash";
 import $ from "jquery";
-import Swal from "sweetalert2";
 import "select2";
+import Select2Language from "select2/src/js/select2/i18n/zh-TW";
 import "datatables.net";
 import "datatables.net-bs";
+import DatatableLanguage from "datatables.net-plugins/i18n/zh_Hant.json";
 import "datatables.net-buttons";
 import "datatables.net-buttons-bs";
 import axios from "axios";
@@ -12,15 +13,22 @@ import "jquery-validation/dist/additional-methods";
 import "jquery-validation/dist/localization/messages_zh_TW";
 import flatpickr from "flatpickr";
 import monthSelectPlugin from "flatpickr/dist/plugins/monthSelect";
-import { MandarinTraditional } from "flatpickr/dist/l10n/zh-tw.js";
+import { MandarinTraditional } from "flatpickr/dist/l10n/zh-tw";
 import Croppie from "Croppie";
 import moment from "moment";
+import { saveAs } from "file-saver";
+import camelcaseKeys from "camelcase-keys";
+import snakecaseKeys from "snakecase-keys";
 
 import Vue from "vue";
 import VueAffix from "vue-affix";
 import VueScrollactive from "vue-scrollactive";
 import VueDraggable from "vuedraggable";
 import VueSweetalert2 from "vue-sweetalert2";
+import VueModal from "vue-js-modal";
+import { CollapseTransition } from "@ivanv/vue-collapse-transition";
+import FloatingVue from "floating-vue";
+
 window._ = lodash;
 
 /**
@@ -30,10 +38,11 @@ window._ = lodash;
 window.$ = window.jQuery = $;
 
 /**
- * sweetalert2
+ * bootstrap 3
  */
-// 宣告全域物件
-window.Swal = Swal;
+require("bootstrap-3");
+// 讓 modal 內的元件可以獲得焦點
+$.fn.modal.Constructor.prototype.enforceFocus = function () {};
 
 /**
  * select2
@@ -42,15 +51,14 @@ window.Swal = Swal;
 $.fn.select2.defaults.set("allowClear", true);
 $.fn.select2.defaults.set("theme", "bootstrap");
 $.fn.select2.defaults.set("placeholder", "請選擇");
+$.fn.select2.defaults.set("language", Select2Language);
 
 /**
- * datatables
+ * datatable
  */
-// 預設中文語系
+// 預設值
 $.extend($.fn.dataTable.defaults, {
-    language: {
-        url: "/datatables.net-plugins/i18n/zh_Hant.json",
-    },
+    language: DatatableLanguage,
 });
 
 /**
@@ -86,10 +94,9 @@ flatpickr.setDefaults({
     disableMobile: "true",
 });
 
-/**
- * moment
- */
 window.moment = moment;
+window.camelcaseKeys = camelcaseKeys;
+window.snakecaseKeys = snakecaseKeys;
 
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
@@ -120,22 +127,31 @@ window.Vue = Vue;
 
 Vue.use(VueAffix);
 Vue.use(VueScrollactive);
-Vue.use(VueSweetalert2);
+
+Vue.use(VueSweetalert2, {
+    showConfirmButton: true,
+    confirmButtonText: "確定",
+    confirmButtonColor: "#008000",
+    cancelButtonText: "取消",
+    cancelButtonColor: "#FF0000",
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+});
 // 設定sweetalert2 toast
-const Toast = Vue.swal.mixin({
+window.Toast = Vue.swal.mixin({
     toast: true,
     position: "bottom-end",
     showConfirmButton: false,
-    timer: 3000,
+    timer: 4000,
     timerProgressBar: true,
     didOpen: (toast) => {
         toast.addEventListener("mouseenter", Vue.swal.stopTimer);
         toast.addEventListener("mouseleave", Vue.swal.resumeTimer);
     },
 });
-window.Toast = Toast;
 
-/**
- * vue draggable
- */
+Vue.use(VueModal);
+Vue.use(FloatingVue);
+
 Vue.component("draggable", VueDraggable);
+Vue.component("collapse-transition", CollapseTransition);

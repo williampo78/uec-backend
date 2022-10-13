@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\ReturnExamination;
 use App\Models\ReturnRequest;
+use App\Services\ReturnGoodsService;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,14 @@ use Illuminate\Support\Facades\Log;
 
 class OrderRefundService
 {
+
+    private $returnGoodsService;
+
+    public function __construct(ReturnGoodsService $returnGoodsService)
+    {
+        $this->returnGoodsService = $returnGoodsService;
+    }
+
     /**
      * 處理和搜尋有關的sql
      * @param $builder
@@ -191,13 +200,13 @@ class OrderRefundService
      * @Author: Eric
      * @DateTime: 2022/9/7 上午 11:35
      */
-    public function handleReturnExaminations(Collection $returnExaminations, Collection $lookupValuesVs, array $permission): Collection
+    public function handleReturnExaminations(Collection $returnExaminations, Collection $lookupValuesVs, array $permission, $ReturnRequest): Collection
     {
-        return $returnExaminations->map(function ($returnExamination) use ($lookupValuesVs, $permission) {
+        return $returnExaminations->map(function ($returnExamination) use ($lookupValuesVs, $permission, $ReturnRequest) {
 
             $numberOrLogisticsName = optional($returnExamination->returnRequest)->lgst_company_code;
             $numberOrLogisticsName = config('uec.lgst_company_code_options')[$numberOrLogisticsName] ?? '';
-
+            //供應商自出
             if ($returnExamination->returnRequest->ship_from_whs == 'SUP') {
                 $code                  = $returnExamination->sup_lgst_company;
                 $numberOrLogisticsName = optional($lookupValuesVs->where('code', $code)->first())->description;
@@ -216,18 +225,53 @@ class OrderRefundService
                 ];
             });
 
+            $buttons = [];
+
+            //作廢按鈕
+            if ($permission['auth_void'] == 1) {
+                //可以作廢的狀態
+                $voidableState = [
+                    'CREATED', //接獲申請
+                    'DISPATCHED' //派車回收
+                ];
+
+                //作廢按鈕判斷
+                if (in_array($returnExamination->status_code, $voidableState, true)) {
+                    $buttons[] = 'void';
+                }
+            }
+
+            //協商回報按鈕
+            if ($permission['auth_update'] == 1) {
+                //檢驗異常
+                if ($returnExamination->status_code == 'FAILED') {
+                    $buttons[] = 'negotiate';
+
+                //商城出貨 && 派車回收
+                } elseif ($ReturnRequest->ship_from_whs == 'SELF' && $returnExamination->status_code == 'DISPATCHED') {
+                    $buttons[] = 'negotiate';
+                }
+            }
+
+            //檢驗結果
+            $isExaminationPassed = '';
+            if(!is_null($returnExamination->is_examination_passed)){
+                $isExaminationPassed = $returnExamination->is_examination_passed == 1 ? '合格' : '不合格';
+            }
+
+            //協商結果
+            $negoResult = '';
+            if(!is_null($returnExamination->nego_result)){
+                $negoResult = $returnExamination->nego_result == 1 ? '允許退貨' : '不允許退貨';
+            }
 
             return [
-                'button'                   => [
-                    'title'       => '協商回報',
-                    //是否能協商回報
-                    'can_operate' => $returnExamination->status_code == 'FAILED' && $permission['auth_update'] == 1,
-                ],
+                'buttons'                  => $buttons,
                 'return_examination_id'    => $returnExamination->id,
                 //檢驗單號
                 'examination_no'           => $returnExamination->examination_no ?? '',
                 //檢驗單狀態
-                'status_code'              => config('uec.return_examination_status_codes')[$returnExamination->status_code] ?? null ?? '',
+                'status_code'              => config('uec.return_examination_status_codes')[$returnExamination->status_code] ?? '',
                 //供應商
                 'supplier_name'            => optional($returnExamination)->supplier->name ?? '',
                 //派車確認時間
@@ -239,13 +283,13 @@ class OrderRefundService
                 //檢驗回報時間
                 'examination_reported_at'  => $returnExamination->examination_reported_at ?? '',
                 //檢驗結果
-                'is_examination_passed'    => $returnExamination->is_examination_passed == 1 ? '合格' : '不合格' ?? '',
+                'is_examination_passed'    => $isExaminationPassed,
                 //檢驗結果說明
                 'examination_remark'       => $returnExamination->examination_remark ?? '',
                 //協商結果
-                'nego_result'              => $returnExamination->nego_result == 1 ? '允許退貨' : '不允許退貨' ?? '',
+                'nego_result'              => $negoResult,
                 //協商退款金額
-                'nego_refund_amount'       => number_format($returnExamination->nego_refund_amount) ?? '',
+                'nego_refund_amount'       => is_null($returnExamination->nego_refund_amount) ? '' : number_format($returnExamination->nego_refund_amount),
                 //協商內容備註
                 'nego_remark'              => $returnExamination->nego_remark ?? '',
                 'details'                  => $details ?? []
@@ -529,7 +573,7 @@ class OrderRefundService
         if (empty($returnExamination)) {
             return [
                 'status'  => false,
-                'message' => '發生錯誤'
+                'message' => '發生錯誤，檢驗單不存在'
             ];
         }
 
@@ -604,9 +648,17 @@ class OrderRefundService
             ->whereNull('is_returnable')
             ->first();
 
-        //呼叫退貨api
+        //所有檢驗單皆驗證完成，呼叫退貨api
         if (empty($unconfirmedReturnExamination)) {
-            #TODO 退貨api
+
+            $payload = [
+                'return_request_id' => $returnExamination->return_request_id,
+                'type'              => 'backend'
+            ];
+
+            return $this->returnGoodsService
+                ->setParameters($payload)
+                ->handle();
         }
 
         return [

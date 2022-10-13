@@ -34,6 +34,9 @@
             right: 0;
             margin: auto;
         }
+        .no-pa{
+            padding: 0
+        }
     </style>
     <div class="sysinfo">
         <div class="sysinfo-title theme-color">基本檔</div>
@@ -71,7 +74,7 @@
                         <div class="row ">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2">
                                         <label class="control-label">庫存類型</label><span class="text-red">*</span>
                                     </div>
                                     <div class="col-sm-3">
@@ -361,7 +364,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 " style="padding-right: 0">
                                         <label class="control-label">材積(公分) <span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-1">
@@ -482,7 +485,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 " style="padding-right:0">
                                         <label class="control-label">轉單審核人員</label>
                                     </div>
                                     <div class="col-sm-9">

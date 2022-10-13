@@ -3,7 +3,7 @@
 @section('title', '編輯供應商')
 
 @section('content')
-    <div id="app">
+    <div id="app" v-cloak>
         @if ($errors->any())
             <div ref="errorMessage" style="display: none;">
                 {{ $errors->first('message') }}
@@ -11,13 +11,11 @@
         @endif
 
         <div id="page-wrapper">
-            <!-- 表頭名稱 -->
             <div class="row">
                 <div class="col-sm-12">
                     <h1 class="page-header"><i class="fa-solid fa-pencil"></i> 編輯供應商</h1>
                 </div>
             </div>
-            <!-- /.row -->
             <div class="row">
                 <div class="col-sm-12">
                     <div class="panel panel-default">
@@ -198,18 +196,25 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-4">
                                         <div class="form-group">
                                             <label class="control-label" for="bank_name">收款銀行</label>
                                             <input type="text" class="form-control" name="bank_name" id="bank_name"
                                                 v-model="form.bankName">
                                         </div>
                                     </div>
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-4">
                                         <div class="form-group">
                                             <label class="control-label" for="bank_branch">支行名稱</label>
                                             <input type="text" class="form-control" name="bank_branch" id="bank_branch"
                                                 v-model="form.bankBranch">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label class="control-label" for="bank_account_number">銀行帳號</label>
+                                            <input type="text" class="form-control" name="bank_account_number" id="bank_account_number"
+                                                v-model="form.bankAccountNumber">
                                         </div>
                                     </div>
                                 </div>
@@ -354,6 +359,7 @@
                                     <thead>
                                         <tr>
                                             <th class="text-nowrap">項次</th>
+                                            <th class="text-nowrap">項目代碼</th>
                                             <th class="text-nowrap">項目名稱</th>
                                             <th class="text-nowrap">項目值</th>
                                         </tr>
@@ -362,6 +368,7 @@
                                         <tr v-for="(supplierContractTerm, index) in supplierContractTerms"
                                             :key="index">
                                             <td>@{{ index + 1 }}</td>
+                                            <td>@{{ supplierContractTerm.code }}</td>
                                             <td>@{{ supplierContractTerm.description }}</td>
                                             <td>
                                                 <input type="hidden" :name="`contract_terms[${index}][term_code]`"
@@ -425,6 +432,7 @@
                     active: 1,
                     bankName: "",
                     bankBranch: "",
+                    bankAccountNumber: "",
                     remark: "",
                     contacts: [{
                         name: "",
@@ -445,17 +453,53 @@
                 },
                 supplierTypes: [],
                 paymentTerms: [],
-                taxTypeOptions: [],
-                activeOptions: [],
-                supplierContractStatusCodeOptions: [],
+                taxTypeOptions: [
+                    {
+                        id: "NON_TAXABLE",
+                        text: "免稅",
+                    },
+                    {
+                        id: "TAXABLE",
+                        text: "應稅內含",
+                    },
+                    {
+                        id: "ZERO_RATED",
+                        text: "零稅率",
+                    },
+                ],
+                activeOptions: [
+                    {
+                        id: 1,
+                        text: "啟用",
+                    },
+                    {
+                        id: 0,
+                        text: "關閉",
+                    },
+                ],
+                supplierContractStatusCodeOptions: [
+                    {
+                        id: "CREATED",
+                        text: "未啟動",
+                    },
+                    {
+                        id: "PROCESSING",
+                        text: "用印中",
+                    },
+                    {
+                        id: "APPROVED",
+                        text: "已合作",
+                    },
+                    {
+                        id: "EXPIRED",
+                        text: "已過期",
+                    },
+                ],
                 supplierContractTerms: [],
             },
             created() {
                 let supplierTypes = @json($supplierTypes);
                 let paymentTerms = @json($paymentTerms);
-                let taxTypeOptions = @json($taxTypeOptions);
-                let activeOptions = @json($activeOptions);
-                let supplierContractStatusCodeOptions = @json($supplierContractStatusCodeOptions);
                 let supplierContractTerms = @json($supplierContractTerms);
                 let supplier = @json($supplier);
 
@@ -477,39 +521,11 @@
                     });
                 }
 
-                if (taxTypeOptions) {
-                    Object.entries(taxTypeOptions).forEach(([key, taxTypeOption]) => {
-                        this.taxTypeOptions.push({
-                            text: taxTypeOption,
-                            id: key
-                        });
-                    });
-                }
-
-                if (activeOptions) {
-                    Object.entries(activeOptions).forEach(([key, activeOption]) => {
-                        this.activeOptions.push({
-                            text: activeOption,
-                            id: parseInt(key)
-                        });
-                    });
-                }
-
-                if (supplierContractStatusCodeOptions) {
-                    Object.entries(supplierContractStatusCodeOptions).forEach(([key,
-                        supplierContractStatusCodeOption
-                    ]) => {
-                        this.supplierContractStatusCodeOptions.push({
-                            text: supplierContractStatusCodeOption,
-                            id: key
-                        });
-                    });
-                }
-
                 if (supplierContractTerms) {
                     supplierContractTerms.forEach(supplierContractTerm => {
                         this.supplierContractTerms.push({
-                            description: supplierContractTerm.description
+                            description: supplierContractTerm.description,
+                            code: supplierContractTerm.code,
                         });
 
                         this.form.contract.terms.push({
@@ -542,6 +558,7 @@
                     this.form.active = supplier.active;
                     this.form.bankName = supplier.bank_name;
                     this.form.bankBranch = supplier.bank_branch;
+                    this.form.bankAccountNumber = supplier.bank_account_number;
                     this.form.remark = supplier.remark;
 
                     // 已存在的聯絡人

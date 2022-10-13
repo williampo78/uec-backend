@@ -20,7 +20,7 @@
                         <form id="search-form" class="form-horizontal" method="GET" action="{{ route('products_mall') }}">
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">庫存類型</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -39,7 +39,7 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">商品序號</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -49,7 +49,7 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">供應商</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -68,7 +68,7 @@
                             <br>
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">商品通路</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -90,7 +90,7 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">商品名稱</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -100,7 +100,7 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">前台分類</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -119,7 +119,7 @@
                             <br>
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">配送方式</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -139,7 +139,7 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">商品類型</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -159,7 +159,7 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">上架狀態</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -192,7 +192,7 @@
                             <br>
                             <div class="row">
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left: 0" class="col-sm-3">
                                         <label class="control-label">上架時間</label>
                                     </div>
                                     <div class="col-sm-4">
@@ -207,7 +207,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-sm-1 text-center">
+                                    <div style="padding: 0" class="col-sm-1 text-center">
                                         <label class="control-label">～</label>
                                     </div>
                                     <div class="col-sm-4">
@@ -225,7 +225,7 @@
                                 </div>
 
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">查詢筆數上限</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -234,7 +234,7 @@
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
-                                    <div class="col-sm-3">
+                                    <div style="padding-left:0" class="col-sm-3">
                                         <label class="control-label">建檔時間</label>
                                     </div>
                                     <div class="col-sm-4">
@@ -249,7 +249,7 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-sm-1 text-center">
+                                    <div style="padding: 0" class="col-sm-1 text-center">
                                         <label class="control-label">～</label>
                                     </div>
                                     <div class="col-sm-4">
@@ -287,32 +287,32 @@
                     </div>
 
                     <!-- Table list -->
-                    <div class="panel-body">
+                    <div style="overflow: auto" class="panel-body">
                         <div class="row">
                         </div>
                         {{-- <hr> --}}
                         <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_list">
                             <thead>
                                 <tr>
-                                    <th>功能</th>
-                                    <th>項次</th>
-                                    <th>供應商</th>
-                                    <th>商品序號</th>
-                                    <th>商品名稱</th>
-                                    <th>售價(含稅)</th>
-                                    <th>成本(含稅)</th>
-                                    <th>毛利(%)</th>
-                                    <th>商品類型</th>
-                                    <th>建檔日期</th>
-                                    <th>上架狀態</th>
-                                    <th>上架時間起</th>
-                                    <th>上架時間訖</th>
+                                    <th class="text-nowrap">功能</th>
+                                    <th class="text-nowrap">項次</th>
+                                    <th class="text-nowrap">供應商</th>
+                                    <th class="text-nowrap">商品序號</th>
+                                    <th style="width: 300px; box-sizing:border-box" class="text-nowrap">商品名稱</th>
+                                    <th class="text-nowrap">售價(含稅)</th>
+                                    <th class="text-nowrap">成本(含稅)</th>
+                                    <th class="text-nowrap">毛利(%)</th>
+                                    <th class="text-nowrap">商品類型</th>
+                                    <th class="text-nowrap">建檔日期</th>
+                                    <th class="text-nowrap">上架狀態</th>
+                                    <th class="text-nowrap">上架時間起</th>
+                                    <th class="text-nowrap">上架時間訖</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($products as $key => $val)
                                     <tr>
-                                        <td>
+                                        <td class="text-nowrap">
                                             @if ($share_role_auth['auth_query'])
                                             <a class="btn btn-info btn-sm"
                                                 href="{{ route('products_mall.show', $val->id) }}">
@@ -325,9 +325,9 @@
                                             @endif
                                         </td>
                                         <td>{{ $key += 1 }}</td>
-                                        <td>{{ $val->supplier_name }}</td>
+                                        <td class="text-nowrap">{{ $val->supplier_name }}</td>
                                         <td>{{ $val->product_no }}</td>
-                                        <td>{{ $val->product_name }}</td>
+                                        <td style="display:inline-block;width:300px;min-height:40px;white-space:pre-wrap">{{ $val->product_name }}</td>
                                         <td>{{ $val->selling_price }}</td>
                                         <td>{{ $val->item_cost }}</td>
                                         <td>{{ $val->gross_margin }}</td>

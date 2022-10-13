@@ -21,12 +21,12 @@ class OrderExport implements FromCollection, WithHeadings, WithColumnWidths, Wit
     /**
      * 欄位
      */
-    private const COLUMNS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR'];
+    private const COLUMNS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT'];
 
     /**
      * 欄位寬度
      */
-    private const WIDTHS = [10, 20, 20, 10, 20, 10, 10, 20, 10, 20, 20, 20, 20, 20, 20, 10, 20, 20, 10, 20, 20, 20, 30, 10, 10, 10, 15, 10, 10, 10, 10, 10, 10, 10, 10, 15, 10, 15, 10, 15, 10, 10, 15, 15];
+    private const WIDTHS = [10, 20, 20, 10, 20, 10, 10, 20, 10, 20, 20, 20, 20, 20, 20, 10, 20, 20, 10, 20, 20, 20, 30, 10, 10, 10, 15, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 15, 10, 15, 10, 15, 10, 10, 15, 15];
 
     /**
      * 水平對齊方式
@@ -34,12 +34,12 @@ class OrderExport implements FromCollection, WithHeadings, WithColumnWidths, Wit
      * center: c
      * right: r
      */
-    private const ALIGNMENTS = ['c', 'c', 'c', 'l', 'c', 'l', 'c', 'c', 'r', 'c', 'c', 'c', 'c', 'c', 'l', 'r', 'c', 'c', 'r', 'c', 'l', 'l', 'l', 'l', 'l', 'r', 'r', 'r' ,'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'l'];
+    private const ALIGNMENTS = ['c', 'c', 'c', 'l', 'l', 'c', 'l', 'c', 'c', 'r', 'c', 'c', 'c', 'c', 'c', 'l', 'r', 'c', 'c', 'r', 'c', 'l', 'l', 'l', 'l', 'l', 'l', 'r', 'r', 'r' ,'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'l'];
 
     /**
      * 需合併儲存格的欄位
      */
-    private const MERGE_CELL_COLUMNS = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S'];
+    private const MERGE_CELL_COLUMNS = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
 
     public function __construct($orders)
     {
@@ -58,6 +58,7 @@ class OrderExport implements FromCollection, WithHeadings, WithColumnWidths, Wit
                 'ordered_date' => Carbon::parse($order->ordered_date)->format('Y-m-d H:i'),
                 'order_no' => $order->order_no,
                 'status_code' => config('uec.order_status_code_options')[$order->status_code] ?? null,
+                'buyer_remark' => $order->buyer_remark,
                 'member_account' => $order->member_account,
                 'lgst_method' => config('uec.lgst_method_options')[$order->lgst_method] ?? null,
                 'shipping_fee' => $order->shipping_fee,
@@ -77,6 +78,7 @@ class OrderExport implements FromCollection, WithHeadings, WithColumnWidths, Wit
                 'item_no' => null,
                 'pos_item_no' => null,
                 'product_name' => null,
+                'product_type' => null,
                 'spec_1_value' => null,
                 'spec_2_value' => null,
                 'selling_price' => null,
@@ -142,6 +144,7 @@ class OrderExport implements FromCollection, WithHeadings, WithColumnWidths, Wit
                     $row['item_no'] = $orderDetail->item_no;
                     $row['pos_item_no'] = optional($orderDetail->productItem)->pos_item_no;
                     $row['product_name'] = optional($orderDetail->product)->product_name;
+                    $row['product_type'] = config('uec.product_type_options')[optional($orderDetail->product)->product_type] ?? null;
                     $row['spec_1_value'] = optional($orderDetail->productItem)->spec_1_value;
                     $row['spec_2_value'] = optional($orderDetail->productItem)->spec_2_value;
                     $row['selling_price'] = $orderDetail->selling_price;
@@ -197,6 +200,7 @@ class OrderExport implements FromCollection, WithHeadings, WithColumnWidths, Wit
             '訂單時間',
             '訂單編號',
             '訂單狀態',
+            '訂單備註',
             '會員帳號',
             '物流方式',
             '運費',
@@ -216,6 +220,7 @@ class OrderExport implements FromCollection, WithHeadings, WithColumnWidths, Wit
             'Item編號',
             'POS品號',
             '商品名稱',
+            '商品類型',
             '規格一',
             '規格二',
             '售價',

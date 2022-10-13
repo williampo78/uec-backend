@@ -1,14 +1,14 @@
 <div class="modal fade" id="update_invoice" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
     aria-hidden="true">
 
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="max-width: 800px;">
         <div class="modal-content modal-primary panel-primary">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="myModalLabel"><i class="fa-solid fa-gear"></i> 補登發票</h4>
                 <input type='hidden' id="purchase_id" value="" />
             </div>
-            <form id="update_invoice_form" class="form-horizontal">
+            <form id="update_invoice_form" class="form-horizontal" >
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-sm-6">

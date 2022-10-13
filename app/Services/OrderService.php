@@ -12,6 +12,7 @@ use App\Models\ReturnExaminationDetail;
 use App\Models\ReturnRequest;
 use App\Models\ReturnRequestDetail;
 use App\Models\Shipment;
+use App\Models\ReturnOrderDetail;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -84,6 +85,20 @@ class OrderService
             $orders = $orders->whereRelation('orderCampaignDiscounts.promotionalCampaign', 'campaign_name', 'LIKE', "%{$payload['campaign_name']}%");
         }
 
+        // 訂單類型
+        if (isset($payload['order_ship_from_whs'])) {
+            $orders = $orders->where('ship_from_whs', $payload['order_ship_from_whs']);
+        }
+
+        // 資料範圍
+        if (isset($payload['data_range'])) {
+            if ($payload['data_range'] == 'SHIPPED_AT_NULL') {
+                $orders = $orders->whereRelation('shipments', 'shipped_at', null);
+            } elseif ($payload['data_range'] == 'DELIVERED_AT_NULL') {
+                $orders = $orders->whereRelation('shipments', 'delivered_at', null);
+            }
+        }
+
         return $orders->select()
             ->addSelect(DB::raw('get_order_status_desc(order_no) AS order_status_desc'))
             ->orderBy('ordered_date', 'desc')
@@ -107,6 +122,7 @@ class OrderService
             'orderDetails.product',
             'orderDetails.productItem',
             'orderDetails.shipmentDetail.shipment',
+            'orderDetails.product.supplier',
             'orderPayments' => function ($query) {
                 $query->orderBy('created_at', 'asc');
             },
@@ -135,6 +151,11 @@ class OrderService
             },
             'invoiceAllowances.invoice',
             'donatedInstitution',
+            'returnRequests',
+            'returnOrderDetails',
+            'returnOrderDetails.productItem',
+            'returnOrderDetails.productItem.product',
+            'returnOrderDetails.promotionalCampaign',
         ]);
 
         $order = $order->find($id);
@@ -153,6 +174,9 @@ class OrderService
         $combineInvoices = $combineInvoices->sortBy('transaction_date');
 
         $order->combineInvoices = $combineInvoices;
+
+        // 退貨成功 排序
+        $order->returnOrderDetails = $order->returnOrderDetails->sortBy('Priority');
 
         return $order;
     }
@@ -513,6 +537,7 @@ class OrderService
             }
 
         }
+        $tmp_group = "";
         foreach ($order_details as $key => $val) {
             $findProductPRD_M = OrderCampaignDiscount::where('order_detail_id', '=', $val['id'])
                 ->where('order_id', $orders['results']['order_id'])
@@ -520,7 +545,6 @@ class OrderService
                 ->where('record_identity', 'M')
                 ->where('discount', 0.0)
                 ->first();
-
             if ($findProductPRD_M !== null) {
                 $findProductPRD_G = OrderCampaignDiscount::with([
                     'promotionalCampaign',
@@ -564,26 +588,37 @@ class OrderService
                     }
 
                     $photo_name = empty($photo_name) ? null : config('filesystems.disks.s3.url') . $photo_name;
-
                     if (!isset($order_details[$key]['discount_content'][$PRD->group_seq])) {
                         $qty = optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty - optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->returned_qty;
-                        $order_details[$key]['discount_content'][$PRD->group_seq] = [
-                            'display' => true,
-                            'campaignName' => $PRD->promotionalCampaign->campaign_name,
-                            'campaignBrief' => $PRD->promotionalCampaign->campaign_brief,
-                            'thresholdCampaignBrief' => $PRD->promotionalCampaignThreshold ? $PRD->promotionalCampaignThreshold->threshold_brief : '',
-                            'campaignProdList' => [
-                                [
-                                    'id' => $PRD->order_detail_id,
-                                    'productId' => $PRD->product->id,
-                                    'productName' => $PRD->product->product_name,
-                                    'productPhoto' => $photo_name,
-                                    'qty' => $qty,
-                                    'spec_1_value' => optional($PRD->productItem)->spec_1_value,
-                                    'spec_2_value' => optional($PRD->productItem)->spec_2_value
+
+                        if ($tmp_group != $PRD->order_detail_id) {
+                            $order_details[$key]['discount_content'][$PRD->group_seq] = [
+                                'display' => true,
+                                'campaignName' => $PRD->promotionalCampaign->campaign_name,
+                                'campaignBrief' => $PRD->promotionalCampaign->campaign_brief,
+                                'thresholdCampaignBrief' => $PRD->promotionalCampaignThreshold ? $PRD->promotionalCampaignThreshold->threshold_brief : '',
+                                'campaignProdList' => [
+                                    [
+                                        'id' => $PRD->order_detail_id,
+                                        'productId' => $PRD->product->id,
+                                        'productName' => $PRD->product->product_name,
+                                        'productPhoto' => $photo_name,
+                                        'qty' => $qty,
+                                        'spec_1_value' => optional($PRD->productItem)->spec_1_value,
+                                        'spec_2_value' => optional($PRD->productItem)->spec_2_value
+                                    ],
                                 ],
-                            ],
-                        ];
+                            ];
+                            $tmp_group = $PRD->order_detail_id;
+                        } else {
+                            $order_details[$key]['discount_content'][$PRD->group_seq] = [
+                                'display' => true,
+                                'campaignName' => $PRD->promotionalCampaign->campaign_name,
+                                'campaignBrief' => $PRD->promotionalCampaign->campaign_brief,
+                                'thresholdCampaignBrief' => $PRD->promotionalCampaignThreshold ? $PRD->promotionalCampaignThreshold->threshold_brief : '',
+                                'campaignProdList' => [],
+                            ];
+                        }
                     } else {
                         $qty = optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty - optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->returned_qty;
                         $order_details[$key]['discount_content'][$PRD->group_seq]['campaignProdList'][] = [
@@ -599,7 +634,6 @@ class OrderService
 
                 }
             }
-
             //滿額折
             $TargetThresholdDiscounts = $thresholdDiscounts
                 ->where('product_id', $val['product_id'])
@@ -675,23 +709,22 @@ class OrderService
         // 金流單
         if ($order->status_code == 'CANCELLED' || $order->status_code == 'VOIDED') {
             $payment = OrderPayment::select("latest_api_date")
-                ->where('source_table_name', 'return_requests')
+                ->where('source_table_name', 'orders')
                 ->where('payment_type', 'REFUND')
                 ->where('payment_status', 'COMPLETED')
                 ->where('order_no', $order->order_no)
                 ->first();
             $T03 = isset($payment->latest_api_date) ? Carbon::parse($payment->latest_api_date)->format('Y-m-d H:i') : $T03;
         }
-
         // 出貨貨態
         $shipments = $this->getShipmentDetailByOrderNo($order->order_no);
         if (isset($shipments)) {
             foreach ($shipments as $shipment) {
                 $T01 = Carbon::parse($shipment->shipment_date)->format('Y-m-d H:i');
-                $T02 = !is_null($shipment->voided_at) ? Carbon::parse($shipment->voided_at)->format('Y-m-d H:i') : Carbon::parse($shipment->cancelled_at)->format('Y-m-d H:i');
-                $T05 = (is_null($shipment->shipped_at)) ? $T05 : Carbon::parse($shipment->shipped_at)->format('Y-m-d H:i');
-                $T06 = (is_null($shipment->delivered_at)) ? null : Carbon::parse($shipment->delivered_at)->format('Y-m-d H:i'); //出貨單 配達時間
-                $T07 = (is_null($shipment->overdue_confirmed_at)) ? null : Carbon::parse($shipment->overdue_confirmed_at)->format('Y-m-d H:i'); //出貨單 配送異常時間
+                $T02 = ($shipment->voided_at) ? Carbon::parse($shipment->voided_at)->format('Y-m-d H:i') : Carbon::parse($shipment->cancelled_at)->format('Y-m-d H:i');
+                $T05 = ($shipment->shipped_at) ? Carbon::parse($shipment->shipped_at)->format('Y-m-d H:i') : null;
+                $T06 = ($shipment->delivered_at) ? Carbon::parse($shipment->delivered_at)->format('Y-m-d H:i') : null; //出貨單 配達時間
+                $T07 = ($shipment->overdue_confirmed_at) ? Carbon::parse($shipment->overdue_confirmed_at)->format('Y-m-d H:i') : null; //出貨單 配送異常時間
                 $status[$shipment->new_order_detail_id][$shipment->product_item_id] = [
                     "order_status" => $order->status_code,
                     "payment_status" => $order->pay_status,
@@ -711,6 +744,7 @@ class OrderService
                 $info_array = [];
                 $show_array = [];
                 foreach ($shipment_detail as $item_id => $detail) {
+                    //$ship_return = true($detail['T06'] ? true : false);
                     $info_array[] = [
                         'number_desc' => '配送單號',
                         'number' => $detail['package_no']
@@ -720,13 +754,13 @@ class OrderService
                         "status_time" => $detail['T01'],
                         "status_display" => true
                     ];
-                    if ($detail['shipment_status'] == 'CANCELLED' || $detail['shipment_status'] == 'VOIDED') {
+                    if ($detail['order_status'] == 'CANCELLED' || $detail['order_status'] == 'VOIDED') {
                         $show_array[] = [
                             "status_desc" => "已取消",
                             "status_time" => $detail['T02'],
                             "status_display" => false
                         ];
-                        if ($detail['shipment_status'] == 'COMPLETED') {
+                        if ($detail['T03']) {
                             $show_array[] = [
                                 "status_desc" => "已退款",
                                 "status_time" => $detail['T03'],
@@ -772,33 +806,42 @@ class OrderService
                 }
             }
         }
-        $re_write_type = $can_return_order['type'];
-        $re_write_status = $can_return_order['status'];
 
         // 退貨貨態
         $return_examination_info = $this->getReturnExaminationsByOrderNo($order->order_no);
-        if ($can_return_order['type'] == 2 && $return_examination_info->count() == 0) { //至少一張出貨單配達、尚有出貨單未配達，沒有退貨
-            $re_write_type = 3;
-            $re_write_status = true;
+        //可否申請退貨 B
+        if ($can_return_order['type'] == 2 && $return_examination_info->count() == 0) { //至少一張出貨單配達、尚有出貨單未配達，沒有退貨檢驗單
+            $shipment_status['can_return_order']['type'] = 3;
+            $shipment_status['can_return_order']['status'] = true;
+        } else {
+            $shipment_status['can_return_order']['type'] = $can_return_order['type'];
+            $shipment_status['can_return_order']['status'] = $can_return_order['status'];
         }
-        $shipment_status['can_return_order']['type'] = $re_write_type;
-        $shipment_status['can_return_order']['status'] = $re_write_status;
         if (isset($return_examination_info)) {
+            $voided_count = 0;
+            $exam_count = 0;
+            $closed_count = 0;
             foreach ($return_examination_info as $return_detail) {
                 $return_type = false;
-                if (($return_detail->return_requests_status != 'COMPLETED' || $return_detail->return_requests_status != 'VOIDED')) { //「未結案」的退貨申請
-                    $shipment_status['can_return_order']['type'] = 2;
-                    $shipment_status['can_return_order']['status'] = true;
+                if ($return_detail->return_requests_status != 'COMPLETED' && $return_detail->return_requests_status != 'VOIDED') { //未結案，退貨取消
+                    $exam_count++;
                 }
-                $T21 = (is_null($return_detail->created_at)) ? null : Carbon::parse($return_detail->created_at)->format('Y-m-d H:i');//退貨檢驗單 產生時間
+                if ($return_detail->return_requests_status == 'VOIDED') { //退貨取消，狀態回復出貨狀態
+                    $voided_count++;
+                    continue;
+                }
+                if ($return_detail->return_requests_status == 'CLOSED') { //退貨取消，狀態回復出貨狀態
+                    $closed_count++;
+                }
+                $T21 = ($return_detail->created_at) ? Carbon::parse($return_detail->created_at)->format('Y-m-d H:i') : null;//退貨檢驗單 產生時間
                 if ($order->ship_from_whs == 'SELF') {
-                    $T22 = (is_null($return_detail->lgst_dispatched_at)) ? null : Carbon::parse($return_detail->lgst_dispatched_at)->format('Y-m-d H:i');//拋轉秋雨時間
+                    $T22 = ($return_detail->lgst_dispatched_at) ? Carbon::parse($return_detail->lgst_dispatched_at)->format('Y-m-d H:i') : null;//拋轉秋雨時間
                 } else {
-                    $T22 = (is_null($return_detail->lgst_dispatched_at)) ? null : Carbon::parse($return_detail->lgst_dispatched_at)->format('Y-m-d H:i');//退貨檢驗單 派車時間
+                    $T22 = ($return_detail->lgst_dispatched_at) ? Carbon::parse($return_detail->lgst_dispatched_at)->format('Y-m-d H:i') : null;//退貨檢驗單 派車時間
                 }
-                $T23 = (is_null($return_detail->returnable_confirmed_at)) ? null : Carbon::parse($return_detail->returnable_confirmed_at)->format('Y-m-d H:i');//退貨檢驗單檢驗回報時間
-                $T24 = (is_null($return_detail->refund_at)) ? null : Carbon::parse($return_detail->refund_at)->format('Y-m-d H:i');//退款成功時間 / 退款失敗時間
-                $T25 = (is_null($return_detail->examination_reported_at)) ? null : Carbon::parse($return_detail->examination_reported_at)->format('Y-m-d H:i');//退貨檢驗單 檢驗異常時間
+                $T23 = ($return_detail->returnable_confirmed_at) ? Carbon::parse($return_detail->returnable_confirmed_at)->format('Y-m-d H:i') : null;//退貨檢驗單檢驗回報時間
+                $T24 = ($return_detail->refund_at) ? Carbon::parse($return_detail->refund_at)->format('Y-m-d H:i') : null;//退款成功時間 / 退款失敗時間
+                $T25 = ($return_detail->examination_reported_at) ? Carbon::parse($return_detail->examination_reported_at)->format('Y-m-d H:i') : null;//退貨檢驗單 檢驗異常時間
                 $req_mobile = isset($return_detail->req_mobile) ? substr($return_detail->req_mobile, 0, 7) . '***' : "";
                 $return_status[$return_detail->new_order_detail_id][$return_detail->product_item_id] = [
                     "can_return" => $return_type,
@@ -821,6 +864,7 @@ class OrderService
                     $info_array = [];
                     $show_array = [];
                     foreach ($examination_detail as $item_id => $detail) {
+                        if ($detail['status_code'] == 'VOIDED') continue; //退貨檢驗作廢，狀態回復出貨狀態
                         $info_array[] = [
                             'number_desc' => '退貨單號',
                             'number' => $detail['examination_no'],
@@ -838,7 +882,8 @@ class OrderService
                             "status_time" => $detail['T22'],
                             "status_display" => false
                         ];
-                        if ($detail['status_code'] == 'VOIDED' || ($detail['status_code'] == 'M_CLOSED' && $detail['is_returnable'] === 0)) {
+
+                        if (($detail['status_code'] == 'M_CLOSED' && $detail['is_returnable'] === 0)) {
                             $show_array[] = [
                                 "status_desc" => "退貨失敗",
                                 "status_time" => $detail['T23'],
@@ -879,7 +924,15 @@ class OrderService
                     }
                 }
             }
+            if (($can_return_order['type'] == 2 && $return_examination_info->count() == $voided_count) || $closed_count >0) { //已取消退貨 (進入挑品頁)
+                $shipment_status['can_return_order']['type'] = 3;
+                $shipment_status['can_return_order']['status'] = true;
+            } elseif ($exam_count > 0) { //有退貨申請未完成的
+                $shipment_status['can_return_order']['type'] = 2;
+                $shipment_status['can_return_order']['status'] = true;
+            }
         }
+
         if (!isset($shipment_status)) {
             $shipment_status['shipped_info'] = null;
             $shipment_status['shipped_status'] = null;
@@ -946,6 +999,10 @@ class OrderService
                     ->on('return_request_details.order_detail_seq', 'order_details.seq');
             })
             ->join('return_examinations', 'return_examinations.return_request_id', 'return_requests.id')
+            ->join("return_examination_details", function ($join) {
+                $join->on('return_examination_details.return_examination_id', 'return_examinations.id')
+                    ->on('return_examination_details.return_request_detail_id', 'return_request_details.id');
+            })
             ->where('orders.order_no', $orderNo)
             ->where('orders.is_latest', 1)
             ->get();
@@ -964,7 +1021,7 @@ class OrderService
     public function canReturnOrderV2(string $status_code, ?string $delivered_at, ?string $cooling_off_due_date, ?int $return_request_id): array
     {
         $now = Carbon::now();
-        $cooling_off_due_date = Carbon::parse($cooling_off_due_date);
+        $cooling_off_due_date = ($cooling_off_due_date) ? Carbon::parse($cooling_off_due_date) : null;
         $data = [];
         if ($status_code == 'PROCESSING' && !isset($cooling_off_due_date)) { //出貨準備中，無出貨單配達
             $data['status'] = true;
@@ -1032,8 +1089,23 @@ class OrderService
                 $returnable['point_discount'] = [];
                 $returnable['item_id'] = [];
                 $returnable['detail_id'] = [];
+                $returnable['giveaway'] = [];
+                $returnable['main_product'] = [];
+                $returnable['return_id'] = $request->return_id;
+                $order->orderDetails->each(function ($orderDetail) use (&$returnable) {
+                    if ($orderDetail->record_identity == "G") { //找出贈品
+                        $returnable['giveaway'][$orderDetail->main_product_id][] = $orderDetail->id;
+                    }
+                });
                 $order->orderDetails->each(function ($orderDetail) use ($returnRequest, &$request, &$returnable, &$product_with) {
-                    if (in_array($orderDetail->id, $request->return_id)) {
+                    if (in_array($orderDetail->id, $returnable['return_id'])) {
+                        if (isset($returnable['giveaway'][$orderDetail->product_id])) {
+                            foreach ($returnable['giveaway'][$orderDetail->product_id] as $give_key => $give_value) {
+                                if (!in_array($returnable['giveaway'][$orderDetail->product_id][$give_key], $returnable['return_id'])) {//漏傳單品贈
+                                    $returnable['return_id'][] = $give_value;
+                                }
+                            }
+                        }
                         $supplier = ($product_with['ship_from_whs'] == 'SUP') ? $product_with['supplier_id'][$orderDetail->product_item_id] : 0;
                         if (!key_exists($supplier, $returnable['amount'])) $returnable['amount'][$supplier] = 0;
                         if (!key_exists($supplier, $returnable['points'])) $returnable['points'][$supplier] = 0;
@@ -1062,11 +1134,11 @@ class OrderService
                             'created_by' => -1,
                             'updated_by' => -1,
                         ]);
-                        $returnable['amount'][$supplier] += $orderDetail->subtotal;
-                        $returnable['points'][$supplier] += $orderDetail->points;
-                        $returnable['point_discount'][$supplier] += $orderDetail->point_discount;
+                        $returnable['amount'][$supplier] += ($orderDetail->subtotal + $orderDetail->point_discount);
+                        $returnable['points'][$supplier] += abs($orderDetail->points); //正數呈現
+                        $returnable['point_discount'][$supplier] += abs($orderDetail->point_discount); ////正數呈現
                         $returnable['item_id'][$orderDetail->product_item_id] = $supplier;
-                        $returnable['detail_id'][$orderDetail->product_item_id] = $return_request_detail->id;
+                        $returnable['detail_id'][$orderDetail->product_item_id][$orderDetail->id] = $return_request_detail->id;
                     }
                 });
             }
@@ -1081,19 +1153,21 @@ class OrderService
             $exam_payload = [];
             foreach ($returnable['amount'] as $supplier_id => $returnableVal) {
                 // 新增退貨檢驗單
-                $random_string = Str::upper(Str::random(6));
-                $examination_no = 'RX' . $now->format('ymd') . $random_string;
+                $examination_no = ColumnNumberGenerator::make(new ReturnExamination(), 'examination_no')->generate('RX', 6, true, date("ymd"), 'number');
                 $returnExamination = ReturnExamination::create([
                     'return_request_id' => $returnRequest->id,
                     'examination_no' => $examination_no,
                     'request_no' => $requestNo,
                     'supplier_id' => $supplier_id,
                     'status_code' => 'CREATED',
-                    'lgst_dispatched_deadline' => Carbon::parse($returnRequest->create_at)->addDay(2)->format('Y-m-d 23:59:59'),
-                    'examination_deadline' => Carbon::parse($returnRequest->create_at)->addDay(7)->format('Y-m-d 23:59:59'),
+                    'lgst_dispatched_deadline' => Carbon::parse($returnRequest->create_at)->addWeekday(2)->format('Y-m-d 23:59:59'),
+                    'examination_deadline' => Carbon::parse($returnRequest->create_at)->addWeekday(7)->format('Y-m-d 23:59:59'),
                     'returnable_amount' => ($returnable['amount'][$supplier_id] * -1),
                     'returnable_points' => $returnable['points'][$supplier_id],
                     'returnable_point_discount' => $returnable['point_discount'][$supplier_id],
+                    'expected_ret_amount' => ($returnable['amount'][$supplier_id] * -1),
+                    'expected_ret_points' => $returnable['points'][$supplier_id],
+                    'expected_ret_point_discount' => $returnable['point_discount'][$supplier_id],
                     'created_by' => -1,
                     'updated_by' => -1,
                 ]);
@@ -1103,12 +1177,12 @@ class OrderService
                 // 退貨檢驗單明細
                 if ($order->orderDetails->isNotEmpty()) {
                     $order->orderDetails->each(function ($orderDetail) use ($returnExamination, &$request, &$returnable, &$supplier_id, &$msg) {
-                        if (in_array($orderDetail->id, $request->return_id)) {
+                        if (in_array($orderDetail->id, $returnable['return_id'])) {
                             if ($returnable['item_id'][$orderDetail->product_item_id] == $supplier_id) {
                                 // 新增退貨檢驗單明細
                                 $returnExaminationDetail = ReturnExaminationDetail::create([
                                     'return_examination_id' => $returnExamination->id,
-                                    'return_request_detail_id' => $returnable['detail_id'][$orderDetail->product_item_id],
+                                    'return_request_detail_id' => $returnable['detail_id'][$orderDetail->product_item_id][$orderDetail->id],
                                     'product_item_id' => $orderDetail->product_item_id,
                                     'item_no' => $orderDetail->item_no,
                                     'request_qty' => $orderDetail->qty,
@@ -1120,6 +1194,8 @@ class OrderService
                                 $msg['examination'][$returnExamination->examination_no][] = [
                                     'id' => $orderDetail->id,
                                     'product_name' => $orderDetail->product->product_name,
+                                    'spec_1_value' => ($orderDetail->product->spec_dimension > 0 ? $orderDetail->productItem->spec_1_value : ''),
+                                    'spec_2_value' => ($orderDetail->product->spec_dimension > 1 ? $orderDetail->productItem->spec_2_value : ''),
                                     'return_qty' => $orderDetail->qty,
                                     'record_identity' => $orderDetail->record_identity
                                 ];
@@ -1127,6 +1203,8 @@ class OrderService
                         }
                     });
                 }
+                //依主從商品排序
+                array_multisort(array_column($msg['examination'][$returnExamination->examination_no], 'record_identity'), SORT_DESC, $msg['examination'][$returnExamination->examination_no]);
             }
             // 更新訂單
             Order::findOrFail($order->id)
@@ -1171,5 +1249,38 @@ class OrderService
             ->where('orders.is_latest', 1)
             ->get();
         return $data;
+    }
+
+    /**
+     * 檢查會員訂單前一版訂單
+     *
+     * @param string $orderNo
+     * @return array|null
+     */
+    public function getMemberPreRevision(array $payload = []): ?array
+    {
+        $member = auth('api')->user();
+        $orders = Order::where('member_id', $member->member_id)
+            ->whereDate('ordered_date', '>=', $payload['ordered_date_start'])
+            ->whereDate('ordered_date', '<=', $payload['ordered_date_end'])
+            ->select('order_no', 'revision_no', 'refund_status', 'total_amount', 'shipping_fee', 'point_discount', 'cart_campaign_discount', 'points', 'paid_amount', 'fee_of_instal')
+            ->orderBy('order_no', 'asc')
+            ->orderBy('revision_no', 'asc')
+            ->get()->toArray();
+        //整理版本內容
+        $data = [];
+        foreach ($orders as $order) {
+            $data[$order['order_no']][] = $order;
+        }
+        foreach ($data as $order_no => $info) {
+            $vision_no = (count($info) - 1);
+            if ($vision_no == 0) {
+                $arr_data[$order_no] = $info[$vision_no];
+            } else {
+                $vision_no = ($vision_no-1);
+                $arr_data[$order_no] = $info[$vision_no];
+            }
+        }
+        return $arr_data;
     }
 }

@@ -38,7 +38,6 @@
             right: 0;
             margin: auto;
         }
-
     </style>
     <div class="sysinfo">
         <div class="sysinfo-title theme-color">基本檔</div>
@@ -286,8 +285,8 @@
                                 </div>
                                 {{-- 效期控管的天數 --}}
                                 <div class="col-sm-3">
-                                    <input class="form-control" name="expiry_days"
-                                        value=" {{ $products->expiry_days }}" disabled>
+                                    <input class="form-control" name="expiry_days" value=" {{ $products->expiry_days }}"
+                                        disabled>
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -295,12 +294,13 @@
                                     <label class="control-label">允收期(天)</label>
                                 </div>
                                 <div class="col-sm-3">
-                                    <input type="number" class="form-control" name="expiry_receiving_days" min="0"
-                                        value="{{ $products->expiry_receiving_days }}" disabled>
+                                    <input type="number" class="form-control" name="expiry_receiving_days"
+                                        min="0" value="{{ $products->expiry_receiving_days }}" disabled>
                                 </div>
                                 <div class="col-sm-3">
                                     <label class="control-label">
-                                        <a href="#" data-toggle="modal" data-target="#model_requisitions_log">請購紀錄</a>
+                                        <a href="#" data-toggle="modal"
+                                            data-target="#model_requisitions_log">請購紀錄</a>
                                     </label>
                                 </div>
                             </div>
@@ -413,11 +413,13 @@
                                     @foreach ($payment_method_options as $key => $val)
                                         <label class="radio-inline">
                                             @if ($payment_method_options_lock[$key])
-                                                <input class="payment_method" type="checkbox" name="payment_method[]" value="{{ $key }}" checked onclick="return false" disabled>
+                                                <input class="payment_method" type="checkbox" name="payment_method[]"
+                                                    value="{{ $key }}" checked onclick="return false" disabled>
                                                 {{ $val }}
                                             @else
                                                 <input class="payment_method" type="checkbox" name="payment_method[]"
-                                                    value="{{ $key }}" {{in_array($key,$payment_method) ? 'checked' : '' }} disabled>
+                                                    value="{{ $key }}"
+                                                    {{ in_array($key, $payment_method) ? 'checked' : '' }} disabled>
                                                 {{ $val }}
                                             @endif
                                         </label>
@@ -454,7 +456,8 @@
                                     <label class="control-label">採購人員</label>
                                 </div>
                                 <div class="col-sm-9">
-                                    <input class="form-control" name="keyword" id="keyword" value="{{$finallyOrderSupplier}}" readonly>
+                                    <input class="form-control" name="keyword" id="keyword"
+                                        value="{{ $finallyOrderSupplier }}" readonly>
                                 </div>
                             </div>
                             <div class="col-sm-6">
@@ -602,28 +605,29 @@
                                     </div>
                                     <div class="col-sm-10">
                                         <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row form-group">
-                                @foreach ($product_photos as $key => $val)
-                                    <div class="col-sm-2 col-md-2">
-                                        <div class="thumbnail">
-                                            <div class="img-box" style="pointer-events: none;">
-                                                <img src="{{ config('filesystems.disks.s3.url') . $val->photo_name }}">
-                                            </div>
-                                            <div class="caption" style="pointer-events: none;">
-                                                <p>
-                                                    排序: {{ $key + 1 }}
-                                                    {{-- <button class="btn btn-danger pull-right btn-events-none" type="button"
+                                        <div style="display: flex;flex-wrap:wrap; gap:15px">
+                                            @foreach ($product_photos as $key => $val)
+                                                <div class="thumbnail" style="min-width:175px">
+                                                    <div class="img-box" style="pointer-events: none;">
+                                                        <img
+                                                            src="{{ config('filesystems.disks.s3.url') . $val->photo_name }}">
+                                                    </div>
+                                                    <div class="caption"
+                                                        style="pointer-events: none; display:inline-block">
+                                                        <p>
+                                                            排序: {{ $key + 1 }}
+                                                            {{-- <button class="btn btn-danger pull-right btn-events-none" type="button"
                                                         @click="delImages(key)" style="pointer-events: auto;">
                                                         <i class="fa-solid fa-trash-can"></i>
                                                     </button> --}}
-                                                </p>
-                                            </div>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            @endforeach
                                         </div>
+
                                     </div>
-                                @endforeach
+                                </div>
                             </div>
                         </div>
                         <hr>
@@ -631,197 +635,223 @@
                             <div id="SkuComponent">
                                 <div class="row form-group">
                                     <div class="col-sm-12">
-                                        <div class="col-sm-2 ">
-                                            <label class="radio-inline">
-                                                <input type="radio" name="spec_dimension" value="0"
-                                                    {{ $products->spec_dimension == '0' ? 'checked' : 'disabled' }}>
-                                                單規格
-                                            </label>
+                                        <div class="col-sm-1 no-pa">
+                                            <label class="control-label">商品規格<span class="text-red">*</span></label>
                                         </div>
-                                        <div class="col-sm-2">
-                                            <label class="radio-inline">
-                                                <input type="radio" name="spec_dimension" value="1"
-                                                    {{ $products->spec_dimension == '1' ? 'checked' : 'disabled' }}>
-                                                一維多規格
-                                            </label>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            <label class="radio-inline">
-                                                <input type="radio" name="spec_dimension" value="2"
-                                                    {{ $products->spec_dimension == '2' ? 'checked' : 'disabled' }}>
-                                                二維多規格
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row form-group">
-                                    @if ($products->spec_dimension >= '1')
-                                        <div class="col-sm-6">
-                                            <div class="col-sm-2 no-pa">
-                                                <label class="control-label">規格一<span
-                                                        class="text-red">*</span></label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <input class="form-control" type="text" name="spec_1" id="spec_1"
-                                                value="{{ $products->spec_1 }}" disabled>
-                                            </div>
-                                        </div>
-                                    @endif
-                                    @if ($products->spec_dimension == '2')
-                                        <div class="col-sm-6" v-if="products.spec_dimension == 2">
-                                            <div class="col-sm-2 no-pa">
-                                                <label class="control-label">規格二<span
-                                                        class="text-red">*</span></label>
-                                            </div>
-                                            <div class="col-sm-9">
-                                                <input class="form-control" type="text" name="spec_1" id="spec_1"
-                                                value="{{ $products->spec_2 }}" disabled>
-                                            </div>
-                                        </div>
-                                    @endif
+                                        <div class="col-sm-11">
+                                            <div class="col-sm-12" style="margin-bottom:20px">
 
-                                </div>
-                                {{-- 二維多規格 --}}
-                                <div class="row form-group">
-                                    @if ($products->spec_dimension >= '1')
-                                        <div class="col-sm-6">
-                                            <table class="table table-striped table-bordered table-hover">
-                                                <thead>
-                                                    {{-- <tr>
+                                                <div class="col-sm-2 ">
+                                                    <label class="radio-inline">
+                                                        <input type="radio" name="spec_dimension" value="0"
+                                                            {{ $products->spec_dimension == '0' ? 'checked' : 'disabled' }}>
+                                                        單規格
+                                                    </label>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <label class="radio-inline">
+                                                        <input type="radio" name="spec_dimension" value="1"
+                                                            {{ $products->spec_dimension == '1' ? 'checked' : 'disabled' }}>
+                                                        一維多規格
+                                                    </label>
+                                                </div>
+                                                <div class="col-sm-2">
+                                                    <label class="radio-inline">
+                                                        <input type="radio" name="spec_dimension" value="2"
+                                                            {{ $products->spec_dimension == '2' ? 'checked' : 'disabled' }}>
+                                                        二維多規格
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="row form-group">
+                                                @if ($products->spec_dimension >= '1')
+                                                    <div class="col-sm-1"></div>
+                                                    <div class="col-sm-5">
+                                                        <div class="col-sm-2 no-pa">
+                                                            <label class="control-label">規格一<span
+                                                                    class="text-red">*</span></label>
+                                                        </div>
+                                                        <div class="col-sm-9">
+                                                            <input class="form-control" type="text" name="spec_1"
+                                                                id="spec_1" value="{{ $products->spec_1 }}" disabled>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                @if ($products->spec_dimension == '2')
+                                                    <div class="col-sm-5" v-if="products.spec_dimension == 2">
+                                                        <div class="col-sm-2 no-pa">
+                                                            <label class="control-label">規格二<span
+                                                                    class="text-red">*</span></label>
+                                                        </div>
+                                                        <div class="col-sm-9">
+                                                            <input class="form-control" type="text" name="spec_1"
+                                                                id="spec_1" value="{{ $products->spec_2 }}" disabled>
+                                                        </div>
+                                                    </div>
+                                                @endif
+
+                                            </div>
+                                            {{-- 二維多規格 --}}
+                                            <div class="row form-group">
+                                                @if ($products->spec_dimension >= '1')
+                                                    <div class="col-sm-1"></div>
+                                                    <div class="col-sm-5">
+                                                        <table class="table table-striped table-bordered table-hover">
+                                                            <thead>
+                                                                {{-- <tr>
                                                     <th>
                                                         <button class="btn btn-primary btn-sm" type="button" @click="AddSpecToSkuList('1')">新增項目
                                                         </button>
                                                     </th>
                                                 </tr> --}}
-                                                </thead>
-                                                <tbody>
-                                                    @foreach ($spac_list['spac_1'] as $val)
-                                                        <tr v-for="(spec_1, spec_1_key) in SpecList.spec_1"
-                                                            @dragstart="drag" @dragover='dragover' @dragleave='dragleave'
-                                                            @drop="drop" draggable="true" :data-index="spec_1_key"
-                                                            :data-type="'spec_1'">
-                                                            <td>
-                                                                <div class="col-sm-1">
-                                                                    <label class="control-label">
-                                                                        <i class="fa-solid fa-list fa-lg"></i>
-                                                                    </label>
-                                                                </div>
-                                                                <div class="col-sm-9">
-                                                                    <input class="form-control"
-                                                                        value="{{ $val->spec_1_value }}" disabled>
-                                                                </div>
-                                                                <div class="col-sm-2">
-                                                                    {{-- <button class="btn btn-danger btn-sm" type="button"
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($spac_list['spac_1'] as $val)
+                                                                    <tr v-for="(spec_1, spec_1_key) in SpecList.spec_1"
+                                                                        @dragstart="drag" @dragover='dragover'
+                                                                        @dragleave='dragleave' @drop="drop"
+                                                                        draggable="true" :data-index="spec_1_key"
+                                                                        :data-type="'spec_1'">
+                                                                        <td>
+                                                                            <div class="col-sm-1">
+                                                                                <label class="control-label">
+                                                                                    <i class="fa-solid fa-list fa-lg"></i>
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="col-sm-9">
+                                                                                <input class="form-control"
+                                                                                    value="{{ $val->spec_1_value }}"
+                                                                                    disabled>
+                                                                            </div>
+                                                                            <div class="col-sm-2">
+                                                                                {{-- <button class="btn btn-danger btn-sm" type="button"
                                                                 @click="DelSpecList(spec_1 ,'spec_1' ,spec_1_key)">刪除</button> --}}
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
 
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    @endif
-                                    @if ($products->spec_dimension == '2')
-                                        <div class="col-sm-6">
-                                            <table class="table table-striped table-bordered table-hover">
-                                                <thead>
-
-                                                </thead>
-                                                <tbody>
-                                                    @foreach ($spac_list['spac_2'] as $val)
-                                                        <tr v-for="(spec_2, spec_2_key) in SpecList.spec_2"
-                                                            @dragstart="drag" @dragover='dragover' @dragleave='dragleave'
-                                                            @drop="drop" draggable="true" :data-index="spec_2_key"
-                                                            :data-type="'spec_2'">
-                                                            <td>
-                                                                <div class="col-sm-1">
-                                                                    <label class="control-label">
-                                                                        <i class="fa-solid fa-list fa-lg"></i>
-                                                                    </label>
-                                                                </div>
-                                                                <div class="col-sm-9">
-                                                                    <input class="form-control"
-                                                                        value="{{ $val->spec_1_value }}" disabled>
-                                                                </div>
-                                                                <div class="col-sm-2">
-                                                                    {{-- <button class="btn btn-danger btn-sm" type="button"
-                                                                @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)">刪除</button> --}}
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    @endif
-                                </div>
-                                <textarea style="display: none" name="SkuListdata" cols="30"
-                                    rows="10">@{{ SkuList }}</textarea>
-                                <table class="table table-striped table-bordered table-hover">
-                                    <thead>
-                                        <tr>
-                                            @if ($products->spec_dimension >= '1')
-                                                <th style="width: 10%">規格一</th>
-                                            @endif
-                                            @if ($products->spec_dimension == '2')
-                                                <th v-if="products.spec_dimension == 2" style="width: 10%">規格二</th>
-                                            @endif
-                                            <th style="width: 15%">Item編號</th>
-                                            <th style="width: 10%">廠商貨號</th>
-                                            <th style="width: 10%">國際條碼</th>
-                                            <th style="width: 10%">POS品號</th>
-                                            <th style="width: 10%">安全庫存量*</th>
-                                            <th style="width: 10%">是否追加*</th>
-                                            <th style="width: 10%">狀態*</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($products_item as $val)
-                                            <tr>
-                                                @if ($products->spec_dimension >= '1')
-                                                    <td>
-                                                        {{ $val->spec_1_value }}
-                                                    </td>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 @endif
                                                 @if ($products->spec_dimension == '2')
-                                                    <td>
-                                                        {{ $val->spec_2_value }}
-                                                    </td>
+                                                    <div class="col-sm-5">
+                                                        <table class="table table-striped table-bordered table-hover">
+                                                            <thead>
+
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach ($spac_list['spac_2'] as $val)
+                                                                    <tr v-for="(spec_2, spec_2_key) in SpecList.spec_2"
+                                                                        @dragstart="drag" @dragover='dragover'
+                                                                        @dragleave='dragleave' @drop="drop"
+                                                                        draggable="true" :data-index="spec_2_key"
+                                                                        :data-type="'spec_2'">
+                                                                        <td>
+                                                                            <div class="col-sm-1">
+                                                                                <label class="control-label">
+                                                                                    <i class="fa-solid fa-list fa-lg"></i>
+                                                                                </label>
+                                                                            </div>
+                                                                            <div class="col-sm-9">
+                                                                                <input class="form-control"
+                                                                                    value="{{ $val->spec_1_value }}"
+                                                                                    disabled>
+                                                                            </div>
+                                                                            <div class="col-sm-2">
+                                                                                {{-- <button class="btn btn-danger btn-sm" type="button"
+                                                                @click="DelSpecList(spec_2 ,'spec_2' ,spec_2_key)">刪除</button> --}}
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+                                                                @endforeach
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 @endif
+                                            </div>
+                                            <textarea style="display: none" name="SkuListdata" cols="30" rows="10">@{{ SkuList }}</textarea>
+                                            <div style="overflow: auto">
+                                                <table class="table table-striped table-bordered table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            @if ($products->spec_dimension >= '1')
+                                                                <th class="text-nowrap">規格一</th>
+                                                            @endif
+                                                            @if ($products->spec_dimension == '2')
+                                                                <th v-if="products.spec_dimension == 2"
+                                                                    class="text-nowrap">規格二</th>
+                                                            @endif
+                                                            <th class="text-nowrap">Item編號</th>
+                                                            <th class="text-nowrap">廠商貨號</th>
+                                                            <th class="text-nowrap">國際條碼</th>
+                                                            <th class="text-nowrap">POS品號</th>
+                                                            <th class="text-nowrap">安全庫存量*</th>
+                                                            <th class="text-nowrap">是否追加*</th>
+                                                            <th class="text-nowrap">狀態*</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach ($products_item as $val)
+                                                            <tr>
+                                                                @if ($products->spec_dimension >= '1')
+                                                                    <td>
+                                                                        {{ $val->spec_1_value }}
+                                                                    </td>
+                                                                @endif
+                                                                @if ($products->spec_dimension == '2')
+                                                                    <td>
+                                                                        {{ $val->spec_2_value }}
+                                                                    </td>
+                                                                @endif
 
-                                                <td><input class="form-control" value="{{ $val->item_no }}" disabled>
-                                                </td>
-                                                <td><input class="form-control" value="{{ $val->supplier_item_no }}"
-                                                        disabled></td>
-                                                <td><input class="form-control" value="{{ $val->ean }}" disabled>
-                                                </td>
-                                                <td><input class="form-control" value="{{ $val->pos_item_no }}"
-                                                        disabled></td>
-                                                <td><input class="form-control" value="{{ $val->safty_qty }}"
-                                                        disabled>
-                                                </td>
-                                                <td>
-                                                    <select class="form-control js-select2" id="active" disabled>
-                                                        <option value="1" {{ $val->active == '1' ? 'selected' : '' }}>是
-                                                        </option>
-                                                        <option value="0" {{ $val->active == '0' ? 'selected' : '' }}>否
-                                                        </option>
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <select class="form-control js-select2" disabled>
-                                                        <option value="1" {{ $val->status == '1' ? 'selected' : '' }}>啟用
-                                                        </option>
-                                                        <option value="0" {{ $val->status == '0' ? 'selected' : '' }}>停用
-                                                        </option>
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                        @endforeach
+                                                                <td><input style="width:140px" class="form-control"
+                                                                        value="{{ $val->item_no }}" disabled>
+                                                                </td>
+                                                                <td><input style="width:140px" class="form-control"
+                                                                        value="{{ $val->supplier_item_no }}" disabled>
+                                                                </td>
+                                                                <td><input style="width:140px" class="form-control"
+                                                                        value="{{ $val->ean }}" disabled>
+                                                                </td>
+                                                                <td><input style="width:140px" class="form-control"
+                                                                        value="{{ $val->pos_item_no }}" disabled></td>
+                                                                <td><input style="width:75px" class="form-control"
+                                                                        value="{{ $val->safty_qty }}" disabled>
+                                                                </td>
+                                                                <td>
+                                                                    <select class="form-control js-select2" id="active"
+                                                                        disabled>
+                                                                        <option value="1"
+                                                                            {{ $val->active == '1' ? 'selected' : '' }}>是
+                                                                        </option>
+                                                                        <option value="0"
+                                                                            {{ $val->active == '0' ? 'selected' : '' }}>否
+                                                                        </option>
+                                                                    </select>
+                                                                </td>
+                                                                <td>
+                                                                    <select class="form-control js-select2" disabled>
+                                                                        <option value="1"
+                                                                            {{ $val->status == '1' ? 'selected' : '' }}>啟用
+                                                                        </option>
+                                                                        <option value="0"
+                                                                            {{ $val->status == '0' ? 'selected' : '' }}>停用
+                                                                        </option>
+                                                                    </select>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
 
-                                    </tbody>
-                                </table>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
 
                             </div>
 
