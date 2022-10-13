@@ -714,8 +714,9 @@ class MemberController extends Controller
 
         //前台退貨申請
         if (config('uec.cart_p_discount_split') == 1) {//折車多單
-            $requestNo = $this->returnRequestService->generateRequestNo(); //退貨申請單號
-            $return_status = $this->orderService->setReturnByOrderNo($order, $request, $requestNo);
+
+            $return_status = $this->orderService->setReturnByOrderNo($order, $request);
+
             return response()->json([
                 'message' => $return_status['message'],
                 'results' => $return_status['results']

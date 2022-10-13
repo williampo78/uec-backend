@@ -1045,7 +1045,7 @@ class OrderService
      * Author: Rowena
      * Return: string
      */
-    public function setReturnByOrderNo($order, $request, $requestNo)
+    public function setReturnByOrderNo($order, $request)
     {
         $now = Carbon::now();
         //取供應商ID
@@ -1058,6 +1058,7 @@ class OrderService
         DB::beginTransaction();
         try {
             // 新增退貨申請單
+            $requestNo = ColumnNumberGenerator::make(new ReturnRequest(), 'request_no')->generate('RT', 6, true, date("ymd"), 'number');
             $returnRequest = ReturnRequest::create([
                 'agent_id' => 1,
                 'request_no' => $requestNo,
