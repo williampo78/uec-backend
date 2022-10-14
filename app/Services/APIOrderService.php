@@ -49,6 +49,10 @@ class APIOrderService
         $random = Str::random(6);
         //商城倉庫代碼
         $warehouseCode = $this->stockService->getWarehouseConfig();
+        $stock_item_info = $this->stockService->getStockByWarehouse($warehouseCode); //找出產品的庫存數
+        foreach ($stock_item_info as $item_info) {
+            $stock_info_array[$item_info->product_item_id] = $item_info;
+        }
 
         $utms = ShoppingCartDetail::where('member_id', '=', $member_id)->where('status_code', '=', 0)->get();
         $utm_info = [];
@@ -63,7 +67,7 @@ class APIOrderService
         foreach ($product_items as $product_item) {
             $prod_info[$product_item->product_id] = $product_item;
             $prod_items[$product_item->product_id][$product_item->id] = $product_item;
-            $stock = $this->stockService->getStockByItem($warehouseCode, $product_item->id);
+            $stock = $stock_info_array[$product_item->id] ?? null;
             if (isset($stock)) {
                 if ($stock['stockQty'] > 0) {
                     $prod_gift[$product_item->product_id] = $product_item;
@@ -643,7 +647,7 @@ class APIOrderService
             //庫存與LOG相關
             $order_details = OrderDetail::getOrderDetails($newOrder->id);
             foreach ($order_details as $detail) {
-                $stock = $this->stockService->getStockByItem($warehouseCode, $detail->product_item_id);
+                $stock = $stock_info_array[$detail->product_item_id] ?? null;
                 if ( !$this->hasEnoughStockQty($stock['stockQty'], $detail->qty ?? 0)) {
                     $result['status'] = 403;
                     $result['payment_url'] = null;
