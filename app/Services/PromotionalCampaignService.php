@@ -1040,9 +1040,22 @@ class PromotionalCampaignService
             'start_at' => Carbon::parse($campaign->start_at)->format('Y-m-d H:i:s'),
             'end_at' => Carbon::parse($campaign->end_at)->format('Y-m-d H:i:s'),
             'campaign_brief' => $campaign->campaign_brief,
+            'stock_type' => null,
+            'supplier_id' => $campaign->supplier_id ?? 'all',
             'giveaways' => null,
             'products' => null,
         ];
+
+        // 庫存類型
+        switch ($campaign->ship_from_whs) {
+            case 'SELF':
+                $result['stock_type'] = 'A_B';
+                break;
+
+            case 'SUP':
+                $result['stock_type'] = 'T';
+                break;
+        }
 
         // x值(折扣)
         if (isset($campaign->x_value) && in_array($campaign->campaign_type, ['PRD01', 'PRD02', 'PRD03', 'PRD04'])) {
@@ -1394,6 +1407,20 @@ class PromotionalCampaignService
                 'code' => $data['campaign_type'],
             ])->first();
 
+            switch ($data['stock_type']) {
+                case 'A_B':
+                    $shipFromWhs = 'SELF';
+                    break;
+
+                case 'T':
+                    $shipFromWhs = 'SUP';
+                    break;
+
+                default:
+                    $shipFromWhs = null;
+                    break;
+            }
+
             // 新增行銷活動
             $createdPromotionalCampaign = PromotionalCampaign::create([
                 'agent_id' => $user->agent_id,
@@ -1408,6 +1435,8 @@ class PromotionalCampaignService
                 'level_code' => $campaignType->udf_01,
                 'category_code' => $campaignType->udf_03,
                 'promotional_label' => $campaignType->udf_02,
+                'ship_from_whs' => $shipFromWhs,
+                'supplier_id' => $data['supplier_id'] != 'all' ? $data['supplier_id'] : null,
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);
@@ -1470,9 +1499,11 @@ class PromotionalCampaignService
 
         DB::beginTransaction();
         try {
-            $originPromotionalCampaign = PromotionalCampaign::findOrFail($id);
-            if (now()->greaterThanOrEqualTo($originPromotionalCampaign->start_at)) {
-                PromotionalCampaign::findOrFail($id)->update([
+            // 取得行銷活動
+            $campaign = PromotionalCampaign::findOrFail($id);
+
+            if (now()->greaterThanOrEqualTo($campaign->start_at)) {
+                $campaign->update([
                     'campaign_name' => $data['campaign_name'],
                     'active' => $data['active'],
                     'end_at' => $data['end_at'],
@@ -1480,14 +1511,32 @@ class PromotionalCampaignService
                     'updated_by' => $user->id,
                 ]);
             } else {
-                PromotionalCampaign::findOrFail($id)->update([
+                // 出貨倉
+                switch ($data['stock_type']) {
+                    case 'A_B':
+                        $shipFromWhs = 'SELF';
+                        break;
+
+                    case 'T':
+                        $shipFromWhs = 'SUP';
+                        break;
+
+                    default:
+                        $shipFromWhs = $campaign->ship_from_whs;
+                        break;
+                }
+
+                // 更新行銷活動
+                $campaign->update([
                     'campaign_name' => $data['campaign_name'],
                     'active' => $data['active'],
                     'start_at' => $data['start_at'],
                     'end_at' => $data['end_at'],
                     'campaign_brief' => $data['campaign_brief'],
                     'n_value' => $data['n_value'],
-                    'x_value' => in_array($originPromotionalCampaign->campaign_type, ['PRD01', 'PRD02', 'PRD03', 'PRD04']) ? $data['x_value'] : null,
+                    'x_value' => in_array($campaign->campaign_type, ['PRD01', 'PRD02', 'PRD03', 'PRD04']) ? $data['x_value'] : null,
+                    'ship_from_whs' => $shipFromWhs,
+                    'supplier_id' => $data['supplier_id'] != 'all' ? $data['supplier_id'] : null,
                     'updated_by' => $user->id,
                 ]);
 
