@@ -169,9 +169,10 @@ class OrderRefundService
         return ReturnExamination::with([
             'supplier:id,name',
             'returnRequest:id,lgst_company_code,ship_from_whs',
-            'returnExaminationDetails:id,return_examination_id,product_item_id,request_qty',
+            'returnExaminationDetails:id,return_examination_id,return_request_detail_id,product_item_id,request_qty',
             'returnExaminationDetails.productItem:id,product_id,spec_1_value,spec_2_value,item_no',
-            'returnExaminationDetails.productItem.product:id,product_name,supplier_product_no'
+            'returnExaminationDetails.productItem.product:id,product_name,supplier_product_no',
+            'returnExaminationDetails.returnRequestDetail:id,selling_price,campaign_discount,cart_p_discount,subtotal,record_identity'
         ])
             ->where('return_request_id', $id)
             ->orderBy('examination_no')
@@ -189,7 +190,12 @@ class OrderRefundService
                 'examination_remark',
                 'nego_result',
                 'nego_refund_amount',
-                'nego_remark'
+                'nego_remark',
+                'pkg_ret_reported_at',
+                'is_pkg_returned',
+                'pkg_ret_remark',
+                'returnable_point_discount',
+                'returnable_amount'
             ]);
     }
 
@@ -213,15 +219,19 @@ class OrderRefundService
             }
 
             //細項
-            $details = $returnExamination->returnExaminationDetails->map(function ($Detail) {
+            $details = $returnExamination->returnExaminationDetails->map(function ($detail) {
 
                 return [
-                    'item_no'             => $Detail->productItem->item_no ?? '',
-                    'product_name'        => $Detail->productItem->product->product_name ?? '',
-                    'spec_1_value'        => $Detail->productItem->spec_1_value ?? '',
-                    'spec_2_value'        => $Detail->productItem->spec_2_value ?? '',
-                    'request_qty'         => $Detail->request_qty ?? '',
-                    'supplier_product_no' => $Detail->productItem->product->supplier_product_no ?? '',
+                    'item_no'             => $detail->productItem->item_no ?? '',
+                    'product_name'        => $detail->productItem->product->product_name ?? '',
+                    'spec_1_value'        => $detail->productItem->spec_1_value ?? '',
+                    'spec_2_value'        => $detail->productItem->spec_2_value ?? '',
+                    'request_qty'         => $detail->request_qty ?? '',
+                    'supplier_product_no' => $detail->productItem->product->supplier_product_no ?? '',
+                    'selling_price'       => number_format($detail->returnRequestDetail->selling_price),
+                    'discount'            => number_format($detail->returnRequestDetail->campaign_discount + $detail->returnRequestDetail->cart_p_discount),
+                    'subtotal'            => number_format($detail->returnRequestDetail->subtotal),
+                    'record_identity'     => config('uec.order_record_identity_options')[$detail->returnRequestDetail->record_identity] ?? '',
                 ];
             });
 
@@ -253,8 +263,13 @@ class OrderRefundService
                 }
             }
 
-            //檢驗結果
+            //回件/檢驗結果
             $isExaminationPassed = '';
+
+            if(!is_null($returnExamination->is_pkg_returned)){
+                $isExaminationPassed = $returnExamination->is_pkg_returned == 1 ? '已回件' : '未回件';
+            }
+
             if(!is_null($returnExamination->is_examination_passed)){
                 $isExaminationPassed = $returnExamination->is_examination_passed == 1 ? '合格' : '不合格';
             }
@@ -280,18 +295,20 @@ class OrderRefundService
                 'number_or_logistics_name' => $numberOrLogisticsName ?? '',
                 //取件單號
                 'lgst_doc_no'              => $returnExamination->lgst_doc_no ?? '',
-                //檢驗回報時間
-                'examination_reported_at'  => $returnExamination->examination_reported_at ?? '',
-                //檢驗結果
+                //回件/檢驗回報時間
+                'examination_reported_at'  => $returnExamination->examination_reported_at ?? $returnExamination->pkg_ret_reported_at ?? '',
+                //回件/檢驗結果
                 'is_examination_passed'    => $isExaminationPassed,
-                //檢驗結果說明
-                'examination_remark'       => $returnExamination->examination_remark ?? '',
+                //回件/檢驗結果說明
+                'examination_remark'       => $returnExamination->examination_remark ?? $returnExamination->pkg_ret_remark ?? '',
                 //協商結果
                 'nego_result'              => $negoResult,
                 //協商退款金額
                 'nego_refund_amount'       => is_null($returnExamination->nego_refund_amount) ? '' : number_format($returnExamination->nego_refund_amount),
                 //協商內容備註
                 'nego_remark'              => $returnExamination->nego_remark ?? '',
+                //'refundable_amount'        => number_format($returnExamination->returnable_point_discount - $returnExamination->returnable_amount),
+                'refundable_amount'        => $returnExamination->returnable_point_discount - $returnExamination->returnable_amount,
                 'details'                  => $details ?? []
             ];
         });
@@ -439,7 +456,7 @@ class OrderRefundService
            rr.request_no,
            rr.order_no,
            o.member_account,
-           rr.status_code,
+           rr.status_code as rr_status_code,
            rr.lgst_method,
            rr.completed_at,
            rr.refund_method,
@@ -449,7 +466,7 @@ class OrderRefundService
            rr.req_mobile,
            CONCAT(rr.req_city, rr.req_district, rr.req_address) as full_address,
            re.examination_no,
-           re.status_code,
+           re.status_code as re_status_code,
            (select supplier.name from supplier where supplier.id = re.supplier_id) as supplier_name,
            re.sup_lgst_company,
            re.lgst_doc_no,
@@ -488,9 +505,9 @@ class OrderRefundService
      * @Author: Eric
      * @DateTime: 2022/1/17 上午 11:23
      */
-    public function handleExcelData(Collection $collection)
+    public function handleExcelData(Collection $collection, Collection $lookupValuesV)
     {
-        return $collection->map(function ($item, $index) {
+        return $collection->map(function ($item, $index) use ($lookupValuesV) {
             // 退貨申請時間
             $item->request_date = Carbon::parse($item->request_date)->format('Y-m-d H:i');
 
@@ -500,7 +517,7 @@ class OrderRefundService
             }
 
             //退貨申請單狀態
-            $item->status_code = config('uec.return_request_status_options')[$item->status_code] ?? null;
+            $item->rr_status_code = config('uec.return_request_status_options')[$item->rr_status_code] ?? null;
             //付款方式
             $item->refund_method = config('uec.payment_method_options')[$item->refund_method] ?? null;
             //物流方式
@@ -527,7 +544,7 @@ class OrderRefundService
                 (string)$item->request_no, //退貨申請單號
                 (string)$item->order_no, //訂單編號
                 (string)$item->member_account, //會員帳號
-                (string)$item->status_code, //退貨申請單狀態
+                (string)$item->rr_status_code, //退貨申請單狀態
                 (string)$item->lgst_method, //物流方式
                 (string)$item->completed_at, //退貨完成時間
                 (string)$item->refund_method, //退款方式
@@ -537,9 +554,9 @@ class OrderRefundService
                 (string)$item->req_mobile, //取件聯絡手機
                 (string)$item->full_address, //取件地址
                 (string)$item->examination_no,//退貨檢驗單號
-                (string)$item->status_code,//退貨檢驗單狀態
+                (string)$item->re_status_code,//退貨檢驗單狀態
                 (string)$item->supplier_name,//供應商
-                (string)$item->sup_lgst_company,//物流公司
+                (string)optional($lookupValuesV->where('code', $item->sup_lgst_company)->first())->description,//物流公司
                 (string)$item->lgst_doc_no,//取件單號
                 (string)$item->is_pkg_returned,//取件結果
                 (string)$item->is_examination_passed,//檢驗結果
@@ -565,15 +582,25 @@ class OrderRefundService
         //取得檢驗單相關資料
         $returnExamination = ReturnExamination::with([
             'returnExaminationDetails:id,return_examination_id,return_request_detail_id,request_qty',
-            'returnExaminationDetails.ReturnRequestDetail:id,return_request_id,request_qty,point_discount,points'
+            'returnExaminationDetails.returnRequestDetail:id,return_request_id,request_qty,point_discount,points'
         ])
             ->where('status_code', 'FAILED')
-            ->find($payload['return_examination_id'], ['id', 'return_request_id']);
+            ->find($payload['return_examination_id'], ['id', 'return_request_id', 'returnable_point_discount', 'returnable_amount']);
 
         if (empty($returnExamination)) {
             return [
                 'status'  => false,
                 'message' => '發生錯誤，檢驗單不存在'
+            ];
+        }
+        //可退金額的上限
+        $refundableAmount = $returnExamination->returnable_point_discount - $returnExamination->returnable_amount;
+
+        //退款金額大於可退金額
+        if($payload['nego_refund_amount'] > $refundableAmount){
+            return [
+                'status'  => false,
+                'message' => '發生錯誤，退款金額大於可退款金額'
             ];
         }
 
@@ -584,12 +611,14 @@ class OrderRefundService
         $userId         = Auth()->user()->id;
 
         $updateData = [
-            'nego_result'             => $payload['nego_result'],
-            'nego_refund_amount'      => $payload['nego_refund_amount'] * (-1),
-            'nego_remark'             => $payload['nego_remark'],
-            'nego_reported_at'        => $now,
-            'nego_reported_by'        => $userId,
-            'returnable_confirmed_at' => $now
+            'nego_result'               => $payload['nego_result'],
+            'nego_refund_amount'        => $payload['nego_refund_amount'] * (-1),
+            'nego_remark'               => $payload['nego_remark'],
+            'nego_reported_at'          => $now,
+            'nego_reported_by'          => $userId,
+            'returnable_confirmed_at'   => $now,
+            'returnable_points'         => 0,
+            'returnable_point_discount' => 0
         ];
 
         try {
@@ -598,19 +627,13 @@ class OrderRefundService
             if ($payload['nego_result'] == 1) {
                 $updateData['status_code']               = 'NEGO_COMPLETED';
                 $updateData['returnable_amount']         = $payload['nego_refund_amount'] * (-1);
-                $updateData['returnable_points']         = $points * (-1);
-                $updateData['returnable_point_discount'] = $pointDiscounts * (-1);
                 $updateData['is_returnable']             = 1;
-
                 $updateColumn = 'passed_qty';
 
             } else {
                 $updateData['status_code']               = 'M_CLOSED';
                 $updateData['returnable_amount']         = 0;
-                $updateData['returnable_points']         = 0;
-                $updateData['returnable_point_discount'] = 0;
                 $updateData['is_returnable']             = 0;
-
                 $updateColumn = 'failed_qty';
             }
 

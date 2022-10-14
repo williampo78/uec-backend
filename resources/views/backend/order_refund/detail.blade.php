@@ -106,9 +106,9 @@
                                         <th class="text-nowrap">
                                             <span id="number_or_logistics_name_column_name">物流單號</span>
                                         </th>
-                                        <th class="text-nowrap">檢驗回報時間</th>
-                                        <th class="text-nowrap">檢驗結果</th>
-                                        <th class="text-nowrap">檢驗結果說明</th>
+                                        <th class="text-nowrap">回件/檢驗回報時間</th>
+                                        <th class="text-nowrap">回件/檢驗結果</th>
+                                        <th class="text-nowrap">回件/檢驗結果說明</th>
                                         <th class="text-nowrap">協商結果</th>
                                         <th class="text-nowrap">協商退款金額</th>
                                         <th class="text-nowrap">協商內容備註</th>

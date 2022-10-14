@@ -18,7 +18,7 @@ class ReturnExaminationDetail extends Model
         return $this->belongsTo(ProductItem::class, 'product_item_id');
     }
 
-    public function ReturnRequestDetail():belongsTo
+    public function returnRequestDetail():belongsTo
     {
         return $this->belongsTo(ReturnRequestDetail::class, 'return_request_detail_id');
     }
