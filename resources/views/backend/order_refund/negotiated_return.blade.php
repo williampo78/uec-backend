@@ -38,6 +38,32 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <div class="col-sm-4">
+                                                    <label class="control-label">退貨商品</label>
+                                                </div>
+                                                <div class="col-sm-8">
+                                                    <table class="table table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th >商品名稱</th>
+                                                                <th >規格一</th>
+                                                                <th >規格二</th>
+                                                                <th >Item編號</th>
+                                                                <th >售價</th>
+                                                                <th >數量</th>
+                                                                <th >活動折抵</th>
+                                                                <th >小計</th>
+                                                                <th >訂單身份</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody data-target="return_items">
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                <div class="col-sm-4">
                                                     <label class="control-label">協商結果</label>
                                                     <span class="text-red">*</span>
                                                 </div>
@@ -56,13 +82,14 @@
                                         <div class="col-sm-12">
                                             <div class="form-group">
                                                 <div class="col-sm-4">
-                                                    <label class="control-label">退款金額</label>
+                                                    <label class="control-label">協商退款金額</label>
                                                     <span class="text-red">*</span>
                                                 </div>
                                                 <div class="col-sm-8">
                                                     <input type="text" class="form-control search-limit-group"
-                                                           maxlength="6"
+                                                           maxlength="6" min="1" max="999999"
                                                            name="nego_refund_amount" placeholder="※ 填寫500，表示可退款500元">
+                                                    <span class="text-danger">※ 可退款金額：<span data-target="refundable_amount"></span>元</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -96,12 +123,6 @@
                         </div>
                     </div>
                 </div>
-                <hr style="border-top: 1px solid gray;"/>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-warning" data-dismiss="modal">
-                    <i class="fa-solid fa-xmark"></i> 關閉視窗
-                </button>
             </div>
         </div>
         <!-- /.modal-content -->

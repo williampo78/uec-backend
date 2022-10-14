@@ -36,7 +36,6 @@ class OrderRefundController extends Controller
      */
     public function index(Request $request): view
     {
-
         $orderRefunds = collect();
 
         // 有權限
@@ -168,8 +167,11 @@ class OrderRefundController extends Controller
             'to_do_item'
         ]);
 
+        $lookupValuesV = LookupValuesV::where('type_code', 'SUP_LGST_COMPANY')
+            ->get(['code', 'description']);
+
         $orderRefunds = $this->orderRefundService->getExcelData($payload);
-        $orderRefunds = $this->orderRefundService->handleExcelData($orderRefunds);
+        $orderRefunds = $this->orderRefundService->handleExcelData($orderRefunds, $lookupValuesV);
 
         return Excel::download(new OrderRefundExport($orderRefunds), 'orderRefunds.xlsx');
     }
@@ -183,7 +185,6 @@ class OrderRefundController extends Controller
      */
     public function updateNegotiatedReturn(request $request): JsonResponse
     {
-
         $result = [
             'status'  => false,
             'message' => 'Forbidden'
