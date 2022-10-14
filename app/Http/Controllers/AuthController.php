@@ -58,6 +58,12 @@ class AuthController extends Controller
                 ->withInput();
         }
 
+        if ($user->active <= 0) {
+            return back()
+                ->withErrors(['帳號未啟用，請聯繫帳號管理員'])
+                ->withInput();
+        }
+
         Auth::login($user);
         $this->roleService->putUserRolesSession();
         $this->roleService->setUrlSsoSwitchBtn();
