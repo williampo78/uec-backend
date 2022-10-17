@@ -1,5 +1,5 @@
 {{--退貨協商回報--}}
-<div class="modal fade" id="negotiated_return" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+<div class="modal fade overflow-auto" id="negotiated_return" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
      aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content modal-primary panel-primary">
@@ -17,30 +17,30 @@
                                     <div class="row">
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <div class="col-sm-4">
+                                                <div class="col-sm-2">
                                                     <label class="control-label">退貨申請單號</label>
                                                 </div>
-                                                <div class="col-sm-8">
+                                                <div class="col-sm-10">
                                                     <p class="form-control-static" data-target="request-no"></p>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <div class="col-sm-4">
+                                                <div class="col-sm-2">
                                                     <label class="control-label">退貨檢驗單號</label>
                                                 </div>
-                                                <div class="col-sm-8">
+                                                <div class="col-sm-10">
                                                     <p class="form-control-static" data-target="examination-no"></p>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <div class="col-sm-4">
+                                                <div class="col-sm-2">
                                                     <label class="control-label">退貨商品</label>
                                                 </div>
-                                                <div class="col-sm-8">
+                                                <div class="col-sm-10">
                                                     <table class="table table-bordered">
                                                         <thead>
                                                             <tr>
@@ -63,7 +63,7 @@
                                         </div>
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <div class="col-sm-4">
+                                                <div class="col-sm-2">
                                                     <label class="control-label">協商結果</label>
                                                     <span class="text-red">*</span>
                                                 </div>
@@ -72,7 +72,7 @@
                                                         <input type="radio" name="nego_result" value="1">允許退貨
                                                     </label>
                                                 </div>
-                                                <div class="col-sm-3">
+                                                <div class="col-sm-7">
                                                     <label class="radio-inline">
                                                         <input type="radio" name="nego_result" value="0">不允許退貨
                                                     </label>
@@ -81,11 +81,11 @@
                                         </div>
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <div class="col-sm-4">
+                                                <div class="col-sm-2">
                                                     <label class="control-label">協商退款金額</label>
                                                     <span class="text-red">*</span>
                                                 </div>
-                                                <div class="col-sm-8">
+                                                <div class="col-sm-10">
                                                     <input type="text" class="form-control search-limit-group"
                                                            maxlength="6" min="1" max="999999"
                                                            name="nego_refund_amount" placeholder="※ 填寫500，表示可退款500元">
@@ -95,11 +95,11 @@
                                         </div>
                                         <div class="col-sm-12">
                                             <div class="form-group">
-                                                <div class="col-sm-4">
+                                                <div class="col-sm-2">
                                                     <label class="control-label">協商內容備註</label>
                                                     <span class="text-red">*</span>
                                                 </div>
-                                                <div class="col-sm-8">
+                                                <div class="col-sm-10">
                                                     <textarea class="form-control" rows="5" maxlength="250"
                                                               name="nego_remark" placeholder="最多輸入250個字"></textarea>
                                                 </div>
