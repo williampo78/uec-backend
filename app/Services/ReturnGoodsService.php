@@ -27,7 +27,6 @@ class ReturnGoodsService
     private $newOrderDetails;
     private $newOrderCampaignDiscounts;
     private $oldOrderPayment;
-    private $returnOrderDetails;
     private array $orderDetailIdToNewId = [];
     private array $verifyResult = [];
     private array $params = [];
@@ -42,7 +41,6 @@ class ReturnGoodsService
         $this->newOrderDetails             = collect();
         $this->newOrderCampaignDiscounts   = collect();
         $this->createReturnOrderDetailData = collect();
-        $this->returnOrderDetails          = collect();
         $this->oldOrderCampaignDiscounts   = collect();
     }
 
@@ -271,7 +269,7 @@ class ReturnGoodsService
             //點數折扣
             'point_discount'           => $this->createOrderDetailData->sum('point_discount'),
             //實際付款金額
-            'paid_amount'              => $this->createOrderDetailData->sum('subtotal') - $this->newOrder->cart_campaign_discount - $this->newOrder->cart_p_discount - $this->newOrder->point_discount,
+            'paid_amount'              => $this->createOrderDetailData->sum('subtotal') + $this->newOrder->cart_campaign_discount + $this->newOrder->cart_p_discount + $this->newOrder->point_discount + $this->newOrder->shipping_fee + $this->newOrder->fee_of_instal,
             //使用點數
             'points'                   => $this->createOrderDetailData->sum('points'),
             //已退購物車滿額折扣
@@ -294,7 +292,7 @@ class ReturnGoodsService
             //金額符合最低分期門檻
             if ($createData['paid_amount'] >= $this->newOrder->min_consumption_of_instal) {
                 //手續費
-                $createData['fee_of_instal'] = round($createData['paid_amount'] * ($this->newOrder->interest_rate_of_instal / 100));
+                $createData['fee_of_instal'] = $this->getFee($createData['paid_amount'], $this->newOrder->interest_rate_of_instal);
                 //實付金額
                 $createData['paid_amount'] = $createData['paid_amount'] + $createData['fee_of_instal'];
                 //未達門檻，指定為一次付清
@@ -475,11 +473,9 @@ class ReturnGoodsService
         //新增商品銷退資料
         $this->createReturnOrderDetailData->each(function ($detail) {
 
-            $returnOrderDetail = $this->returnRequest
+            $this->returnRequest
                 ->returnOrderDetails()
                 ->create($detail);
-
-            $this->returnOrderDetails->push($returnOrderDetail);
         });
 
         //取得需要新增折扣加收的資料
@@ -494,7 +490,7 @@ class ReturnGoodsService
             $discounts = $orderCampaignDiscount->sum('discount');
             $discounts = $this->invertSign($discounts);
 
-            $returnRequest = $this->returnRequest
+            $this->returnRequest
                 ->returnOrderDetails()
                 ->create([
                     'request_no'              => $this->requestNo,
@@ -511,9 +507,29 @@ class ReturnGoodsService
                     'created_by'              => $this->getUserId(),
                     'updated_by'              => $this->getUserId(),
                 ]);
-
-            $this->returnOrderDetails->push($returnRequest);
         });
+
+        //新增利息收入資料
+        if($this->newOrder->fee_of_instal != $this->oldOrder->fee_of_instal){
+            $amount = $this->newOrder->fee_of_instal - $this->oldOrder->fee_of_instal;
+            $this->returnRequest
+                ->returnOrderDetails()
+                ->create([
+                    'request_no'              => $this->requestNo,
+                    'order_no'                => $this->orderNo,
+                    'data_type'               => 'INSTAL_FEE',
+                    'product_item_id'         => null,
+                    'promotional_campaign_id' => null,
+                    'selling_price'           => $amount,
+                    'qty'                     => 1,
+                    'subtotal'                => $amount,
+                    'points'                  => 0,
+                    'point_discount'          => 0,
+                    'refund_amount'           => $amount,
+                    'created_by'              => $this->getUserId(),
+                    'updated_by'              => $this->getUserId(),
+                ]);
+        }
     }
 
     /**
@@ -550,7 +566,7 @@ class ReturnGoodsService
                 'payment_type'              => 'REFUND',
                 'payment_method'            => $this->newOrder->payment_method,
                 'payment_status'            => 'PENDING',
-                'amount'                    => $this->newOrder->returned_paid_amount,
+                'amount'                    => $this->returnRequest->refund_amount,
                 'latest_api_status'         => null,
                 'latest_api_date'           => null,
                 'point_discount'            => $this->newOrder->returned_point_discount,
@@ -608,6 +624,12 @@ class ReturnGoodsService
                 'wallet_point'              => null
             ]);
 
+        //金額
+        $amount = $this->oldOrderPayment->amount + $this->returnRequest->refund_amount;
+        //手續費
+        $feeOfInstal = $this->getFee($amount, $this->oldOrderPayment->interest_rate_of_instal);
+        $amount = $amount + $feeOfInstal;
+
         //新增請款單
         $this->newOrder
             ->orderPayments()
@@ -618,7 +640,7 @@ class ReturnGoodsService
                 'payment_type'              => 'PAY',
                 'payment_method'            => $this->newOrder->payment_method,
                 'payment_status'            => 'PENDING',
-                'amount'                    => $this->newOrder->paid_amount,
+                'amount'                    => $amount,
                 'latest_api_status'         => null,
                 'latest_api_date'           => null,
                 'point_discount'            => $this->newOrder->point_discount,
@@ -630,6 +652,7 @@ class ReturnGoodsService
                 'number_of_instal'          => $this->newOrder->number_of_instal,
                 'interest_rate_of_instal'   => $this->newOrder->interest_rate_of_instal,
                 'min_consumption_of_instal' => $this->newOrder->min_consumption_of_instal,
+                'fee_of_instal'             => $feeOfInstal,
                 'remark'                    => null,
                 'created_by'                => $this->getUserId(),
                 'updated_by'                => $this->getUserId(),
@@ -637,6 +660,11 @@ class ReturnGoodsService
                 'wallet_balance'            => null,
                 'wallet_point'              => null
             ]);
+    }
+
+    private function getFee(int $amount, $rate)
+    {
+        return round($amount * ($rate * 0.01));
     }
 
     /**
@@ -718,7 +746,7 @@ class ReturnGoodsService
             }
 
             DB::beginTransaction();
-            $this->updateReturnExamination();
+            //$this->updateReturnExamination();
             $this->updateOrder();
             $this->handleCreateOrderDetailAndReturnOrderDetailData();
             $this->createOrder();
