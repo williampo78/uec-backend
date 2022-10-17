@@ -642,6 +642,8 @@ class MemberController extends Controller
                         'source_doc_no' => $order->order_no,
                         'source_table_name' => 'order_details',
                         'source_table_id' => $orderDetail->id,
+                        'transaction_nontax_amount' => ($orderDetail->purchase_price * $orderDetail->qty) - ((($orderDetail->purchase_price * $orderDetail->qty) / 1.05) * 0.05),
+                        'transaction_amount' => ($orderDetail->purchase_price * $orderDetail->qty),
                         'created_by' => -1,
                         'updated_by' => -1,
                     ]);
