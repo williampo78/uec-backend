@@ -47,16 +47,53 @@ class ReturnOrderDetail extends Model
     /**
      * 取得 退貨成功 排序
      */
-
     public function getPriorityAttribute()
     {
-       $response = 0;
-       if ($this->data_type == 'PRD') {
+        $response = 0;
+
+        if ($this->data_type == 'PRD') {
             $response = 1;
-       } elseif ($this->data_type == 'CAMPAIGN') {
+        } elseif ($this->data_type == 'CAMPAIGN') {
             $response = 2;
-       } 
-       return $response;
+        }
+
+        return $response;
     }
-    
+
+    /**
+     * 取得 退貨成功 排序2
+     */
+    public function getDtlDescAttribute()
+    {
+        $response = 0;
+
+        if ($this->data_type == 'PRD') {
+            $temp = [];
+
+            if (isset($this->productItem)) {
+                $temp['item_no'] = $this->productItem->item_no;
+                $temp['spec_1_value'] = $this->productItem->spec_1_value;
+                $temp['spec_2_value'] = $this->productItem->spec_2_value;
+            }
+
+            if (isset($this->productItem->product)) {
+                $temp['product_name'] = $this->productItem->product->product_name;
+                $temp['spec_dimension'] = $this->productItem->product->spec_dimension;
+            }
+
+            if ($temp['spec_dimension'] == 0) {
+                $response = $temp['item_no'] . '_' . $temp['product_name'];
+            } elseif ($temp['spec_dimension'] == 1) {
+                $response = $temp['item_no'] . '_' . $temp['product_name'] . '_' . $temp['spec_1_value'];
+            } elseif ($temp['spec_dimension'] == 2) {
+                $response = $temp['item_no'] . '_' . $temp['product_name'] . '_' . $temp['spec_1_value'] . '/' . $temp['spec_2_value'];
+            }
+        } elseif ($this->data_type == 'CAMPAIGN') {
+            if (isset($this->promotionalCampaign)) {
+                $response = $this->promotionalCampaign->campaign_brief;
+            }
+        }
+
+        return $response;
+    }
 }

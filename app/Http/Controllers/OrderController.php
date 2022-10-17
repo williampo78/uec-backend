@@ -321,7 +321,6 @@ class OrderController extends Controller
         }
 
         // 發票資訊
-        //dd($order->combineInvoices);
         if ($order->combineInvoices->isNotEmpty()) {
             $order->combineInvoices->each(function ($combineInvoice) use (&$payload) {
                 $invoices = [
@@ -516,7 +515,8 @@ class OrderController extends Controller
 
         // 退貨
         if ($order->returnRequests->isNotEmpty()) {
-            $returnRequests = $order->returnRequests->first();
+            // 可能多筆, 取最新一筆
+            $returnRequests = $order->returnRequests->last();
             $payload['is_return'] = isset($returnRequests->order_no) ? 1 : 0;
             $payload['return_status_code'] = isset($returnRequests->status_code) ? $returnRequests->status_code : null;
         }
