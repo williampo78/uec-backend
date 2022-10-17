@@ -190,12 +190,24 @@
                                                         </div>
                                                         <div class="col-sm-10">
                                                             <label class="radio-inline">
-                                                                <input type="radio" name="stock_type" value="A_B"
-                                                                    v-model="form.stockType" @click="clickStockType">買斷 / 寄售
+                                                                <input
+                                                                    type="radio"
+                                                                    name="stock_type"
+                                                                    value="A_B"
+                                                                    v-model="form.stockType"
+                                                                    @click="clickStockType"
+                                                                    :disabled="isNowGreaterThanOrEqualToStartAt"
+                                                                >買斷 / 寄售
                                                             </label>
                                                             <label class="radio-inline">
-                                                                <input type="radio" name="stock_type" value="T"
-                                                                    v-model="form.stockType" @click="clickStockType">轉單
+                                                                <input
+                                                                    type="radio"
+                                                                    name="stock_type"
+                                                                    value="T"
+                                                                    v-model="form.stockType"
+                                                                    @click="clickStockType"
+                                                                    :disabled="isNowGreaterThanOrEqualToStartAt"
+                                                                >轉單
                                                             </label>
                                                         </div>
                                                     </div>
@@ -215,6 +227,7 @@
                                                                 name="supplier_id"
                                                                 :allow-clear="false"
                                                                 @select2-selecting="onSupplierSelecting"
+                                                                :disabled="isNowGreaterThanOrEqualToStartAt"
                                                             >
                                                                 <option disabled value=""></option>
                                                             </select2>
@@ -493,6 +506,8 @@
                     this.form.startAt = campaign.start_at;
                     this.form.endAt = campaign.end_at;
                     this.form.campaignBrief = campaign.campaign_brief;
+                    this.form.stockType = campaign.stock_type;
+                    this.form.supplierId = campaign.supplier_id;
 
                     if (Array.isArray(campaign.products) && campaign.products.length) {
                         campaign.products.forEach(product => {

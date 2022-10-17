@@ -337,8 +337,9 @@
         let manual_refund_form_object;
         let negotiated_return_form_object;
         let manual_refund_button_object;
+        let return_items;
         const required_message = '須指定﹝退貨申請時間﹞起訖、或﹝退貨申請單號﹞、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢！';
-        const void_return_examination_url = '{{ route('order_refund.void_return_examination') }}'
+        const void_return_examination_url = '{{ route('order_refund.void_return_examination') }}';
 
         $(function () {
             get_detail_url = '{{ route('order_refund.detail') }}';
@@ -444,8 +445,8 @@
                     //退款金額
                     nego_refund_amount: {
                         required: true,
-                        min: 0,
-                        max: 999999,
+                        //min: 10,
+                        //max: 999999,
                         digits: true
                     },
                     //協商內容備註
@@ -457,8 +458,8 @@
                 messages: {
                     //退款金額
                     nego_refund_amount: {
-                        min: '請輸入大於{0}的數字',
-                        max: '請輸入小於{0}的數字',
+                        min: '請輸入{0}以上的數字',
+                        max: '退款金額大於可退款金額，請輸入{0}以下的數字',
                         digits: '金額格式錯誤'
                     },
                     //協商內容備註
@@ -542,7 +543,7 @@
 
             //切換協商結果radio
             $(document).on('change', 'input[name="nego_result"]', function () {
-                console.log(212121);
+
                 nego_refund_amount_object.prop('disabled', false);
                 //不允許退貨
                 if ($(this).val() == 0) {
@@ -606,7 +607,16 @@
                     responseType: 'blob',
                 })
                     .then(function (response) {
-                        saveAs(response.data, "order_refunds.xlsx");
+                        let dateObject  = new Date();
+                        let fullYear = dateObject.getFullYear();
+                        let month = (dateObject.getMonth() + 1).toString().padStart(2, '0');
+                        let date = dateObject.getDate().toString().padStart(2, '0');
+                        let hours = dateObject.getHours().toString().padStart(2, '0');
+                        let minutes = dateObject.getMinutes().toString().padStart(2, '0');
+                        let seconds = dateObject.getSeconds().toString().padStart(2, '0');
+                        let fileName = `order_refund_${fullYear}${month}${date}${hours}${minutes}${seconds}.xlsx`;
+
+                        saveAs(response.data, fileName);
                     })
                     .catch(function (error) {
                         console.log(error);
@@ -618,6 +628,22 @@
 
                 removeError();
 
+                let return_item_html = '';
+
+                $.each(return_items, function (index, detail) {
+                    return_item_html += `<tr>
+                        <td>${detail.product_name}</td>
+                        <td class="text-nowrap">${detail.spec_1_value}</td>
+                        <td class="text-nowrap">${detail.spec_2_value}</td>
+                        <td class="text-nowrap">${detail.item_no}</td>
+                        <td class="text-nowrap">${detail.selling_price}</td>
+                        <td class="text-nowrap">${detail.request_qty}</td>
+                        <td class="text-nowrap">${detail.discount}</td>
+                        <td class="text-nowrap">${detail.subtotal}</td>
+                        <td class="text-nowrap">${detail.record_identity}</td>
+                    </tr>`;
+                });
+
                 //檢驗單id
                 negotiated_return_form_object.find('input[name="return_examination_id"]').val($(this).data('return_examination_id'));
                 //退貨申請單號
@@ -628,8 +654,14 @@
                 negotiated_return_form_object.find('input[name="nego_result"]').prop('checked', false);
                 //退款金額
                 negotiated_return_form_object.find('input[name="nego_refund_amount"]').val('');
+                //限制可退金額max
+                negotiated_return_form_object.find('input[name="nego_refund_amount"]').attr('max', $(this).data('refundable_amount'));
                 //協商內容備註
                 negotiated_return_form_object.find('textarea[name="nego_remark"]').val('');
+                //退貨商品
+                negotiated_return_form_object.find('tbody[data-target="return_items"]').html(return_item_html);
+                //可退款金額
+                negotiated_return_form_object.find('span[data-target="refundable_amount"]').text($(this).data('refundable_amount').toLocaleString());
             });
 
             //人工退款按鈕
@@ -766,7 +798,7 @@
             //退貨原因
             $('#modal-req-reason-description').empty().text(return_request.req_reason_description);
             //退貨備註
-            $('.modal-req-remark').empty().text(return_request.req_remark);
+            $('#modal-req-remark').empty().text(return_request.req_remark);
         }
 
         //退款明細
@@ -787,13 +819,19 @@
                         <td class="text-nowrap">${detail.spec_2_value}</td>
                         <td class="text-nowrap">${detail.request_qty}</td>
                         <td class="text-nowrap">${detail.supplier_product_no}</td>
+                        <td class="text-nowrap">${detail.selling_price}</td>
+                        <td class="text-nowrap">${detail.discount}</td>
+                        <td class="text-nowrap">${detail.subtotal}</td>
+                        <td class="text-nowrap">${detail.record_identity}</td>
                     </tr>`;
                 });
 
                 let button = '';
                 //協商回報
                 if (value.buttons.includes('negotiate')) {
-                    button += `<button type="button" class="btn btn-warning negotiated-return" data-return_examination_id="${value.return_examination_id}" data-return_request_no="${request_no}" data-return_examination_no="${value.examination_no}" data-toggle="modal" data-target="#negotiated_return" data-dismiss="modal">協商回報</button>`;
+                    //退貨項目
+                    return_items = value.details;
+                    button += `<button type="button" class="btn btn-warning negotiated-return" data-return_examination_id="${value.return_examination_id}" data-return_request_no="${request_no}" data-return_examination_no="${value.examination_no}" data-refundable_amount="${value.refundable_amount}" data-toggle="modal" data-target="#negotiated_return" data-dismiss="modal">協商回報</button> `;
                 }
 
                 //作廢
@@ -827,17 +865,21 @@
                             <td style="border:none" colspan="2"></td>
                             <td style="border:none" colspan="10">
                                 <table class="table table-bordered">
-                                   <thead>
+                                    <thead>
                                         <tr class="active">
-                                          <th class="text-nowrap">Item編號</th>
-                                          <th class="text-nowrap">商品名稱</th>
-                                          <th class="text-nowrap" >規格一</th>
-                                          <th class="text-nowrap">規格二</th>
-                                          <th class="text-nowrap">申請數量</th>
-                                          <th class="text-nowrap">廠商料號</th>
+                                            <th class="text-nowrap">Item編號</th>
+                                            <th class="text-nowrap">商品名稱</th>
+                                            <th class="text-nowrap">規格一</th>
+                                            <th class="text-nowrap">規格二</th>
+                                            <th class="text-nowrap">申請數量</th>
+                                            <th class="text-nowrap">廠商料號</th>
+                                            <th class="text-nowrap">售價</th>
+                                            <th class="text-nowrap">活動折抵</th>
+                                            <th class="text-nowrap">小計</th>
+                                            <th class="text-nowrap">訂單身份</th>
                                         </tr>
                                     </thead>
-                                   <tbody>
+                                    <tbody>
                                         ${details}
                                     </tbody>
                                 </table>

@@ -74,6 +74,16 @@
     </script>
 
     @yield('js')
+
+    @if (auth()->check())
+        <script>
+            setTimeout(function() {
+                !alert('即將登出');
+                window.location.reload();
+            }, {{ config('session.lifetime') }} * 1000 * 60);
+        </script>
+    @endif
+
 </body>
 
 </html>
