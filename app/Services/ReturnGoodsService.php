@@ -511,23 +511,42 @@ class ReturnGoodsService
 
         //新增利息收入資料
         if($this->newOrder->fee_of_instal != $this->oldOrder->fee_of_instal){
-            $amount = $this->newOrder->fee_of_instal - $this->oldOrder->fee_of_instal;
+
+            $oldFeeOfInstal = $this->invertSign($this->oldOrder->fee_of_instal);
+
             $this->returnRequest
                 ->returnOrderDetails()
-                ->create([
-                    'request_no'              => $this->requestNo,
-                    'order_no'                => $this->orderNo,
-                    'data_type'               => 'INSTAL_FEE',
-                    'product_item_id'         => null,
-                    'promotional_campaign_id' => null,
-                    'selling_price'           => $amount,
-                    'qty'                     => 1,
-                    'subtotal'                => $amount,
-                    'points'                  => 0,
-                    'point_discount'          => 0,
-                    'refund_amount'           => $amount,
-                    'created_by'              => $this->getUserId(),
-                    'updated_by'              => $this->getUserId(),
+                ->createMany([
+                    [
+                        'request_no'              => $this->requestNo,
+                        'order_no'                => $this->orderNo,
+                        'data_type'               => 'INSTAL_FEE',
+                        'product_item_id'         => null,
+                        'promotional_campaign_id' => null,
+                        'selling_price'           => $oldFeeOfInstal,
+                        'qty'                     => 1,
+                        'subtotal'                => $oldFeeOfInstal,
+                        'points'                  => 0,
+                        'point_discount'          => 0,
+                        'refund_amount'           => $oldFeeOfInstal,
+                        'created_by'              => $this->getUserId(),
+                        'updated_by'              => $this->getUserId(),
+                    ],
+                    [
+                        'request_no'              => $this->requestNo,
+                        'order_no'                => $this->orderNo,
+                        'data_type'               => 'INSTAL_FEE',
+                        'product_item_id'         => null,
+                        'promotional_campaign_id' => null,
+                        'selling_price'           => $this->newOrder->fee_of_instal,
+                        'qty'                     => 1,
+                        'subtotal'                => $this->newOrder->fee_of_instal,
+                        'points'                  => 0,
+                        'point_discount'          => 0,
+                        'refund_amount'           => $this->newOrder->fee_of_instal,
+                        'created_by'              => $this->getUserId(),
+                        'updated_by'              => $this->getUserId(),
+                    ],
                 ]);
         }
     }
