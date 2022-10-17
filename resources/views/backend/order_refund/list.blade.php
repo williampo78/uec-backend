@@ -4,67 +4,22 @@
 
 @section('css')
     <style>
-        .modal-dialog {
-            max-width: 100%;
-        }
-
-        .is-dangerous-stock {
-            background-color: #ba3f4e;
-            color: white;
-        }
-
-        .modal-dialog .modal-body .panel {
-            margin: 0;
-            border-radius: 0;
-        }
-
-        .modal-dialog .modal-body .panel .panel-heading {
-            height: 4rem;
-        }
-
-        .no-border-bottom {
-            border-bottom: 0;
-        }
-
-        .amount-panel .row {
-            padding: 1rem;
-        }
-
-        .tab-content {
-            border-left: 1px solid #ddd;
-            border-right: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-            padding: 30px;
-        }
-
-        #tab-lgst-info tbody th {
-            text-align: right;
-        }
-
-        .detail {
-            display: none;
-        }
-
-        .detail-show {
-            display: table-row;
-        }
-
-        .refund-item {
-            cursor: pointer;
-        }
-
-        .refund-item .fa-chevron-down {
-            display: none
-        }
-
-        .refund-item-active .fa-chevron-down {
-            display: inline
-        }
-
-        .refund-item-active span {
-            display: none
-        }
-
+        .modal-dialog { max-width: 100%; }
+        .is-dangerous-stock { background-color: #ba3f4e; color: white; }
+        .modal-dialog .modal-body .panel { margin: 0; border-radius: 0; }
+        .modal-dialog .modal-body .panel .panel-heading { height: 4rem; }
+        .no-border-bottom { border-bottom: 0; }
+        .amount-panel .row { padding: 1rem; }
+        .tab-content { border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 30px; }
+        #tab-lgst-info tbody th { text-align: right; }
+        .detail { display: none; }
+        .detail-show { display: table-row; }
+        .refund-item { cursor: pointer; }
+        .refund-item .fa-chevron-down { display: none }
+        .refund-item-active .fa-chevron-down { display: inline }
+        .refund-item-active span { display: none }
+        .maintain-return-outer{ grid-template-columns: 1fr 1fr 1fr; gap: 15px; padding: 0 5px; }
+        .maintain-return-title{ display: grid; grid-template-columns: 100px 1fr;  align-items: center; }
     </style>
 @endsection
 
@@ -77,190 +32,125 @@
                 <h1 class="page-header"><i class="fa-solid fa-list"></i> 退貨申請單管理</h1>
             </div>
         </div>
-
         <div class="row">
             <div class="col-sm-12">
                 <div class="panel panel-default">
                     <!-- 功能按鈕 -->
                     <div class="panel-heading">
-                        <form id="search-form" class="form-horizontal" method="GET" action="">
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="row">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">退貨申請時間</label>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <div class="input-group" id="order_refund_date_start_flatpickr">
-                                                    <input type="text" class="form-control search-limit-group"
-                                                           name="order_refund_date_start" id="order_refund_date_start"
-                                                           value="{{ request()->input('order_refund_date_start') }}"
-                                                           autocomplete="off" data-input/>
-                                                    <span class="input-group-btn" data-toggle>
-                                                        <button class="btn btn-default" type="button">
-                                                            <i class="fa-solid fa-calendar-days"></i>
-                                                        </button>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-1 text-center">
-                                            <label class="control-label">～</label>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <div class="input-group" id="order_refund_date_end_flatpickr">
-                                                    <input type="text" class="form-control search-limit-group"
-                                                           name="order_refund_date_end" id="order_refund_date_end"
-                                                           value="{{ request()->input('order_refund_date_end') }}"
-                                                           autocomplete="off" data-input/>
-                                                    <span class="input-group-btn" data-toggle>
-                                                        <button class="btn btn-default" type="button">
-                                                            <i class="fa-solid fa-calendar-days"></i>
-                                                        </button>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">退貨申請單號
-                                            </label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <input class="form-control search-limit-group" name="request_no"
-                                                   id="request_no"
-                                                   value="{{ request()->input('request_no') }}"/>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">會員帳號
-                                            </label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <input class="form-control search-limit-group" name="member_account"
-                                                   id="member_account"
-                                                   value="{{ request()->input('member_account') }}"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <br/>
-
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">退貨申請狀態</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <select class="form-control select2-shipment-status-code" id="status_code"
-                                                    name="status_code">
-                                                <option></option>
-                                                @if (config()->has('uec.return_request_status_options'))
-                                                    @foreach (config('uec.return_request_status_options') as $key => $value)
-                                                        <option value='{{ $key }}'
-                                                            {{ $key == request()->input('status_code') ? 'selected' : '' }}>
-                                                            {{ $value }}</option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">訂單編號
-                                            </label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <input class="form-control search-limit-group" name="order_no" id="order_no"
-                                                   value="{{ request()->input('order_no') }}"/>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">會員姓名
-                                            </label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <input class="form-control search-limit-group" name="member_name"
-                                                   id="member_name" value="{{ request()->input('member_name') }}"/>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <br/>
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">訂單類型</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <select id="ship_from_whs" class="form-control select2-shipment-status-code"
-                                                    name="ship_from_whs">
-                                                <option></option>
-                                                @foreach ($shipFromWhs as $type)
-                                                    <option value='{{ $type['id'] }}'
-                                                        {{ $type['id'] == request('ship_from_whs') ? 'selected' : '' }}>
-                                                        {{ $type['text'] }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">待辦項目</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <select id="to_do_item" class="form-control select2-shipment-status-code"
-                                                    name="to_do_item">
-                                                <option></option>
-                                                @foreach ($toDoItems as $item)
-                                                    <option value='{{ $item['id'] }}'
-                                                        {{ $item['id'] == request('to_do_item') ? 'selected' : '' }}>
-                                                        {{ $item['text'] }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3"></div>
-                                        <div class="col-sm-9 text-right">
-                                            @if ($share_role_auth['auth_export'])
-                                                <button data-url="{{ route('order_refund.export_excel') }}"
-                                                        class="btn btn-primary" id="btn-export-excel" type="button">
-                                                    <i class="fa-solid fa-file-excel"></i> 匯出EXCEL
+                        <form id="search-form" method="GET" action="">
+                            <div class="maintain-return-outer d-md-grid d-block">
+                                <div class="form-group maintain-return-title ">
+                                    <label class="control-label">退貨申請時間</label>
+                                    <div class="d-flex align-items-center date-input-custom w-100">
+                                        <div class="input-group" id="order_refund_date_start_flatpickr">
+                                            <input type="text" class="form-control search-limit-group" style="z-index: 3;"
+                                                    name="order_refund_date_start" id="order_refund_date_start"
+                                                    value="{{ request()->input('order_refund_date_start') }}"
+                                                    autocomplete="off" data-input/>
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
                                                 </button>
-                                            @endif
-
-                                            @if ($share_role_auth['auth_query'])
-                                                <button class="btn btn-warning" id="btn-search">
-                                                    <i class="fa-solid fa-magnifying-glass"></i> 查詢
+                                            </span>
+                                        </div>
+                                        <label>～</label>
+                                        <div class="input-group" id="order_refund_date_end_flatpickr">
+                                            <input type="text" class="form-control search-limit-group" style="z-index: 3;"
+                                                    name="order_refund_date_end" id="order_refund_date_end"
+                                                    value="{{ request()->input('order_refund_date_end') }}"
+                                                    autocomplete="off" data-input/>
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
                                                 </button>
-                                            @endif
+                                            </span>
                                         </div>
                                     </div>
+                                    <div class="maintain-return-error column-full"></div>
+                                </div>
+                                <div class="form-group maintain-return-title">
+                                    <label class="control-label">退貨申請單號
+                                    </label>
+                                    <input class="form-control search-limit-group" name="request_no"
+                                            id="request_no"
+                                            value="{{ request()->input('request_no') }}"/>
+                                </div>
+                                <div class="form-group maintain-return-title">
+                                        <label class="control-label">會員帳號
+                                        </label>
+                                        <input class="form-control search-limit-group" name="member_account"
+                                                id="member_account"
+                                                value="{{ request()->input('member_account') }}"/>
                                 </div>
                             </div>
-                            <br/>
+                            <div class="maintain-return-outer d-md-grid d-block">
+                                <div class="form-group maintain-return-title">
+                                    <label class="control-label">退貨申請狀態</label>
+                                    <select class="form-control select2-shipment-status-code" id="status_code"
+                                            name="status_code">
+                                        <option></option>
+                                        @if (config()->has('uec.return_request_status_options'))
+                                            @foreach (config('uec.return_request_status_options') as $key => $value)
+                                                <option value='{{ $key }}'
+                                                    {{ $key == request()->input('status_code') ? 'selected' : '' }}>
+                                                    {{ $value }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                                <div class="form-group maintain-return-title">
+                                    <label class="control-label">訂單編號
+                                    </label>
+                                    <input class="form-control search-limit-group" name="order_no" id="order_no"
+                                            value="{{ request()->input('order_no') }}"/>
+                                </div>
+                                <div class="form-group maintain-return-title">
+                                        <label class="control-label">會員姓名
+                                        </label>
+                                        <input class="form-control search-limit-group" name="member_name"
+                                                id="member_name" value="{{ request()->input('member_name') }}"/>
+                                </div>
+                            </div>
+                            <div class="maintain-return-outer d-md-grid d-block">
+                                <div class="form-group maintain-return-title">
+                                    <label class="control-label">訂單類型</label>
+                                    <select id="ship_from_whs" class="form-control select2-shipment-status-code"
+                                            name="ship_from_whs">
+                                        <option></option>
+                                        @foreach ($shipFromWhs as $type)
+                                            <option value='{{ $type['id'] }}'
+                                                {{ $type['id'] == request('ship_from_whs') ? 'selected' : '' }}>
+                                                {{ $type['text'] }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group maintain-return-title">
+                                    <label class="control-label">待辦項目</label>
+                                    <select id="to_do_item" class="form-control select2-shipment-status-code"
+                                            name="to_do_item">
+                                        <option></option>
+                                        @foreach ($toDoItems as $item)
+                                            <option value='{{ $item['id'] }}'
+                                                {{ $item['id'] == request('to_do_item') ? 'selected' : '' }}>
+                                                {{ $item['text'] }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="text-right">
+                                    @if ($share_role_auth['auth_export'])
+                                        <button data-url="{{ route('order_refund.export_excel') }}"
+                                                class="btn btn-primary" id="btn-export-excel" type="button">
+                                            <i class="fa-solid fa-file-excel"></i> 匯出EXCEL
+                                        </button>
+                                    @endif
+
+                                    @if ($share_role_auth['auth_query'])
+                                        <button class="btn btn-warning" id="btn-search">
+                                            <i class="fa-solid fa-magnifying-glass"></i> 查詢
+                                        </button>
+                                    @endif
+                                </div>
+                            </div>
                         </form>
                     </div>
 
@@ -397,7 +287,7 @@
                         require_from_group: required_message,
                     },
                     order_refund_date_end: {
-                        require_from_group: required_message,
+                        require_from_group: null,
                     },
                     request_no: {
                         require_from_group: required_message,
@@ -406,9 +296,14 @@
                         require_from_group: required_message,
                     },
                 },
-                errorClass: "help-block",
+                errorClass: "help-block column-full",
                 errorElement: "span",
                 errorPlacement: function (error, element) {
+                    if(element.parents('.date-input-custom').length  ){
+                        // 退貨申請時間欄位
+                        element.parents('.maintain-return-title').find('.maintain-return-error').append(error);
+                        return
+                    }
                     if (element.parent('.input-group').length) {
                         error.insertAfter(element.parent());
                         return;
@@ -428,7 +323,7 @@
                     $(element).closest(".form-group").removeClass("has-error");
                 },
                 success: function (label, element) {
-                    $(element).closest(".form-group").removeClass("has-error");
+                    // $(element).closest(".form-group").removeClass("has-error");
                 },
             });
 
