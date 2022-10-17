@@ -176,7 +176,7 @@ class OrderService
         $order->combineInvoices = $combineInvoices;
 
         // 退貨成功 排序
-        $order->returnOrderDetails = $order->returnOrderDetails->sortBy('Priority');
+        $order->returnOrderDetails = $order->returnOrderDetails->sortBy('Priority')->sortBy('DtlDesc');
 
         return $order;
     }
