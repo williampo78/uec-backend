@@ -526,7 +526,7 @@ class OrderController extends Controller
             $order->returnOrderDetails->each(function ($returnOrderDetail) use (&$payload) {
                 $returnOrderDetails = [
                     'request_no' => $returnOrderDetail->request_no,
-                    'data_type' => $returnOrderDetail->data_type,
+                    'data_type' => config('uec.data_type_options')[$returnOrderDetail->data_type] ?? null,
                     'dtl_desc' => null,
                     'selling_price' => null,
                     'qty' => $returnOrderDetail->qty,
