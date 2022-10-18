@@ -4,38 +4,16 @@
 
 @section('css')
     <style>
-        .modal-dialog {
-            max-width: 100%;
-        }
-
-        .modal-dialog .modal-body .panel {
-            margin: 0;
-            border-radius: 0;
-        }
-
-        .modal-dialog .modal-body .panel .panel-heading {
-            height: 4rem;
-        }
-
-        .no-border-bottom {
-            border-bottom: 0;
-        }
-
-        .amount-panel .row {
-            padding: 1rem;
-        }
-
-        .tab-content {
-            border-left: 1px solid #ddd;
-            border-right: 1px solid #ddd;
-            border-bottom: 1px solid #ddd;
-            padding: 30px;
-        }
-
-        #tab-lgst-info tbody th {
-            text-align: right;
-        }
-
+        .modal-dialog { max-width: 100%; }
+        .modal-dialog .modal-body .panel { margin: 0; border-radius: 0; }
+        .modal-dialog .modal-body .panel .panel-heading { height: 4rem; }
+        .no-border-bottom { border-bottom: 0; }
+        .amount-panel .row { padding: 1rem; }
+        .tab-content { border-left: 1px solid #ddd; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 30px; }
+        #tab-lgst-info tbody th { text-align: right; }
+        .maintain-sale-outer{ grid-template-columns: 1fr 1fr 1fr; gap: 15px; padding: 0 5px; }
+        .maintain-sale-title{ display: grid; grid-template-columns: 100px 1fr;  align-items: center; }
+        .column-full{ grid-column: 2/5; }
     </style>
 @endsection
 
@@ -54,246 +32,154 @@
                 <div class="panel panel-default">
                     <!-- 功能按鈕 -->
                     <div class="panel-heading">
-                        <form id="search-form" class="form-horizontal" method="GET" action="">
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="row">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">訂單時間</label>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <div class="input-group" id="ordered_date_start_flatpickr">
-                                                    <input type="text" class="form-control search-limit-group"
-                                                        name="ordered_date_start" id="ordered_date_start"
-                                                        value="{{ request()->input('ordered_date_start') }}"
-                                                        autocomplete="off" data-input />
-                                                    <span class="input-group-btn" data-toggle>
-                                                        <button class="btn btn-default" type="button">
-                                                            <i class="fa-solid fa-calendar-days"></i>
-                                                        </button>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-1 text-center">
-                                            <label class="control-label">～</label>
-                                        </div>
-                                        <div class="col-sm-4">
-                                            <div class="form-group">
-                                                <div class="input-group" id="ordered_date_end_flatpickr">
-                                                    <input type="text" class="form-control search-limit-group"
-                                                        name="ordered_date_end" id="ordered_date_end"
-                                                        value="{{ request()->input('ordered_date_end') }}"
-                                                        autocomplete="off" data-input />
-                                                    <span class="input-group-btn" data-toggle>
-                                                        <button class="btn btn-default" type="button">
-                                                            <i class="fa-solid fa-calendar-days"></i>
-                                                        </button>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">訂單編號</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <input class="form-control search-limit-group" name="order_no" id="order_no"
-                                                value="{{ request()->input('order_no') }}" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">會員帳號</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <input class="form-control search-limit-group" name="member_account"
-                                                id="member_account" value="{{ request()->input('member_account') }}" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <br />
-
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">訂單狀態</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <select class="form-control select2-order-status-code" id="order_status_code"
-                                                name="order_status_code">
-                                                <option></option>
-                                                @if (config()->has('uec.order_status_code_options'))
-                                                    @foreach (config('uec.order_status_code_options') as $key => $value)
-                                                        <option value='{{ $key }}'
-                                                            {{ $key == request()->input('order_status_code') ? 'selected' : '' }}>
-                                                            {{ $value }}</option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">付款狀態</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <select class="form-control select2-pay-status" id="pay_status"
-                                                name="pay_status">
-                                                <option></option>
-                                                @if (config()->has('uec.order_pay_status_options'))
-                                                    @foreach (config('uec.order_pay_status_options') as $key => $value)
-                                                        <option value='{{ $key }}'
-                                                            {{ $key == request()->input('pay_status') ? 'selected' : '' }}>
-                                                            {{ $value }}</option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">出貨單狀態</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <select class="form-control select2-shipment-status-code"
-                                                id="shipment_status_code" name="shipment_status_code">
-                                                <option></option>
-                                                @if (config()->has('uec.shipment_status_code_options'))
-                                                    @foreach (config('uec.shipment_status_code_options') as $key => $value)
-                                                        <option value='{{ $key }}'
-                                                            {{ $key == request()->input('shipment_status_code') ? 'selected' : '' }}>
-                                                            {{ $value }}</option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <br />
-
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">商品序號</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <input class="form-control" name="product_no" id="product_no"
-                                                value="{{ request()->input('product_no') }}" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">商品名稱</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <input class="form-control" name="product_name" id="product_name"
-                                                value="{{ request()->input('product_name') }}" placeholder="模糊查詢" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">活動名稱</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <input class="form-control" name="campaign_name" id="campaign_name"
-                                                value="{{ request()->input('campaign_name') }}" placeholder="模糊查詢" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <br />
-
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">訂單類型</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <select class="form-control select2-ship-from-whs" id="order_ship_from_whs"
-                                                name="order_ship_from_whs">
-                                                <option></option>
-                                                @if (config()->has('uec.order_ship_from_whs_options'))
-                                                    @foreach (config('uec.order_ship_from_whs_options') as $key => $value)
-                                                        <option value='{{ $key }}'
-                                                            {{ $key == request()->input('order_ship_from_whs') ? 'selected' : '' }}>
-                                                            {{ $value }}</option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3">
-                                            <label class="control-label">資料範圍</label>
-                                        </div>
-                                        <div class="col-sm-9">
-                                            <select class="form-control select2-data-range" id="data_range"
-                                                name="data_range">
-                                                <option></option>
-                                                @if (config()->has('uec.data_range_options'))
-                                                    @foreach (config('uec.data_range_options') as $key => $value)
-                                                        <option value='{{ $key }}'
-                                                            {{ $key == request()->input('data_range') ? 'selected' : '' }}>
-                                                            {{ $value }}</option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-4"></div>
-                            </div>
-                            <br />
-
-                            <div class="row">
-                                <div class="col-sm-8"></div>
-                                <div class="col-sm-4">
-                                    <div class="form-group">
-                                        <div class="col-sm-3"></div>
-                                        <div class="col-sm-9 text-right">
-                                            @if ($share_role_auth['auth_export'])
-                                                <button class="btn btn-primary" id="btn-export-excel" type="button">
-                                                    <i class="fa-solid fa-file-excel"></i> 匯出EXCEL
+                        <form id="search-form" method="GET" action="">
+                            <div class="maintain-sale-outer d-md-grid d-block">
+                                <div class="form-group maintain-sale-title">
+                                    <label class="control-label">訂單時間</label>
+                                    <div class="d-flex align-items-center date-input-custom w-100">
+                                        <div class="input-group flex-grow-1" id="ordered_date_start_flatpickr">
+                                            <input type="text" class="form-control search-limit-group" style="z-index: 3;"
+                                                name="ordered_date_start" id="ordered_date_start"
+                                                value="{{ request()->input('ordered_date_start') }}"
+                                                autocomplete="off" data-input />
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
                                                 </button>
-                                            @endif
-
-                                            @if ($share_role_auth['auth_query'])
-                                                <button class="btn btn-warning" id="btn-search">
-                                                    <i class="fa-solid fa-magnifying-glass"></i> 查詢
+                                            </span>
+                                        </div>
+                                        <label>～</label>
+                                        <div class="input-group flex-grow-1" id="ordered_date_end_flatpickr">
+                                            <input type="text" class="form-control search-limit-group" style="z-index: 3;"
+                                                name="ordered_date_end" id="ordered_date_end"
+                                                value="{{ request()->input('ordered_date_end') }}"
+                                                autocomplete="off" data-input />
+                                            <span class="input-group-btn" data-toggle>
+                                                <button class="btn btn-default" type="button">
+                                                    <i class="fa-solid fa-calendar-days"></i>
                                                 </button>
-                                            @endif
+                                            </span>
                                         </div>
                                     </div>
+                                    <div class="maintain-sale-error column-full"></div>
+                                </div>
+                                <div class="form-group maintain-sale-title">
+                                    <label class="control-label">訂單編號</label>
+                                    <input class="form-control search-limit-group" name="order_no" id="order_no"
+                                        value="{{ request()->input('order_no') }}" />
+                                </div>
+
+                                <div class="form-group maintain-sale-title">
+                                    <label class="control-label">會員帳號</label>
+                                    <input class="form-control search-limit-group" name="member_account"
+                                        id="member_account" value="{{ request()->input('member_account') }}" />
+                                </div>
+                            </div>
+
+                            <div class="maintain-sale-outer d-md-grid d-block">
+                                <div class="form-group maintain-sale-title">
+                                    <label class="control-label">訂單狀態</label>
+                                    <select class="form-control select2-order-status-code" id="order_status_code"
+                                        name="order_status_code">
+                                        <option></option>
+                                        @if (config()->has('uec.order_status_code_options'))
+                                            @foreach (config('uec.order_status_code_options') as $key => $value)
+                                                <option value='{{ $key }}'
+                                                    {{ $key == request()->input('order_status_code') ? 'selected' : '' }}>
+                                                    {{ $value }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                                <div class="form-group maintain-sale-title">
+                                    <label class="control-label">付款狀態</label>
+                                    <select class="form-control select2-pay-status" id="pay_status"
+                                        name="pay_status">
+                                        <option></option>
+                                        @if (config()->has('uec.order_pay_status_options'))
+                                            @foreach (config('uec.order_pay_status_options') as $key => $value)
+                                                <option value='{{ $key }}'
+                                                    {{ $key == request()->input('pay_status') ? 'selected' : '' }}>
+                                                    {{ $value }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                                <div class="form-group maintain-sale-title">
+                                    <label class="control-label">出貨單狀態</label>
+                                    <select class="form-control select2-shipment-status-code"
+                                        id="shipment_status_code" name="shipment_status_code">
+                                        <option></option>
+                                        @if (config()->has('uec.shipment_status_code_options'))
+                                            @foreach (config('uec.shipment_status_code_options') as $key => $value)
+                                                <option value='{{ $key }}'
+                                                    {{ $key == request()->input('shipment_status_code') ? 'selected' : '' }}>
+                                                    {{ $value }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="maintain-sale-outer d-md-grid d-block">
+                                <div class="form-group maintain-sale-title">
+                                    <label class="control-label">商品序號</label>
+                                    <input class="form-control" name="product_no" id="product_no"
+                                        value="{{ request()->input('product_no') }}" />
+                                </div>
+                                <div class="form-group maintain-sale-title">
+                                    <label class="control-label">商品名稱</label>
+                                    <input class="form-control" name="product_name" id="product_name"
+                                        value="{{ request()->input('product_name') }}" placeholder="模糊查詢" />
+                                </div>
+                                <div class="form-group maintain-sale-title">
+                                    <label class="control-label">活動名稱</label>
+                                    <input class="form-control" name="campaign_name" id="campaign_name"
+                                        value="{{ request()->input('campaign_name') }}" placeholder="模糊查詢" />
+                                </div>
+                            </div>
+
+                            <div class="maintain-sale-outer d-md-grid d-block">
+                                <div class="form-group maintain-sale-title">
+                                    <label class="control-label">訂單類型</label>
+                                    <select class="form-control select2-ship-from-whs" id="order_ship_from_whs"
+                                        name="order_ship_from_whs">
+                                        <option></option>
+                                        @if (config()->has('uec.order_ship_from_whs_options'))
+                                            @foreach (config('uec.order_ship_from_whs_options') as $key => $value)
+                                                <option value='{{ $key }}'
+                                                    {{ $key == request()->input('order_ship_from_whs') ? 'selected' : '' }}>
+                                                    {{ $value }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+
+                                <div class="form-group maintain-sale-title">
+                                    <label class="control-label">資料範圍</label>
+                                    <select class="form-control select2-data-range" id="data_range"
+                                        name="data_range">
+                                        <option></option>
+                                        @if (config()->has('uec.data_range_options'))
+                                            @foreach (config('uec.data_range_options') as $key => $value)
+                                                <option value='{{ $key }}'
+                                                    {{ $key == request()->input('data_range') ? 'selected' : '' }}>
+                                                    {{ $value }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                </div>
+                                <div class="text-right">
+                                    @if ($share_role_auth['auth_export'])
+                                        <button class="btn btn-primary" id="btn-export-excel" type="button">
+                                            <i class="fa-solid fa-file-excel"></i> 匯出EXCEL
+                                        </button>
+                                    @endif
+
+                                    @if ($share_role_auth['auth_query'])
+                                        <button class="btn btn-warning" id="btn-search">
+                                            <i class="fa-solid fa-magnifying-glass"></i> 查詢
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
                         </form>
@@ -415,7 +301,7 @@
                         require_from_group: '須指定﹝訂單時間﹞起訖、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢!',
                     },
                     ordered_date_end: {
-                        require_from_group: '須指定﹝訂單時間﹞起訖、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢!',
+                        require_from_group: null,
                     },
                     order_no: {
                         require_from_group: '須指定﹝訂單時間﹞起訖、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢!',
@@ -424,9 +310,14 @@
                         require_from_group: '須指定﹝訂單時間﹞起訖、或﹝訂單編號﹞、或﹝會員帳號﹞才可執行查詢!',
                     },
                 },
-                errorClass: "help-block",
+                errorClass: "help-block column-full",
                 errorElement: "span",
                 errorPlacement: function(error, element) {
+                    if(element.parents('.date-input-custom').length  ){
+                        // 退貨申請時間欄位
+                        element.parents('.maintain-sale-title').find('.maintain-sale-error').append(error);
+                        return
+                    }
                     if (element.parent('.input-group').length) {
                         error.insertAfter(element.parent());
                         return;
@@ -446,7 +337,7 @@
                     $(element).closest(".form-group").removeClass("has-error");
                 },
                 success: function(label, element) {
-                    $(element).closest(".form-group").removeClass("has-error");
+                    // $(element).closest(".form-group").removeClass("has-error");
                 },
             });
 

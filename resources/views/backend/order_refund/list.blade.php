@@ -42,7 +42,7 @@
                                 <div class="form-group maintain-return-title ">
                                     <label class="control-label">退貨申請時間</label>
                                     <div class="d-flex align-items-center date-input-custom w-100">
-                                        <div class="input-group" id="order_refund_date_start_flatpickr">
+                                        <div class="input-group flex-grow-1" id="order_refund_date_start_flatpickr">
                                             <input type="text" class="form-control search-limit-group" style="z-index: 3;"
                                                     name="order_refund_date_start" id="order_refund_date_start"
                                                     value="{{ request()->input('order_refund_date_start') }}"
@@ -54,7 +54,7 @@
                                             </span>
                                         </div>
                                         <label>～</label>
-                                        <div class="input-group" id="order_refund_date_end_flatpickr">
+                                        <div class="input-group flex-grow-1" id="order_refund_date_end_flatpickr">
                                             <input type="text" class="form-control search-limit-group" style="z-index: 3;"
                                                     name="order_refund_date_end" id="order_refund_date_end"
                                                     value="{{ request()->input('order_refund_date_end') }}"

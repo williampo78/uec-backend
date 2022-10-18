@@ -1,4 +1,4 @@
-<div class="modal fade" id="order_detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<div class="modal fade overflow-auto" id="order_detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content modal-primary panel-primary">
             <div class="modal-header panel-heading">
@@ -7,36 +7,36 @@
             </div>
             <div class="modal-body">
                 <div style="font-weight:bold" class="row">
-                    <div class="col-sm-3">
+                    <div class="col-lg-3 d-lg-flex flex-lg-column flex-grow-1 d-block">
                         <h5 style="font-weight: bold; font-size:16px">訂單資訊</h5>
-                        <table class="table table-bordered">
+                        <table class="table table-bordered flex-grow-1">
                             <tr>
-                                <th class="active">訂單編號</th>
-                                <td id="modal-order-no"></td>
+                                <th class="active align-middle">訂單編號</th>
+                                <td id="modal-order-no" class="align-middle"></td>
                             </tr>
                             <tr>
-                                <th class="active">訂單狀態</th>
-                                <td id="modal-order-status-code"></td>
+                                <th class="active align-middle">訂單狀態</th>
+                                <td id="modal-order-status-code" class="align-middle"></td>
                             </tr>
                             <tr>
-                                <th class="active">付款狀態</th>
-                                <td id="modal-pay-status"></td>
+                                <th class="active align-middle">付款狀態</th>
+                                <td id="modal-pay-status" class="align-middle"></td>
                             </tr>
                             <tr>
-                                <th class="active">訂單時間</th>
-                                <td id="modal-ordered-date"></td>
+                                <th class="active align-middle">訂單時間</th>
+                                <td id="modal-ordered-date" class="align-middle"></td>
                             </tr>
                             <tr>
-                                <th class="active">付款方式</th>
-                                <td id="modal-payment-method"></td>
+                                <th class="active align-middle">付款方式</th>
+                                <td id="modal-payment-method" class="align-middle"></td>
                             </tr>
                             <tr>
-                                <th class="active">免運門檻</th>
-                                <td id="modal-shipping-free-threshold"></td>
+                                <th class="active align-middle">免運門檻</th>
+                                <td id="modal-shipping-free-threshold" class="align-middle"></td>
                             </tr>
                         </table>
                     </div>
-                    <div class="col-sm-5">
+                    <div class="col-lg-5">
                         <h5 style="font-weight: bold; font-size:16px">訂購人</h5>
                         <table style="table-layout: fixed" class="table table-bordered">
                             <tr>
@@ -71,7 +71,7 @@
                             </tr>
                         </table>
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-lg-4">
                         <h5 style="font-weight: bold; font-size:16px">
                         金額</h5>
                         <table style="table-layout: fixed" class="table table-bordered">

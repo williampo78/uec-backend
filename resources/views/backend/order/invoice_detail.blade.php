@@ -1,4 +1,4 @@
-<div class="modal fade" id="invoice_detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+<div class="modal fade overflow-auto" id="invoice_detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
     aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content modal-primary panel-primary">
