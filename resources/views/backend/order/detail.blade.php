@@ -80,10 +80,6 @@
                                 <td class="text-right" colspan="3" id="modal-total-amount"></td>
                             </tr>
                             <tr>
-                                <th colspan="4" class="active">滿額折抵 (B)：</th>
-                                <td class="text-right" colspan="3" id="modal-cart-campaign-discount"></td>
-                            </tr>
-                            <tr>
                                 <th colspan="4" class="active">點數折抵 (C)：</th>
                                 <td class="text-right" colspan="3" id="modal-point-discount"></td>
                             </tr>
@@ -92,7 +88,7 @@
                                 <td class="text-right" colspan="3" id="modal-shipping-fee"></td>
                             </tr>
                             <tr>
-                                <th colspan="4" class="active">結帳金額 (=A+B+C+D)：</th>
+                                <th colspan="4" class="active">結帳金額 (=A+C+D)：</th>
                                 <td class="text-right" colspan="3" id="modal-paid-amount"></td>
                             </tr>
                         </table>
