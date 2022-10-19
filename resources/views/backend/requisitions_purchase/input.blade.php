@@ -584,6 +584,8 @@
                                 obj.subtotal_tax_price = 0 ;
                                 obj.original_subtotal_tax_price = 0 ;
                                 obj.original_subtotal_price = 0 ;
+                                obj.quotation_id = '';
+                                obj.quotation_doc_number = '';
                             }
                         } else {
                             if (vm.detailsUpdate.length > 0 && obj.old_item_price == 0) { //因為編輯撈取如果是贈品會抓不到 單價 需要另外ajax 取得
@@ -602,6 +604,8 @@
                                 req();
                             } else {
                                 obj.item_price = obj.old_item_price;
+                                obj.quotation_id = obj.old_quotation_id;
+                                obj.quotation_doc_number = obj.old_quotation_doc_number;
                             }
                         }
                         if (obj.item_qty >= 0 && obj.item_price) {
@@ -714,7 +718,13 @@
                                 details[getSelectKey].item_price = response.data.item_price;
                                 details[getSelectKey].old_item_price = response.data.item_price;
                                 details[getSelectKey].quotation_doc_number = response.data.doc_number;
+                                details[getSelectKey].old_quotation_doc_number = response.data.doc_number;
                                 details[getSelectKey].quotation_id = response.data.quotation_id;
+                                details[getSelectKey].old_quotation_id = response.data.quotation_id;
+                                if(details[getSelectKey].is_gift == true){
+                                    console.log(details[getSelectKey].is_gift);
+                                    details[getSelectKey].quotation_doc_number = '';
+                                }
 
                             }
                             req();
