@@ -1,6 +1,6 @@
 @extends('backend.layouts.master')
 
-@section('title', '商品主檔 - 批次上傳')
+@section('title', '商品新增 - 批次上傳')
 
 @section('content')
 
@@ -10,7 +10,7 @@
             <!-- 表頭名稱 -->
             <div class="row">
                 <div class="col-sm-12">
-                    <h3 class="page-header"><i class="fa-solid fa-cube"></i>商品主檔 - 批次上傳</h3>
+                    <h3 class="page-header"><i class="fa-solid fa-cube"></i>商品新增 - 批次上傳</h3>
                 </div>
             </div>
             <div class="row">
@@ -85,18 +85,16 @@
                                     <div>
                                         <ul style="list-style-type:none;">
                                             <li><b>注意事項</b></li>
-                                            <li>(1) 請先下載範例檔(<a href="/backend/download-sample/product-batch-upload-sample.xlsx?rename=商品主檔批次上傳-範例&type=xlsx">下載</a>)</li>
-                                            <li>(2) 商品Excel</li>
-                                            <li>　♦ 附檔名須為xlsx，筆數最多100筆</li>
+                                            <li>(1) 商品Excel (<a href="/backend/download-sample/product-batch-upload-sample.xlsx?rename=商品主檔批次上傳-範例&type=xlsx">下載範例檔</a>)</li>
                                             <li>　♦ 包含「items」、「photos」2個頁籤</li>
                                             <li>　　＊第1列為欄位名稱、第2列為欄位說明，須保留</li>
                                             <li>　　＊第3列開始才是真正的資料內容</li>
-                                            <li>(3) 圖片ZIP</li>
+                                            <li>(2) 圖片ZIP</li>
                                             <li>　♦ 附檔名須為zip</li>
                                             <li>　♦ 各商品請獨立一個資料夾存放圖片</li>
                                             <li>　♦ 單張圖片的大小請勿超過1M、寬與高的比例須為1:1、至少須為480*480</li>
-                                            <li>(4) 上傳檔案「商品Excel」、「圖片ZIP」加總大小上限為400MB</li>
-                                            <li>(5) 執行匯入後，約須10~20分鐘的等待時間，可從匯入記錄查看。</li>
+                                            <li>(3) 上傳檔案「商品Excel」、「圖片ZIP」加總大小上限為400MB</li>
+                                            <li>(4) 執行匯入後，約須10~20分鐘的等待時間，執行結果可於此功能的「匯入記錄」</li>
                                         </ul>
                                     </div>
                                 </form>

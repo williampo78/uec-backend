@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
+
 class ProductBatchService
 {
 
@@ -66,9 +67,11 @@ class ProductBatchService
     {
         try {
             $result = BatchUploadLog::create($inputLogData);
+
             return $result->id;
         } catch (\Exception $e) {
             Log::channel('batch_upload')->warning('addBatchUploadLog' . $e->getMessage());
+
             return false;
         }
     }
@@ -263,7 +266,7 @@ class ProductBatchService
 
         try {
             $result = [];
-            $pos_item_no_arrays = [] ; //檢查輸入是否重複
+            $pos_item_no_arrays = []; //檢查輸入是否重複
 
             $supplier = $this->supplierService->getSuppliers();
             $brands = $this->brandsService->getBrands();
@@ -631,18 +634,18 @@ class ProductBatchService
                     }
                     // POS商品編號已跟現有品項重複
                     if (!empty($item['pos_item_no'])) {
-                        if($productItem->where('pos_item_no',$item['pos_item_no'])->count() > 0){
+                        if ($productItem->where('pos_item_no', $item['pos_item_no'])->count() > 0) {
                             $errorContent['errorMessage'] = 'POS商品編號已跟現有品項重複';
                             array_push($result, $errorContent);
                         };
                     }
                     // 匯入的POS品號有重複
                     if (!empty($item['pos_item_no'])) {
-                        if(in_array($item['pos_item_no'], $pos_item_no_arrays)){
+                        if (in_array($item['pos_item_no'], $pos_item_no_arrays)) {
                             $errorContent['errorMessage'] = "匯入的POS品號有重複{$item['pos_item_no']}";
                             array_push($result, $errorContent);
-                        }else{
-                            array_push($pos_item_no_arrays,$item['pos_item_no']);
+                        } else {
+                            array_push($pos_item_no_arrays, $item['pos_item_no']);
                         }
                     }
                     // 「安全庫存量」未填寫
@@ -670,7 +673,8 @@ class ProductBatchService
 
             Log::channel('batch_upload')->warning("驗證產品時發生未預期的錯誤");
             Log::channel('batch_upload')->error($e->getMessage());
-            return $result ;
+
+            return $result;
 
         }
 
@@ -679,63 +683,73 @@ class ProductBatchService
     public function verifySkuItem($products)
     {
         $result = [];
-        foreach ($products as $supplier_product_no => $product) {
-            $spec_1_values = collect([]);
-            $spec_2_values = collect([]);
-            $productBasice = $product['productBasice'];
-            $errorContent = [
-                'rowNum' => $productBasice['rowNum'],
-                'supplierProductNo' => $supplier_product_no,
-                'errorMessage' => '',
-            ];
-            foreach ($product['productItems'] as $item) {
-                if ($item['spec_1_value'] !== '') {
-                    $spec_1_values->push($item['spec_1_value']);
+        try {
+            foreach ($products as $supplier_product_no => $product) {
+                $spec_1_values = collect([]);
+                $spec_2_values = collect([]);
+                $productBasice = $product['productBasice'];
+                $errorContent = [
+                    'rowNum' => $productBasice['rowNum'],
+                    'supplierProductNo' => $supplier_product_no,
+                    'errorMessage' => '',
+                ];
+                foreach ($product['productItems'] as $item) {
+                    if ($item['spec_1_value'] !== '') {
+                        $spec_1_values->push($item['spec_1_value']);
+                    }
+                    if ($item['spec_2_value'] !== '') {
+                        $spec_2_values->push($item['spec_2_value']);
+                    };
                 }
-                if ($item['spec_2_value'] !== '') {
-                    $spec_2_values->push($item['spec_2_value']);
-                };
-            }
 
-            // 驗證匯入規格是否符合規則
-            $spec_1_count = $spec_1_values->unique()->count() == 0 ? 1 : $spec_1_values->unique()->count();
-            $spec_2_count = $spec_2_values->unique()->count() == 0 ? 1 : $spec_2_values->unique()->count();
-            $itemCorrectNum = $spec_1_count * $spec_2_count;
-            $itemRealNum = $product['productItems']->count();
+                // 驗證匯入規格是否符合規則
+                $spec_1_count = $spec_1_values->unique()->count() == 0 ? 1 : $spec_1_values->unique()->count();
+                $spec_2_count = $spec_2_values->unique()->count() == 0 ? 1 : $spec_2_values->unique()->count();
+                $itemCorrectNum = $spec_1_count * $spec_2_count;
+                $itemRealNum = $product['productItems']->count();
 
-            if ($itemRealNum !== $itemCorrectNum) {
-                $errorContent['errorMessage'] = "需要{$itemRealNum}筆品項，但實際匯入規格只有{$itemCorrectNum}筆品項";
-                array_push($result, $errorContent);
-            }
-            switch ($productBasice['spec_dimension']) {
-                case '0':
-                    if ($product['productItems'] > 1) {
-                        $errorContent['errorMessage'] = "  單規格商品：同個檔案內，不能有多筆「廠商料號」相同的資料";
-                        array_push($result, $errorContent);
-                    }
-                    break;
-                case '1':
-                    if ($spec_1_values->count() !== $spec_1_values->unique()->count()) {
-                        $errorContent['errorMessage'] = "一維多規格商品：同個檔案內，不能有多筆「廠商料號」、「規格一」相同的資料";
-                        array_push($result, $errorContent);
-                    }
-                    break;
-                case '2':
-                    $cartesian = $this->cartesian([
-                        $spec_1_values->unique(),
-                        $spec_2_values->unique(),
-                    ]);
-                    foreach ($cartesian as $spec) {
-                        $find = $product['productItems']->where('spec_1_value', $spec[0])->where('spec_2_value', $spec[1])->all();
-                        if (count($find) > 1) {
-                            $errorContent['errorMessage'] = "二維多規格商品：同個檔案內，不能有多筆「廠商料號」、「規格一」、「規格二」相同的資料";
+                if ($itemRealNum !== $itemCorrectNum) {
+                    $errorContent['errorMessage'] = "需要{$itemRealNum}筆品項，但實際匯入規格只有{$itemCorrectNum}筆品項";
+                    array_push($result, $errorContent);
+                }
+                switch ($productBasice['spec_dimension']) {
+                    case '0':
+                        if ($itemRealNum > 1) {
+                            $errorContent['errorMessage'] = "  單規格商品：同個檔案內，不能有多筆「廠商料號」相同的資料";
                             array_push($result, $errorContent);
                         }
-                    }
-                    break;
-                default:
-                    break;
+                        break;
+                    case '1':
+                        if ($spec_1_values->count() !== $spec_1_values->unique()->count()) {
+                            $errorContent['errorMessage'] = "一維多規格商品：同個檔案內，不能有多筆「廠商料號」、「規格一」相同的資料";
+                            array_push($result, $errorContent);
+                        }
+                        break;
+                    case '2':
+                        $cartesian = $this->cartesian([
+                            $spec_1_values->unique(),
+                            $spec_2_values->unique(),
+                        ]);
+                        foreach ($cartesian as $spec) {
+                            $find = $product['productItems']->where('spec_1_value', $spec[0])->where('spec_2_value', $spec[1])->all();
+                            if (count($find) > 1) {
+                                $errorContent['errorMessage'] = "二維多規格商品：同個檔案內，不能有多筆「廠商料號」、「規格一」、「規格二」相同的資料";
+                                array_push($result, $errorContent);
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
+        } catch (\Exception $e) {
+            array_push($result, [
+                'rowNum' => '',
+                'supplierProductNo' => '',
+                'errorMessage' => "驗證品項時發生未預期的錯誤：{$e->getMessage()}",
+            ]);
+            Log::channel('batch_upload')->warning("驗證品項時發生未預期的錯誤");
+            Log::channel('batch_upload')->error($e);
         }
 
         return $result;
@@ -745,7 +759,7 @@ class ProductBatchService
      * 迪卡爾積演算法
      *
      * @param  array $input
-     * @return void
+     * @return array
      */
     public function cartesian(array $input)
     {
@@ -861,7 +875,7 @@ class ProductBatchService
                         $productBasice['selling_channel'] = 'STORE';
                         break;
                     case 'W':
-                        $productBasice['selling_channel'] ='WHOLE';
+                        $productBasice['selling_channel'] = 'WHOLE';
                         break;
                     default:
                         # code...
@@ -938,7 +952,7 @@ class ProductBatchService
                         'sort' => $item['sort'] ?? 0,
                         'spec_1_value' => $item['spec_1_value'] ?? '',
                         'spec_2_value' => $item['spec_2_value'] ?? '',
-                        'pos_item_no'=>$item['pos_item_no'] ?? '' ,
+                        'pos_item_no' => $item['pos_item_no'] ?? '',
                         'supplier_item_no' => $item['supplier_item_no'],
                         'item_no' => $product_no . str_pad($add_item_no, 4, "0", STR_PAD_LEFT), //新增時直接用key生成id
                         'photo_name' => $photoName,
@@ -953,7 +967,7 @@ class ProductBatchService
                     $produceSkuForm['skuListdata'][$key]['id'] = ProductItem::create($skuInsert)->id;
                     $produceSkuForm['skuListdata'][$key]['item_no'] = $product_no . str_pad($add_item_no, 4, "0", STR_PAD_LEFT);
                     $produceSkuForm['skuListdata'][$key]['safty_qty'] = ltrim($item['safty_qty'], '0');
-                    $add_item_no += 1 ;
+                    $add_item_no += 1;
                 }
 
                 DB::table('product_spec_info')->insert([
@@ -969,6 +983,7 @@ class ProductBatchService
             $result['count'] = $products->count();
             Storage::disk('s3')->deleteDirectory($endPath);
             DB::commit();
+
             return $result;
         } catch (\Exception $e) {
             DB::rollBack();
@@ -1063,46 +1078,48 @@ class ProductBatchService
     {
         $result = collect();
         foreach ($verifys as $verifyType => $content) {
-            switch ($verifyType) {
-                case 'verifyProduct':
-                    $result->push([
-                        '異常items',
-                    ]);
-                    $result->push([
-                        '行數',
-                        '廠商料號',
-                        '錯誤訊息',
-                    ]);
-                    break;
-                case 'verifySkuItem':
-                    $result->push([
-                        '異常規格',
-                    ]);
-                    $result->push([
-                        '行數',
-                        '廠商料號',
-                        '錯誤訊息',
-                    ]);
-                    break;
-                case 'verifyPhoto':
-                    $result->push([
-                        '異常photos',
-                    ]);
-                    $result->push([
-                        '廠商料號',
-                        '照片名稱',
-                        '錯誤訊息',
-                    ]);
-                    break;
-                default:
-                    # code...
-                    break;
+            if(count($content) > 0){
+                switch ($verifyType) {
+                    case 'verifyProduct':
+                        $result->push([
+                            '異常items',
+                        ]);
+                        $result->push([
+                            '行數',
+                            '廠商料號',
+                            '錯誤訊息',
+                        ]);
+                        break;
+                    case 'verifySkuItem':
+                        $result->push([
+                            '異常規格',
+                        ]);
+                        $result->push([
+                            '行數',
+                            '廠商料號',
+                            '錯誤訊息',
+                        ]);
+                        break;
+                    case 'verifyPhoto':
+                        $result->push([
+                            '異常photos',
+                        ]);
+                        $result->push([
+                            '廠商料號',
+                            '照片名稱',
+                            '錯誤訊息',
+                        ]);
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
             }
 
             foreach ($content as $itemError) {
                 $result->push($itemError);
             }
-
+            $result->push([]);
         }
 
         return $result;

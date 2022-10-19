@@ -49,6 +49,9 @@
                                         @case('upload_success')
                                             已成功上傳檔案！
                                         @break
+                                        @case('batch_upload_success')
+                                        檔案已上傳主機，處理時間約需10~20分鐘(視資料量多寡而定)，執行結果可於此功能的「匯入記錄」頁籤查看、避免重複上傳檔案，謝謝！
+                                        @break
                                         @default
                                             @isset($message)
                                                 {{ $message }}
