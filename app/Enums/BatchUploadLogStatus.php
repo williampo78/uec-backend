@@ -10,7 +10,7 @@ final class BatchUploadLogStatus
 
     const STATUS_ARR = [
         self::STATUS_DEFAULT    =>  '待執行',
-        self::STATUS_COMPLETED  =>  '已完成',
-        self::STATUS_FAILED     =>  '已失敗'
+        self::STATUS_COMPLETED  =>  '成功',
+        self::STATUS_FAILED     =>  '失敗'
     ];
 }

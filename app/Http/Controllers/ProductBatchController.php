@@ -78,13 +78,14 @@ class ProductBatchController extends Controller
                 'saved_file_1_name' => $excel['filePath'],
                 'source_file_2_name' => $zip['originalName'],
                 'saved_file_2_name' => $zip['filePath'],
+                'program_code'=>'product-batch-upload',
                 'status' => 0, //等待執行
                 'created_by' => Auth::user()->id,
                 'updated_by' => Auth::user()->id,
             ];
             $batchUploadLogId = $this->productBatchService->addBatchUploadLog($inputLogData);
             $addJob = $this->productBatchService->addJob($batchUploadLogId);
-            $result['act'] = 'upload_success';
+            $result['act'] = 'batch_upload_success';
             $result['route_name'] = 'product-batch-upload';
 
             return view('backend.success', $result);
