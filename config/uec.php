@@ -122,6 +122,13 @@ return [
         'DELIVERED_AT_NULL' => '所有未配達訂單',
     ],
 
+    // 退貨成功-明細類型
+    'data_type_options' => [
+        'PRD' => '銷退',
+        'CAMPAIGN' => '折扣加收',
+        'INSTAL_FEE' => '分期付款手續費',
+    ],
+
     // 發票用途
     'invoice_usage_options' => [
         'P' => '個人電子發票',
