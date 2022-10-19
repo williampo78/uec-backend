@@ -9174,9 +9174,9 @@ vue__WEBPACK_IMPORTED_MODULE_28__["default"].use((vue_scrollactive__WEBPACK_IMPO
 vue__WEBPACK_IMPORTED_MODULE_28__["default"].use((vue_sweetalert2__WEBPACK_IMPORTED_MODULE_24___default()), {
   showConfirmButton: true,
   confirmButtonText: "確定",
-  confirmButtonColor: "#008000",
+  confirmButtonColor: "#5cb85c",
   cancelButtonText: "取消",
-  cancelButtonColor: "#FF0000",
+  cancelButtonColor: "#d9534f",
   allowOutsideClick: false,
   allowEscapeKey: false
 }); // 設定sweetalert2 toast

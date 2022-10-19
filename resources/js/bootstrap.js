@@ -131,9 +131,9 @@ Vue.use(VueScrollactive);
 Vue.use(VueSweetalert2, {
     showConfirmButton: true,
     confirmButtonText: "確定",
-    confirmButtonColor: "#008000",
+    confirmButtonColor: "#5cb85c",
     cancelButtonText: "取消",
-    cancelButtonColor: "#FF0000",
+    cancelButtonColor: "#d9534f",
     allowOutsideClick: false,
     allowEscapeKey: false,
 });

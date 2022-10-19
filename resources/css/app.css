@@ -27,6 +27,9 @@
 /* vue-treeselect */
 @import "~@riophae/vue-treeselect/dist/vue-treeselect.css";
 
+/* sweetalert2 */
+@import "~sweetalert2/dist/sweetalert2.min.css";
+
 @import "./page.css";
 @import "./draggable.css";
 @import "./sweetalert2.css";
