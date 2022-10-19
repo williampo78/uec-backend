@@ -722,7 +722,7 @@
                         $("#tab-return-success tbody").empty();
 
                         // 有退貨，退貨已完成
-                        if (order.is_return == 1 && order.return_status_code == 'COMPLETED') {
+                        if (order.is_return == 1) {
                             if (order.return_order_details) {
                                 let count = 1;
                                 order.return_order_details.forEach((return_order_detail) => {
