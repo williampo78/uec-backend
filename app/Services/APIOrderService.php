@@ -1411,8 +1411,8 @@ class APIOrderService
                         $logData['product_item_id'] = $detail->product_item_id;
                         $logData['item_no'] = $detail->item_no;
                         $logData['transaction_qty'] = -$detail->qty;
-                        $logData['transaction_nontax_amount'] = ($detail->purchase_price * $detail->qty) - ((($detail->purchase_price * $detail->qty) / 1.05) * 0.05);
-                        $logData['transaction_amount'] = ($detail->purchase_price * $detail->qty);
+                        $logData['transaction_nontax_amount'] = (($detail->purchase_price * $detail->qty) - ((($detail->purchase_price * $detail->qty) / 1.05) * 0.05)) * -1;
+                        $logData['transaction_amount'] = ($detail->purchase_price * $detail->qty) * -1;
                         $logData['source_doc_no'] = $webData['order_no'];
                         $logData['source_table_name'] = 'order_details';
                         $logData['source_table_id'] = $detail->id;
