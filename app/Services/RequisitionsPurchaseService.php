@@ -307,7 +307,7 @@ class RequisitionsPurchaseService
 
             $result['status'] = false;
         }
-        dd('STOP');
+
         return $result;
     }
 

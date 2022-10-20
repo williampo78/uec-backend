@@ -333,6 +333,8 @@
                         quotation_doc_number: obj.quotation_doc_number, //規格二
                         quotation_id: obj.quotation_id, //規格二
                         old_item_price: 0,
+                        old_quotation_id:obj.quotation_id,
+                        old_quotation_doc_number: obj.quotation_doc_number,
                     });
                     var whereGet = '?supplier_id=' + $('#supplier_id').val() +
                             '&currency_code=' + $('#currency_code').val() +
@@ -600,6 +602,8 @@
                                     details[key].old_item_price = response.data.item_price;
                                     details[key].quotation_doc_number = response.data.doc_number;
                                     details[key].quotation_id = response.data.quotation_id;
+                                    details[key].old_quotation_id = response.data.quotation_id;
+                                    details[key].old_quotation_doc_number = response.data.doc_number;
                                 }
                                 req();
                             } else {
@@ -722,7 +726,6 @@
                                 details[getSelectKey].quotation_id = response.data.quotation_id;
                                 details[getSelectKey].old_quotation_id = response.data.quotation_id;
                                 if(details[getSelectKey].is_gift == true){
-                                    console.log(details[getSelectKey].is_gift);
                                     details[getSelectKey].quotation_doc_number = '';
                                 }
 
