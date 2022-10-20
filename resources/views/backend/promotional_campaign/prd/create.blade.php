@@ -17,8 +17,13 @@
                 {{ $errors->first('message') }}
             </div>
         @endif
-
         <div id="page-wrapper">
+            <!-- 表頭名稱 -->
+            <div class="row">
+                <div class="col-sm-12">
+                    <h1 class="page-header"><span class="fa-solid fa-plus"></span> 單品活動 新增資料</h1>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-sm-12">
                     <div class="panel panel-default">
@@ -28,358 +33,302 @@
                                 @csrf
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <div class="form-horizontal">
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <div class="col-sm-2">
-                                                            <label class="control-label">活動名稱 <span
-                                                                    style="color: red;">*</span></label>
-                                                        </div>
-                                                        <div class="col-sm-10">
-                                                            <input type="text" class="form-control" name="campaign_name"
-                                                                v-model="form.campaignName">
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <div class="col-sm-2">
-                                                            <label class="control-label">狀態 <span
-                                                                    style="color: red;">*</span></label>
-                                                        </div>
-                                                        <div class="col-sm-10">
-                                                            <label class="radio-inline">
-                                                                <input type="radio" name="active" value="1"
-                                                                    v-model="form.active">生效
-                                                            </label>
-                                                            <label class="radio-inline">
-                                                                <input type="radio" name="active" value="0"
-                                                                    v-model="form.active">失效
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <br />
-
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <div class="col-sm-2">
-                                                            <label class="control-label">活動類型 <span
-                                                                    style="color: red;">*</span></label>
-                                                        </div>
-                                                        <div class="col-sm-10">
-                                                            <select2
-                                                                class="form-control"
-                                                                :options="campaignTypes"
-                                                                v-model="form.campaignType"
-                                                                name="campaign_type"
-                                                                @select2-selecting="onCampaignTypeSelecting"
-                                                                :allow-clear="false"
-                                                            >
-                                                                <option disabled value=""></option>
-                                                            </select2>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <div class="row">
-                                                        <div class="col-sm-6">
-                                                            <div class="form-group">
-                                                                <div class="col-sm-4">
-                                                                    <label class="control-label">N (滿額) = <span
-                                                                            style="color: red;">*</span></label>
-                                                                </div>
-                                                                <div class="col-sm-8">
-                                                                    <input type="number" class="form-control"
-                                                                        name="n_value" v-model="form.nValue" min="1">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-6" v-if="showXValue">
-                                                            <div class="form-group">
-                                                                <div class="col-sm-3">
-                                                                    <label class="control-label">X (折扣) = <span
-                                                                            style="color: red;">*</span></label>
-                                                                </div>
-                                                                <div class="col-sm-5">
-                                                                    <input type="number" class="form-control"
-                                                                        name="x_value" v-model="form.xValue">
-                                                                </div>
-                                                                <div class="col-sm-4" v-if="showXValueHint">
-                                                                    <p class="form-control-static">打85折，輸入0.85</p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <br />
-
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <div class="col-sm-2">
-                                                            <label class="control-label">上架時間起 <span
-                                                                    style="color: red;">*</span></label>
-                                                        </div>
-                                                        <div class="col-sm-10">
-                                                            <div class="input-group" id="start_at_flatpickr">
-                                                                <input type="text" class="form-control" name="start_at"
-                                                                    autocomplete="off" data-input v-model="form.startAt">
-                                                                <span class="input-group-btn" data-toggle>
-                                                                    <button class="btn btn-default" type="button">
-                                                                        <i class="fa-solid fa-calendar-days"></i>
-                                                                    </button>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <div class="col-sm-2">
-                                                            <label class="control-label">上架時間訖 <span
-                                                                    style="color: red;">*</span></label>
-                                                        </div>
-                                                        <div class="col-sm-10">
-                                                            <div class="input-group" id="end_at_flatpickr">
-                                                                <input type="text" class="form-control" name="end_at"
-                                                                    autocomplete="off" data-input v-model="form.endAt">
-                                                                <span class="input-group-btn" data-toggle>
-                                                                    <button class="btn btn-default" type="button">
-                                                                        <i class="fa-solid fa-calendar-days"></i>
-                                                                    </button>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <br />
-
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <div class="col-sm-2">
-                                                            <label class="control-label">前台文案 <span
-                                                                    style="color: red;">*</span></label>
-                                                        </div>
-                                                        <div class="col-sm-10">
-                                                            <input type="text" class="form-control" name="campaign_brief"
-                                                                v-model="form.campaignBrief">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <div class="col-sm-2">
-                                                            <label class="control-label">
-                                                                庫存類型 <span style="color: red;">*</span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="col-sm-10">
-                                                            <label class="radio-inline">
-                                                                <input type="radio" name="stock_type" value="A_B"
-                                                                    v-model="form.stockType" @click="clickStockType">買斷 / 寄售
-                                                            </label>
-                                                            <label class="radio-inline">
-                                                                <input type="radio" name="stock_type" value="T"
-                                                                    v-model="form.stockType" @click="clickStockType">轉單
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <div class="col-sm-2">
-                                                            <label class="control-label">
-                                                                供應商 <span style="color: red;">*</span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="col-sm-10">
-                                                            <select2
-                                                                class="form-control"
-                                                                :options="suppliers"
-                                                                v-model="form.supplierId"
-                                                                name="supplier_id"
-                                                                :allow-clear="false"
-                                                                @select2-selecting="onSupplierSelecting"
-                                                            >
-                                                                <option disabled value=""></option>
-                                                            </select2>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <hr style="border-top: 1px solid gray;" />
-                                        </div>
-
-                                        <div>
-                                            <div class="form-group">
-                                                <label class="control-label">適用對象 <span
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">活動名稱 <span
                                                         style="color: red;">*</span></label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" name="campaign_name"
+                                                    v-model="form.campaignName">
+                                            </div>
+                                        </div>
 
-                                                <div class="row" style="margin-left: 1rem;">
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">狀態 <span
+                                                        style="color: red;">*</span></label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="active" value="1"
+                                                        v-model="form.active">生效
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="active" value="0"
+                                                        v-model="form.active">失效
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">活動類型 <span
+                                                        style="color: red;">*</span></label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <select2 class="form-control" :options="campaignTypes"
+                                                    v-model="form.campaignType" name="campaign_type"
+                                                    @select2-selecting="onCampaignTypeSelecting" :allow-clear="false">
+                                                    <option disabled value=""></option>
+                                                </select2>
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">N (滿額) = <span
+                                                        style="color: red;">*</span></label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <div class="row">
+                                                    <div class="col-sm-5 mb-md-0 mb-4">
+                                                        <input type="number" class="form-control" name="n_value"
+                                                            v-model="form.nValue" min="1">
+                                                    </div>
                                                     <div class="col-sm-2">
-                                                        <label class="radio-inline">
-                                                            <input type="radio" name="target_groups" value="all"
-                                                                v-model="form.targetGroups">所有會員
-                                                        </label>
+                                                        <label class="pt-md-2">X (折扣) = <span
+                                                                style="color: red;">*</span></label>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <input type="number" class="form-control" name="x_value"
+                                                            v-model="form.xValue">
+                                                    </div>
+                                                    <div class="col-sm-2" v-if="showXValueHint">
+                                                        <p class="form-control-static fs-6">(打85折，輸入0.85)</p>
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <hr style="border-top: 1px solid gray;" />
                                         </div>
-
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-sm-1">
-                                                    <p>單品清單</p>
-                                                </div>
-                                                <div class="col-sm-2">
-                                                    <button type="button" class="btn btn-warning btn-sm"
-                                                        @click="addProduct">
-                                                        <i class="fa-solid fa-plus"></i> 新增單品
-                                                    </button>
-                                                </div>
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">上架時間 <span style="color: red;">*</span></label>
                                             </div>
-                                            <br>
+                                            <div class="col-sm-10">
+                                                <div class="row">
+                                                    <div class="col-sm-5">
+                                                        <div class="input-group " id="start_at_flatpickr">
 
-                                            <div class="table-responsive">
-                                                <table class='table table-striped table-bordered table-hover'
-                                                    style='width:100%'>
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="text-nowrap">項次</th>
-                                                            <th class="text-nowrap">商品序號</th>
-                                                            <th class="text-nowrap">商品名稱</th>
-                                                            <th class="text-nowrap">售價(含稅)</th>
-                                                            <th class="text-nowrap">上架日期</th>
-                                                            <th class="text-nowrap">上架狀態</th>
-                                                            <th class="text-nowrap">毛利(%)</th>
-                                                            <th class="text-nowrap">功能</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr v-for="(product, index) in form.products"
-                                                            :key="index">
-                                                            <input type="hidden" :name="`products[${index}][product_id]`"
-                                                                :value="product.productId">
-                                                            <td>@{{ index + 1 }}</td>
-                                                            <td>@{{ product.productNo }}</td>
-                                                            <td>@{{ product.productName }}</td>
-                                                            <td>@{{ product.sellingPriceForDisplay }}</td>
-                                                            <td>@{{ product.launchedAt }}</td>
-                                                            <td>@{{ product.launchStatus }}</td>
-                                                            <td>@{{ product.grossMargin }}</td>
-                                                            <td>
-                                                                <button type="button" class="btn btn-danger"
-                                                                    @click="deleteProduct(index)">
-                                                                    <i class="fa-solid fa-trash-can"></i> 刪除
+                                                            <input type="text" class="form-control" name="start_at"
+                                                                autocomplete="off" data-input v-model="form.startAt">
+                                                            <span class="input-group-btn" data-toggle>
+                                                                <button class="btn btn-default" type="button">
+                                                                    <span class="fa-solid fa-calendar-days"></span>
                                                                 </button>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
-                                            </div>
+                                                            </span>
+                                                        </div>
+                                                    </div>
 
-                                            <hr style="border-top: 1px solid gray;" />
-                                        </div>
-
-                                        <div v-if="showGiveaway">
-                                            <div class="row">
-                                                <div class="col-sm-1">
-                                                    <p>贈品清單</p>
-                                                </div>
-                                                <div class="col-sm-2">
-                                                    <button type="button" class="btn btn-warning btn-sm"
-                                                        @click="addGiveaway">
-                                                        <i class="fa-solid fa-plus"></i> 新增贈品
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <br>
-
-                                            <div class="table-responsive">
-                                                <table class='table table-striped table-bordered table-hover'
-                                                    style='width:100%'>
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="text-nowrap">項次</th>
-                                                            <th class="text-nowrap">商品序號</th>
-                                                            <th class="text-nowrap">商品名稱</th>
-                                                            <th class="text-nowrap">贈品數量</th>
-                                                            <th class="text-nowrap">庫存數</th>
-                                                            <th class="text-nowrap">上架狀態</th>
-                                                            <th class="text-nowrap">功能</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr v-for="(giveaway, index) in form.giveaways"
-                                                            :key="index">
-                                                            <input type="hidden" :name="`giveaways[${index}][product_id]`"
-                                                                :value="giveaway.productId">
-                                                            <td>@{{ index + 1 }}</td>
-                                                            <td>@{{ giveaway.productNo }}</td>
-                                                            <td>@{{ giveaway.productName }}</td>
-                                                            <td>
-                                                                <div class="form-group">
-                                                                    <input type="number"
-                                                                        class="form-control giveaway-assigned-qty"
-                                                                        :name="`giveaways[${index}][assigned_qty]`" min="1"
-                                                                        v-model="giveaway.assignedQty">
-                                                                </div>
-                                                            </td>
-                                                            <td>@{{ giveaway.stockQty }}</td>
-                                                            <td>@{{ giveaway.launchStatus }}</td>
-                                                            <td>
-                                                                <button type="button" class="btn btn-danger"
-                                                                    @click="deleteGiveaway(index)">
-                                                                    <i class="fa-solid fa-trash-can"></i> 刪除
+                                                    <div class="col-sm-2 text-center">
+                                                        <label class="pt-md-2">～</label>
+                                                    </div>
+                                                    <div class="col-sm-5">
+                                                        <div class="input-group" id="end_at_flatpickr">
+                                                            <input type="text" class="form-control" name="end_at"
+                                                                autocomplete="off" data-input v-model="form.endAt">
+                                                            <span class="input-group-btn" data-toggle>
+                                                                <button class="btn btn-default" type="button">
+                                                                    <span class="fa-solid fa-calendar-days"></span>
                                                                 </button>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
                                             </div>
-
-                                            <hr style="border-top: 1px solid gray;" />
                                         </div>
-
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">前台文案 <span
+                                                        style="color: red;">*</span></label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" name="campaign_brief"
+                                                    v-model="form.campaignBrief">
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">
+                                                    庫存類型 <span style="color: red;">*</span>
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="stock_type" value="A_B"
+                                                        v-model="form.stockType" @click="clickStockType">買斷 / 寄售
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="stock_type" value="T"
+                                                        v-model="form.stockType" @click="clickStockType">轉單
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">
+                                                    供應商 <span style="color: red;">*</span>
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <select2 class="form-control" :options="suppliers"
+                                                    v-model="form.supplierId" name="supplier_id" :allow-clear="false"
+                                                    @select2-selecting="onSupplierSelecting">
+                                                    <option disabled value=""></option>
+                                                </select2>
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">適用對象 <span
+                                                        style="color: red;">*</span></label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="target_groups" value="all"
+                                                        v-model="form.targetGroups">所有會員
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr style="border-top: 1px solid gray;" />
+                                    <div>
                                         <div class="row">
-                                            <div class="col-sm-12">
-                                                <div class="form-group">
-                                                    @if ($share_role_auth['auth_create'])
-                                                        <button class="btn btn-success" type="button" @click="submitForm"
-                                                            :disabled="saveButton.isDisabled">
-                                                            <i class="fa-solid fa-floppy-disk"></i> 儲存
-                                                        </button>
-                                                    @endif
-                                                    <a href="{{ route('promotional_campaign_prd') }}"
-                                                        class="btn btn-danger">
-                                                        <i class="fa-solid fa-ban"></i> 取消
-                                                    </a>
-                                                </div>
+                                            <div class="col-sm-2">
+                                                <p>單品清單</p>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <button type="button" class="btn btn-warning btn-sm"
+                                                    @click="addProduct">
+                                                    <i class="fa-solid fa-plus"></i> 新增單品
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <br>
+
+                                        <div class="table-responsive">
+                                            <table class='table table-striped table-bordered table-hover'
+                                                style='width:100%'>
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-nowrap">項次</th>
+                                                        <th class="text-nowrap">商品序號</th>
+                                                        <th class="text-nowrap">商品名稱</th>
+                                                        <th class="text-nowrap">售價(含稅)</th>
+                                                        <th class="text-nowrap">上架日期</th>
+                                                        <th class="text-nowrap">上架狀態</th>
+                                                        <th class="text-nowrap">毛利(%)</th>
+                                                        <th class="text-nowrap">功能</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(product, index) in form.products" :key="index">
+                                                        <input type="hidden" :name="`products[${index}][product_id]`"
+                                                            :value="product.productId">
+                                                        <td>@{{ index + 1 }}</td>
+                                                        <td>@{{ product.productNo }}</td>
+                                                        <td>@{{ product.productName }}</td>
+                                                        <td>@{{ product.sellingPriceForDisplay }}</td>
+                                                        <td>@{{ product.launchedAt }}</td>
+                                                        <td>@{{ product.launchStatus }}</td>
+                                                        <td>@{{ product.grossMargin }}</td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-danger"
+                                                                @click="deleteProduct(index)">
+                                                                <i class="fa-solid fa-trash-can"></i> 刪除
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <hr style="border-top: 1px solid gray;" />
+                                    </div>
+
+                                    <div v-if="showGiveaway">
+                                        <div class="row">
+                                            <div class="col-sm-1">
+                                                <p>贈品清單</p>
+                                            </div>
+                                            <div class="col-sm-1">
+                                                <button type="button" class="btn btn-warning btn-sm"
+                                                    @click="addGiveaway">
+                                                    <i class="fa-solid fa-plus"></i> 新增贈品
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <br>
+
+                                        <div class="table-responsive">
+                                            <table class='table table-striped table-bordered table-hover'
+                                                style='width:100%'>
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-nowrap">項次</th>
+                                                        <th class="text-nowrap">商品序號</th>
+                                                        <th class="text-nowrap">商品名稱</th>
+                                                        <th class="text-nowrap">贈品數量</th>
+                                                        <th class="text-nowrap">庫存數</th>
+                                                        <th class="text-nowrap">上架狀態</th>
+                                                        <th class="text-nowrap">功能</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(giveaway, index) in form.giveaways" :key="index">
+                                                        <input type="hidden" :name="`giveaways[${index}][product_id]`"
+                                                            :value="giveaway.productId">
+                                                        <td>@{{ index + 1 }}</td>
+                                                        <td>@{{ giveaway.productNo }}</td>
+                                                        <td>@{{ giveaway.productName }}</td>
+                                                        <td>
+                                                            <div class="form-group">
+                                                                <input type="number"
+                                                                    class="form-control giveaway-assigned-qty"
+                                                                    :name="`giveaways[${index}][assigned_qty]`"
+                                                                    min="1" v-model="giveaway.assignedQty">
+                                                            </div>
+                                                        </td>
+                                                        <td>@{{ giveaway.stockQty }}</td>
+                                                        <td>@{{ giveaway.launchStatus }}</td>
+                                                        <td>
+                                                            <button type="button" class="btn btn-danger"
+                                                                @click="deleteGiveaway(index)">
+                                                                <span class="fa-solid fa-trash-can"></span> 刪除
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <hr style="border-top: 1px solid gray;" />
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="form-group">
+                                                @if ($share_role_auth['auth_create'])
+                                                    <button class="btn btn-success" type="button" @click="submitForm"
+                                                        :disabled="saveButton.isDisabled">
+                                                        <span class="fa-solid fa-floppy-disk"></span> 儲存
+                                                    </button>
+                                                @endif
+                                                <a href="{{ route('promotional_campaign_prd') }}" class="btn btn-danger">
+                                                    <span class="fa-solid fa-ban"></span> 取消
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                            </form>
                         </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <prd-campaign-product-modal :modal="productModal" @save="saveProductModalProducts"></prd-campaign-product-modal>
-        <prd-campaign-product-modal :modal="giveawayModal" @save="saveGiveawayModalProducts"></prd-campaign-product-modal>
+    <prd-campaign-product-modal :modal="productModal" @save="saveProductModalProducts"></prd-campaign-product-modal>
+    <prd-campaign-product-modal :modal="giveawayModal" @save="saveGiveawayModalProducts"></prd-campaign-product-modal>
     </div>
 @endsection
 
@@ -724,7 +673,8 @@
                 "form.stockType"(value) {
                     // 若「庫存類型」為「轉單」且「活動類型」為「GIFT」：「供應商」欄位不允許選「全部」，一定要指定到單一供應商。
                     if (value == "T") {
-                        let campaignType = this.campaignTypes.find(campaignType => campaignType.id == this.form.campaignType);
+                        let campaignType = this.campaignTypes.find(campaignType => campaignType.id == this.form
+                            .campaignType);
                         if (campaignType && campaignType.udf03 == "GIFT") {
                             this.$set(this.suppliers[0], "disabled", true);
                             if (this.form.supplierId == "all") {
