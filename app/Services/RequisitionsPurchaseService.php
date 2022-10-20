@@ -185,6 +185,8 @@ class RequisitionsPurchaseService
                     unset($requisitions_purchase_detail[$key]['old_item_price']);
                     unset($requisitions_purchase_detail[$key]['spec_1_value']);
                     unset($requisitions_purchase_detail[$key]['spec_2_value']);
+                    unset($requisitions_purchase_detail[$key]['old_quotation_doc_number']);
+                    unset($requisitions_purchase_detail[$key]['old_quotation_id']);
                     $requisitions_purchase_detail[$key]['requisitions_purchase_id'] = $requisitions_purchase_id;
                     $requisitions_purchase_detail[$key]['created_by'] = $user_id;
                     $requisitions_purchase_detail[$key]['created_at'] = $now;
@@ -305,7 +307,7 @@ class RequisitionsPurchaseService
 
             $result['status'] = false;
         }
-        dd('STOP');
+
         return $result;
     }
 
