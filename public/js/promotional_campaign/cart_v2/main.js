@@ -768,7 +768,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     getProducts: function getProducts(data) {
       return axios({
-        method: "get",
+        method: "POST",
         url: "/backend/promotional-campaign-cart-v2/product-modal/products",
         params: data
       }).then(function (response) {

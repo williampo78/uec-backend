@@ -712,7 +712,7 @@ export default {
         },
         getProducts(data) {
             return axios({
-                method: "get",
+                method: "POST",
                 url: "/backend/promotional-campaign-cart-v2/product-modal/products",
                 params: data,
             })
