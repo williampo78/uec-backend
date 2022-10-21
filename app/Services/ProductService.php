@@ -510,6 +510,7 @@ class ProductService
             'products.brand_id',
             'products.min_purchase_qty',
             'products.uom',
+            'products.product_type',
             'brands.brand_name as brand_name')
             ->where('product_items.agent_id', $agent_id)
             ->leftJoin('products', 'products.id', '=', 'product_items.product_id')
@@ -523,6 +524,11 @@ class ProductService
         if (!empty($in['exclude_selling_channel'])) {
             $productItems->whereNotIn('products.selling_channel', $in['exclude_selling_channel']);
         }
+
+        $productItems->when(isset($in['stock_type']), function ($query) use ($in) {
+            $query->where('products.stock_type', $in['stock_type']);
+        });
+
         $result = $productItems->get();
 
         return $result;
