@@ -230,7 +230,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
 
     // 新版滿額活動
     Route::get('/promotional-campaign-cart-v2/product-modal/options', [PromotionalCampaignCartV2Controller::class, 'getProductModalOptions']);
-    Route::get('/promotional-campaign-cart-v2/product-modal/products', [PromotionalCampaignCartV2Controller::class, 'getProductModalProducts']);
+    Route::post('/promotional-campaign-cart-v2/product-modal/products', [PromotionalCampaignCartV2Controller::class, 'getProductModalProducts']);
     Route::post('/promotional-campaign-cart-v2/can-active', [PromotionalCampaignCartV2Controller::class, 'canActive']);
     Route::resource('/promotional-campaign-cart-v2', PromotionalCampaignCartV2Controller::class, [
         'names' => [
