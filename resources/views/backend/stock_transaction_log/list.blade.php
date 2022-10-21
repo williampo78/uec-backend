@@ -26,11 +26,15 @@
                                         <label>異動日期</label>
                                         <div>
                                             <div class="d-flex align-items-center">
-                                                <vue-flat-pickr
-                                                    :setting="searchParameters.dateStart" style="flex-grow:1"></vue-flat-pickr>
+                                                <vue-flat-pickr name="dateStart"
+                                                                v-model="searchParameters.dateStart.date"
+                                                                style="flex-grow:1">
+                                                </vue-flat-pickr>
                                                 <label>～</label>
-                                                <vue-flat-pickr
-                                                    :setting="searchParameters.dateEnd"style="flex-grow:1"></vue-flat-pickr>
+                                                <vue-flat-pickr name="dateEnd"
+                                                                v-model="searchParameters.dateEnd.date"
+                                                                style="flex-grow:1">
+                                                </vue-flat-pickr>
                                             </div>
                                         </div>
                                     </div>
