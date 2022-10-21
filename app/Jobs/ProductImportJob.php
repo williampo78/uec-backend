@@ -129,7 +129,9 @@ class ProductImportJob implements ShouldQueue
             }
 
         } catch (Exception $e) {
-            $productBatchService->updateStatusById($this->logId, BatchUploadLogStatus::STATUS_FAILED);
+            $productBatchService->updateStatusById($this->logId, BatchUploadLogStatus::STATUS_FAILED,[
+                'job_completed_log' => "程式異常：{$e->getMessage()}",
+            ]);
             Log::channel('batch_upload')->warning("catch log id : {$this->logId} 失敗" . $e->getMessage());
         }
     }
