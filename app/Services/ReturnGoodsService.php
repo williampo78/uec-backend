@@ -205,10 +205,18 @@ class ReturnGoodsService
     {
         $targetReturnExaminations = $this->returnExamination->where('is_returnable', 1);
 
+        $statusCode = 'PROCESSING';
+        $completedAt = $this->returnRequest->completed_at;
+        //退貨申請單金額為空
+        if(empty($this->returnRequest->refund_amount)){
+            $statusCode = 'COMPLETED';
+            $completedAt = now();
+        }
+
         $this->returnRequest
             ->update([
                 //處理中
-                'status_code'           => 'PROCESSING',
+                'status_code'           => $statusCode,
                 //退款金額
                 'refund_amount'         => $targetReturnExaminations->sum('returnable_amount'),
                 //歸還點數
@@ -216,8 +224,9 @@ class ReturnGoodsService
                 //歸還點數價值
                 'refund_point_discount' => $targetReturnExaminations->sum('returnable_point_discount'),
                 //待退款
-                'refund_status'         => 'PENDING',
-                'new_order_id'          => $this->newOrder->id
+                'refund_status'         => empty($this->returnRequest->refund_amount) ? 'NA' : 'PENDING',
+                'new_order_id'          => $this->newOrder->id,
+                'completed_at'          => $completedAt
             ]);
     }
 
@@ -228,11 +237,14 @@ class ReturnGoodsService
      */
     private function updateReturnExamination()
     {
-        $this->returnRequest
-            ->returnExamination()
-            ->update([
-                'status_code' => 'COMPLETED'
-            ]);
+        //退貨申請單金額為空
+        if (empty($this->returnRequest->refund_amount)) {
+            $this->returnExamination->each(function ($returnExamination) {
+                $returnExamination->update([
+                    'status_code' => $returnExamination->is_examination_passed == 0 ? 'M_CLOSED' : 'CLOSED'
+                ]);
+            });
+        }
     }
 
     /**
@@ -258,6 +270,8 @@ class ReturnGoodsService
     {
         //從舊單複製資料
         $this->newOrder = $this->oldOrder->replicate();
+        $totalAmount = $this->createOrderDetailData->sum('subtotal');
+
         //與舊單不同的資料
         $createData = [
             //修訂版號
@@ -265,11 +279,11 @@ class ReturnGoodsService
             //最新版本
             'is_latest'                => 1,
             //商品原總計，sum(單身的小計)
-            'total_amount'             => $this->createOrderDetailData->sum('subtotal'),
+            'total_amount'             => $totalAmount,
             //點數折扣
             'point_discount'           => $this->createOrderDetailData->sum('point_discount'),
             //實際付款金額
-            'paid_amount'              => $this->createOrderDetailData->sum('subtotal') + $this->newOrder->cart_campaign_discount + $this->newOrder->cart_p_discount + $this->newOrder->point_discount + $this->newOrder->shipping_fee + $this->newOrder->fee_of_instal,
+            'paid_amount'              => $totalAmount + $this->newOrder->cart_campaign_discount + $this->newOrder->cart_p_discount + $this->newOrder->point_discount + $this->newOrder->shipping_fee,
             //使用點數
             'points'                   => $this->createOrderDetailData->sum('points'),
             //已退購物車滿額折扣
@@ -281,7 +295,7 @@ class ReturnGoodsService
             //已退點數
             'returned_points'          => $this->createOrderDetailData->sum('returned_points'),
             //退款狀態
-            'refund_status'            => $this->newOrder->returned_paid_amount == 0 ? 'NA' : 'PENDING',
+            'refund_status'            => empty($this->returnRequest->refund_amount) ? 'NA' : 'PENDING',
             'created_by'               => $this->getUserId(),
             'updated_by'               => $this->getUserId(),
         ];
@@ -326,6 +340,7 @@ class ReturnGoodsService
                 ->where('passed_qty', '>', 0)
                 ->first();
 
+            //退貨項目，整理新增return_order_details資料
             if (!empty($targetReturnRequestDetail)) {
                 //目前退貨會全退，直接設定為0
                 $orderDetail->qty               = 0;
@@ -333,7 +348,7 @@ class ReturnGoodsService
                 $orderDetail->subtotal          = 0;
                 $orderDetail->point_discount    = 0;
                 $orderDetail->points            = 0;
-                //與已退相關的項目，會加上次的值
+                //與已退相關的項目，會累計舊order_detail的值
                 //已退數量
                 $orderDetail->returned_qty = $orderDetail->returned_qty + $this->invertSign($targetReturnRequestDetail->passed_qty);
                 //已退-單品活動折扣
@@ -347,6 +362,12 @@ class ReturnGoodsService
                 //已退-點數
                 $orderDetail->returned_points = $orderDetail->returned_points + $this->invertSign($targetReturnRequestDetail->points);
 
+                $sellingPrice = $orderDetail->selling_price;
+                //贈品
+                if($orderDetail->record_identity == 'G'){
+                    $sellingPrice = 0;
+                }
+
                 //整理新增return_order_details的資料
                 $this->createReturnOrderDetailData->push([
                     'request_no'              => $this->requestNo,
@@ -354,9 +375,9 @@ class ReturnGoodsService
                     'data_type'               => 'PRD',
                     'product_item_id'         => $orderDetail->product_item_id,
                     'promotional_campaign_id' => null,
-                    'selling_price'           => $targetReturnRequestDetail->selling_price,
+                    'selling_price'           => $sellingPrice,
                     'qty'                     => $this->invertSign($targetReturnRequestDetail->passed_qty),
-                    'subtotal'                => $this->invertSign($targetReturnRequestDetail->subtotal),
+                    'subtotal'                => $this->invertSign($targetReturnRequestDetail->passed_qty * $sellingPrice),
                     'points'                  => $this->invertSign($targetReturnRequestDetail->points),
                     'point_discount'          => $this->invertSign($targetReturnRequestDetail->point_discount),
                     'refund_amount'           => $this->invertSign($targetReturnRequestDetail->subtotal) + $this->invertSign($targetReturnRequestDetail->point_discount),
@@ -509,15 +530,14 @@ class ReturnGoodsService
                 ]);
         });
 
-        //新增利息收入資料
+        //舊單和新單分期手續費有落差，新增利息收入資料
         if($this->newOrder->fee_of_instal != $this->oldOrder->fee_of_instal){
 
             $oldFeeOfInstal = $this->invertSign($this->oldOrder->fee_of_instal);
-
+            //退掉舊單分期手續費
             $this->returnRequest
                 ->returnOrderDetails()
-                ->createMany([
-                    [
+                ->create([
                         'request_no'              => $this->requestNo,
                         'order_no'                => $this->orderNo,
                         'data_type'               => 'INSTAL_FEE',
@@ -531,23 +551,27 @@ class ReturnGoodsService
                         'refund_amount'           => $oldFeeOfInstal,
                         'created_by'              => $this->getUserId(),
                         'updated_by'              => $this->getUserId(),
-                    ],
-                    [
-                        'request_no'              => $this->requestNo,
-                        'order_no'                => $this->orderNo,
-                        'data_type'               => 'INSTAL_FEE',
-                        'product_item_id'         => null,
-                        'promotional_campaign_id' => null,
-                        'selling_price'           => $this->newOrder->fee_of_instal,
-                        'qty'                     => 1,
-                        'subtotal'                => $this->newOrder->fee_of_instal,
-                        'points'                  => 0,
-                        'point_discount'          => 0,
-                        'refund_amount'           => $this->newOrder->fee_of_instal,
-                        'created_by'              => $this->getUserId(),
-                        'updated_by'              => $this->getUserId(),
-                    ],
                 ]);
+            //新增新單分期手續費
+            if ($this->newOrder->fee_of_instal > 0) {
+                $this->returnRequest
+                    ->returnOrderDetails()
+                    ->create([
+                            'request_no'              => $this->requestNo,
+                            'order_no'                => $this->orderNo,
+                            'data_type'               => 'INSTAL_FEE',
+                            'product_item_id'         => null,
+                            'promotional_campaign_id' => null,
+                            'selling_price'           => $this->newOrder->fee_of_instal,
+                            'qty'                     => 1,
+                            'subtotal'                => $this->newOrder->fee_of_instal,
+                            'points'                  => 0,
+                            'point_discount'          => 0,
+                            'refund_amount'           => $this->newOrder->fee_of_instal,
+                            'created_by'              => $this->getUserId(),
+                            'updated_by'              => $this->getUserId(),
+                        ]);
+            }
         }
     }
 
@@ -558,6 +582,10 @@ class ReturnGoodsService
      */
     private function handleRefund()
     {
+        if (empty($this->returnRequest->refund_amount) && empty($this->returnRequest->refund_points)) {
+            return;
+        }
+
         //如果為分期付款
         if ($this->newOrder->payment_method == 'TAPPAY_INSTAL') {
             //產生退款單和請款單
@@ -588,8 +616,8 @@ class ReturnGoodsService
                 'amount'                    => $this->returnRequest->refund_amount,
                 'latest_api_status'         => null,
                 'latest_api_date'           => null,
-                'point_discount'            => $this->newOrder->returned_point_discount,
-                'points'                    => $this->newOrder->returned_points,
+                'point_discount'            => $this->returnRequest->refund_point_discount,
+                'points'                    => $this->returnRequest->refund_points,
                 'point_api_status'          => null,
                 'point_api_date'            => null,
                 'point_api_log'             => null,
@@ -635,6 +663,7 @@ class ReturnGoodsService
                 'number_of_instal'          => $this->oldOrderPayment->number_of_instal,
                 'interest_rate_of_instal'   => $this->oldOrderPayment->interest_rate_of_instal,
                 'min_consumption_of_instal' => $this->oldOrderPayment->min_consumption_of_instal,
+                'fee_of_instal'             => $this->invertSign($this->oldOrderPayment->fee_of_instal),
                 'remark'                    => null,
                 'created_by'                => $this->getUserId(),
                 'updated_by'                => $this->getUserId(),
@@ -644,7 +673,7 @@ class ReturnGoodsService
             ]);
 
         //金額
-        $amount = $this->oldOrderPayment->amount + $this->returnRequest->refund_amount;
+        $amount = $this->oldOrderPayment->amount - $this->oldOrderPayment->fee_of_instal + $this->returnRequest->refund_amount;
         //手續費
         $feeOfInstal = $this->getFee($amount, $this->oldOrderPayment->interest_rate_of_instal);
         $amount = $amount + $feeOfInstal;
@@ -662,8 +691,8 @@ class ReturnGoodsService
                 'amount'                    => $amount,
                 'latest_api_status'         => null,
                 'latest_api_date'           => null,
-                'point_discount'            => $this->newOrder->point_discount,
-                'points'                    => $this->newOrder->points,
+                'point_discount'            => $this->returnRequest->refund_point_discount,
+                'points'                    => $this->returnRequest->refund_points,
                 'point_api_status'          => null,
                 'point_api_date'            => null,
                 'point_api_log'             => null,
@@ -765,7 +794,7 @@ class ReturnGoodsService
             }
 
             DB::beginTransaction();
-            //$this->updateReturnExamination();
+            $this->updateReturnExamination();
             $this->updateOrder();
             $this->handleCreateOrderDetailAndReturnOrderDetailData();
             $this->createOrder();
