@@ -114,7 +114,7 @@ class QuotationController extends Controller
         $result['quotation'] = $this->quotationService->getQuotationById($id);
         $result['quotation_details'] = $this->quotationService->getQuotationDetail($id);
         $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
-        $result['products_item'] = $this->productService->getItemsAndProduct(['supplier_id' => $result['quotation']->supplier_id]);
+        $result['products_item'] = $this->productService->getItemsAndProduct(['supplier_id' => $result['quotation']->supplier_id, 'exclude_selling_channel' => ['STORE']]);
         $result['taxList'] = config('uec.tax_option');
         $result['act'] = 'upd';
         $result['id'] = $id;
@@ -180,10 +180,13 @@ class QuotationController extends Controller
 
                     $obj->min_purchase_qty = $obj->productItem->product->min_purchase_qty ?? '';
                     $obj->requisitions_purchase_number = '';
+                    $tmp = [];
                     if(!is_null($obj->productItem->requisitionsPurchaseDetails)){
                         foreach($obj->productItem->requisitionsPurchaseDetails as $key=>$val){
-                            $obj->requisitions_purchase_number .= $val->requisitionsPurchase->number.',' ;
+                            array_push($tmp, $val->requisitionsPurchase->number);
                         }
+                        $tmp = array_unique($tmp);
+                        $obj->requisitions_purchase_number = implode(',', $tmp);
                     }
                     // dd($obj->productItem->requisitionsPurchaseDetails);
                     // forach($obj->productItem->requisitionsPurchaseDetails)
@@ -197,16 +200,15 @@ class QuotationController extends Controller
             case 'supplierGetProducts':
                $products =  $this->productService->getItemsAndProduct([
                     'supplier_id' => $in['supplier_id'],
-                    'stock_type'=> 'A'
+                    'stock_type'=> 'A',
+                    'exclude_selling_channel'=> ['STORE']
                 ]);
 
                 return response()->json([
                     'requestData'=>$in,
                     'products' =>$products ,
                 ]);
-
                 break;
-
             case 'check_quotation_items':
                 $product_items =  array_unique($in['product_items']) ;
                 $result = $this->quotationService->checkQuotationItems($product_items);
