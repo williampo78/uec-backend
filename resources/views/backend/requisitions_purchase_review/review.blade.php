@@ -108,15 +108,17 @@
                             <div class="col-sm-12">
                                 <div class="row form-group">
                                     <div class="col-sm-1"><label> 簽核結果</label></div>
-                                    <label class="btn btn-default form-check-label">
-                                        <input class="form-check-input" name="review_result" type="radio" value="1">核准
-                                    </label>
-                                    <label class="btn btn-default form-check-label">
-                                        <input class="form-check-input" name="review_result" type="radio" value="0">駁回
-                                    </label>
-                                    <label for="">
-                                        <div class="review_result_error"></div>
-                                    </label>
+                                    <div class="col-sm-10 px-0">
+                                        <label class="btn btn-default form-check-label">
+                                            <input class="form-check-input" name="review_result" type="radio" value="1">核准
+                                        </label>
+                                        <label class="btn btn-default form-check-label">
+                                            <input class="form-check-input" name="review_result" type="radio" value="0">駁回
+                                        </label>
+                                        <label for="">
+                                            <div class="review_result_error"></div>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-sm-12">
@@ -126,11 +128,9 @@
                                 </div>
                             </div>
                             <hr>
-                            <div class="col-sm-12">
-                                <div class="row form-group">
-                                    <button class="btn btn-success btn"><i class="fa-solid fa-floppy-disk"></i>儲存</button>
-                                    <a class="btn btn-danger btn" href="{{ route('requisitions_purchase_review') }}"><i class="fa-solid fa-ban"></i>取消</a>
-                                </div>
+                            <div class="form-group">
+                                <button class="btn btn-success btn"><i class="fa-solid fa-floppy-disk"></i>儲存</button>
+                                <a class="btn btn-danger btn" href="{{ route('requisitions_purchase_review') }}"><i class="fa-solid fa-ban"></i>取消</a>
                             </div>
                         </div>
 
