@@ -30,7 +30,7 @@
                                     <div class="col-sm-1"><label> 稅別</label></div>
                                     <div class="col-sm-3">
                                         {{ $data['taxList'][$data['quotation']['tax']] ?? 'error' }}
-                                        {{ $data['quotation']['tax'] != '2' ? '' :($data['quotation']['is_tax_included'] == 1?' (含稅價)':' (未稅價)')}}
+                                        {{ $data['quotation']['tax'] != '2' ? '' : ($data['quotation']['is_tax_included'] == 1 ? ' (含稅價)' : ' (未稅價)') }}
                                     </div>
                                 </div>
 
@@ -55,12 +55,12 @@
                                         <tr>
                                             <td>{{ $v['product_items_no'] }}</td>
                                             <td>{{ $v['product_name'] }}
-                                                @if($v['spec_1_value'])
-                                                    - {{$v['spec_1_value']}}
+                                                @if ($v['spec_1_value'])
+                                                    - {{ $v['spec_1_value'] }}
                                                 @endif
-                                                @if($v['spec_2_value'])
-                                                - {{$v['spec_2_value']}}
-                                            @endif
+                                                @if ($v['spec_2_value'])
+                                                    - {{ $v['spec_2_value'] }}
+                                                @endif
                                             </td>
                                             <td>{{ $v['pos_item_no'] }}</td>
                                             <td>{{ $v['original_unit_price'] }}</td>
@@ -88,10 +88,10 @@
                                             <td>{{ $logVal['user_name'] }}</td>
                                             <td>{{ $logVal['review_at'] }}</td>
                                             <td>{{ $logVal['review_result'] }}
-                                                @if($logVal['review_result'] == '1')
-                                                核准
+                                                @if ($logVal['review_result'] == '1')
+                                                    核准
                                                 @elseif($logVal['review_result'] == '0')
-                                                駁回
+                                                    駁回
                                                 @endif
                                             </td>
                                             <td>{{ $logVal['review_remark'] }}</td>
@@ -104,15 +104,19 @@
                             <div class="col-sm-12">
                                 <div class="row form-group">
                                     <div class="col-sm-1"><label> 簽核結果</label></div>
-                                    <label class="btn btn-default form-check-label">
-                                        <input class="form-check-input" name="review_result" type="radio" value="1">核准
-                                    </label>
-                                    <label class="btn btn-default form-check-label">
-                                        <input class="form-check-input" name="review_result" type="radio" value="0">駁回
-                                    </label>
-                                    <label for="">
-                                        <div class="review_result_error"></div>
-                                    </label>
+                                    <div class="col-sm-10 px-0">
+                                        <label class="btn btn-default form-check-label">
+                                            <input class="form-check-input" name="review_result" type="radio"
+                                                value="1">核准
+                                        </label>
+                                        <label class="btn btn-default form-check-label">
+                                            <input class="form-check-input" name="review_result" type="radio"
+                                                value="0">駁回
+                                        </label>
+                                        <label for="">
+                                            <div class="review_result_error"></div>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-sm-12">
@@ -123,10 +127,11 @@
                             </div>
                             <hr>
                             <div class="col-sm-12">
-                                <div class="row form-group">
-                                    <button class="btn btn-success btn"><i class="fa-solid fa-floppy-disk"></i>儲存</button>
+                                <div class="form-group">
+                                    <button class="btn btn-success btn"><span
+                                            class="fa-solid fa-floppy-disk"></span>儲存</button>
                                     <a class="btn btn-danger btn" href="{{ route('quotation_review') }}">
-                                        <i class="fa-solid fa-ban"></i> 取消
+                                        <span class="fa-solid fa-ban"></span> 取消
                                     </a>
                                 </div>
                             </div>
