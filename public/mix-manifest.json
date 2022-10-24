@@ -3,8 +3,8 @@
     "/js/advertisement.js": "/js/advertisement.js",
     "/js/promotional_campaign/cart/main.js": "/js/promotional_campaign/cart/main.js",
     "/js/promotional_campaign/prd/main.js": "/js/promotional_campaign/prd/main.js",
-    "/js/promotional_campaign/cart_v2/main.js": "/js/promotional_campaign/cart_v2/main.js",
     "/js/misc-stock-request/main.js": "/js/misc-stock-request/main.js",
-    "/css/app.css": "/css/app.css?version=20221031",
+    "/js/promotional_campaign/cart_v2/main.js": "/js/promotional_campaign/cart_v2/main.js?v=2022102401",
+    "/css/app.css": "/css/app.css",
     "/css/advertisement.css": "/css/advertisement.css"
 }
