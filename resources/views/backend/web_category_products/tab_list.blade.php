@@ -7,7 +7,7 @@
 <div class="tab-content">
     <div id="content_type_p" class="tab-pane fade in "
         v-bind:class="category_hierarchy_content.content_type == 'P' ?'active':''">
-        <div class="panel-body col-sm-12">
+        <div class="panel-body col-sm-12 float-none">
 
             <div class="row">
                 <div class="col-sm-2">
@@ -16,7 +16,7 @@
                 </div>
             </div>
             <hr>
-            <table class="table table-striped table-bordered table-hover" style="width:100%">
+            <table class="table table-striped table-bordered table-hover d-inline-block d-md-table overflow-auto" style="width:100%">
                 <thead>
                     <tr>
                         <th>項次</th>
@@ -58,7 +58,7 @@
                         <button type="button" class="btn btn-block btn-warning btn-sm" data-toggle="modal"
                             data-target="#promotion_campaign_model">挑選賣場</button>
                     </div>
-                    <div class="col-sm-5">
+                    <div class="col-sm-5 my-4 my-md-0">
                         <input type="text" id="campaign_brief" name="campaign_brief" v-model="category_hierarchy_content.campaign_brief" class="form-control" readonly>
                         <input type="hidden" name="promotion_campaign_id" v-model="category_hierarchy_content.promotion_campaign_id" class="form-control" readonly>
                     </div>
