@@ -270,6 +270,7 @@ class RequisitionsPurchaseController extends Controller
                         'STORE'
                     ],
                     'supplier_id'=>$rs['supplier_id'],
+                    'stock_type' => 'A',
                 ];
                 $products_item = $this->productService->getItemsAndProduct($in)->transform(function ($obj, $key) {
                     $obj->text = $obj->item_no . '-' . $obj->brand_name . '-' . $obj->product_name . '-' . $obj->spec_1_value . '-' . $obj->spec_2_value;

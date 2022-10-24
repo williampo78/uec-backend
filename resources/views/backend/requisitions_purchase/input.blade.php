@@ -462,8 +462,8 @@
                             if(response.data.item_price == null){
                                 details[key].item_price = '';
                                 details[key].old_item_price = 0;
-                                details[key].quotation_doc_number = '';
-                                details[key].quotation_id = '';
+                                details[key].quotation_doc_number = null;
+                                details[key].quotation_id = null;
                             }else{
                                 details[key].item_price = response.data.item_price;
                                 details[key].old_item_price = 0;
@@ -586,8 +586,8 @@
                                 obj.subtotal_tax_price = 0 ;
                                 obj.original_subtotal_tax_price = 0 ;
                                 obj.original_subtotal_price = 0 ;
-                                obj.quotation_id = '';
-                                obj.quotation_doc_number = '';
+                                obj.quotation_id = null;
+                                obj.quotation_doc_number = null;
                             }
                         } else {
                             if (vm.detailsUpdate.length > 0 && obj.old_item_price == 0) { //因為編輯撈取如果是贈品會抓不到 單價 需要另外ajax 取得
@@ -726,7 +726,7 @@
                                 details[getSelectKey].quotation_id = response.data.quotation_id;
                                 details[getSelectKey].old_quotation_id = response.data.quotation_id;
                                 if(details[getSelectKey].is_gift == true){
-                                    details[getSelectKey].quotation_doc_number = '';
+                                    details[getSelectKey].quotation_doc_number = null;
                                 }
 
                             }
