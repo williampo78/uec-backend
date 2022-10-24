@@ -62,7 +62,12 @@ class ProductBatchService
             'filePath' => $filePath,
         ];
     }
-
+    /**
+     * 匯入紀錄LOG
+     *
+     * @param  [type] $inputLogData
+     * @return void
+     */
     public function addBatchUploadLog($inputLogData)
     {
         try {
@@ -200,8 +205,8 @@ class ProductBatchService
                     'promotion_end_at' => $productBasice['promotion_end_at'] ?? '',
                     'has_expiry_date_text' => $productBasice['has_expiry_date'] ?? '',
                     'has_expiry_date' => $productBasice['has_expiry_date'] == 'Y' ? '1' : '0',
-                    'expiry_days' => $productBasice['expiry_days'] ?? '',
-                    'expiry_receiving_days' => $productBasice['expiry_receiving_days'] ?? '',
+                    'expiry_days' => $productBasice['expiry_days'] ?? 0,
+                    'expiry_receiving_days' => $productBasice['expiry_receiving_days'] ?? 0,
                     'description' => $productBasice['description'] ?? '',
                     'specification' => $productBasice['specification'] ?? '',
                     'rowNum' => $productBasice['rowNum'] ?? '',
