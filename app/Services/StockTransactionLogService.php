@@ -24,11 +24,11 @@ class StockTransactionLogService
             ->has('productItem')
             //異動日期開始
             ->when(empty($payload['dateStart']) === false, function ($query) use ($payload) {
-                $query->where('transaction_date', '>=', $payload['dateStart']);
+                $query->whereDate('transaction_date', '>=', $payload['dateStart']);
             })
             //異動日期結束
             ->when(empty($payload['dateEnd']) === false, function ($query) use ($payload) {
-                $query->where('transaction_date', '<=', $payload['dateEnd']);
+                $query->whereDate('transaction_date', '<=', $payload['dateEnd']);
             })
             //倉庫
             ->when(empty($payload['warehouse']) === false, function ($query) use ($payload) {
