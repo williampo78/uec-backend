@@ -37,7 +37,15 @@
                                     <label class="control-label">出貨單狀態</label>
                                 </div>
                                 <div class="col-sm-8">
-                                    <p class="form-control-static" id="modal-status-code"></p>
+                                    <div class="col-sm-4">
+                                        <p class="form-control-static" id="modal-status-code"></p>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <p class="form-control-static" id="modal-progress-log">
+                                            <button type="button" class="btn btn-primary btn-sm progress_log_detail" data-shipment="{{ $shipment['shipments_id'] }}">出貨配送歷程</button>
+                                        </p>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -60,7 +68,7 @@
                                     <label class="control-label">物流廠商</label>
                                 </div>
                                 <div class="col-sm-8">
-                                    <p class="form-control-static" id="modal-lgst-company-code"></p>
+                                    <p class="form-control-static" id="modal-lgst-company"></p>
                                 </div>
                             </div>
                         </div>
@@ -222,6 +230,9 @@
                                 <th class="text-nowrap">規格一</th>
                                 <th class="text-nowrap">規格二</th>
                                 <th class="text-nowrap">數量</th>
+                                <th class="text-nowrap">廠商料號</th>
+                                <th class="text-nowrap">廠商貨號</th>
+                                <th class="text-nowrap">供應商</th>
                             </tr>
                         </thead>
                         <tbody>

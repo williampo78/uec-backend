@@ -293,6 +293,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     ]);
 
     // 出貨單管理
+    Route::get('/shipment/{shipment}/progress-logs', [ShipmentController::class, 'getProgressLogs']);
     Route::resource('/shipment', ShipmentController::class, [
         'names' => [
             'index' => 'shipment',
