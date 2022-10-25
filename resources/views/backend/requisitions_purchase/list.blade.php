@@ -7,74 +7,59 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa-solid fa-arrow-right-to-bracket"></i> 請購單</h1>
+                <h1 class="page-header"><span class="fa-solid fa-arrow-right-to-bracket"></span> 請購單</h1>
             </div>
         </div>
         <div class="row" id="requisitions_vue_app">
             <div class="col-sm-12">
                 <div class="panel panel-default">
                     <!-- 功能按鈕(新增) -->
-                    <div class="panel-heading">
-                        <form role="form" id="select-form" class="form-horizontal" method="GET" action="{{ route('requisitions_purchase') }}"
+                    <div class="panel-heading p-4">
+                        <form role="form" id="select-form"  method="GET" action="{{ route('requisitions_purchase') }}"
                             enctype="multipart/form-data">
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3">
-                                        <label class="control-label">供應商</label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <select class="form-control" name="supplier_id" id="supplier_id">
-                                            <option value=""></option>
-                                            @foreach ($supplier as $obj)
-                                                <option value='{{ $obj->id }}'
-                                                    {{ request()->input('supplier_id') == $obj->id ? 'selected="selected"' : '' }}>
-                                                    {{ $obj->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                            <div class="d-block d-md-grid custom-outer">
+                                <div class="mb-4 custom-title">
+                                    <label>供應商</label>
+                                    <select class="form-control" name="supplier_id" id="supplier_id">
+                                        <option value=""></option>
+                                        @foreach ($supplier as $obj)
+                                            <option value='{{ $obj->id }}'
+                                                {{ request()->input('supplier_id') == $obj->id ? 'selected="selected"' : '' }}>
+                                                {{ $obj->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
 
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3">
-                                        <label class="control-label">供應商統編</label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" name="company_number" id="company_number"
-                                        value="{{ request()->input('company_number') }}">
-                                    </div>
+                                <div class="mb-4 custom-title">
+                                    <label>供應商統編</label>
+                                    <input class="form-control" name="company_number" id="company_number"
+                                    value="{{ request()->input('company_number') }}">
                                 </div>
 
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3">
-                                        <label class="control-label">狀態</label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <select class="form-control" name="status" id="status">
-                                            <option value="">無</option>
-                                            <option value='drafted'
-                                                {{ request()->input('status') == 'drafted' ? 'selected="selected"' : '' }}>
-                                                草稿</option>
-                                            <option value='reviewing'
-                                                {{ request()->input('status') == 'reviewing' ? 'selected="selected"' : '' }}>
-                                                簽核中</option>
-                                            <option value='approved'
-                                                {{ request()->input('status') == 'approved' ? 'selected="selected"' : '' }}>
-                                                已核准</option>
-                                            <option value='rejected'
-                                                {{ request()->input('status') == 'rejected' ? 'selected="selected"' : '' }}>
-                                                已駁回</option>
-                                        </select>
-                                    </div>
+                                <div class="mb-4 custom-title">
+                                    <label>狀態</label>
+                                    <select class="form-control" name="status" id="status">
+                                        <option value="">無</option>
+                                        <option value='drafted'
+                                            {{ request()->input('status') == 'drafted' ? 'selected="selected"' : '' }}>
+                                            草稿</option>
+                                        <option value='reviewing'
+                                            {{ request()->input('status') == 'reviewing' ? 'selected="selected"' : '' }}>
+                                            簽核中</option>
+                                        <option value='approved'
+                                            {{ request()->input('status') == 'approved' ? 'selected="selected"' : '' }}>
+                                            已核准</option>
+                                        <option value='rejected'
+                                            {{ request()->input('status') == 'rejected' ? 'selected="selected"' : '' }}>
+                                            已駁回</option>
+                                    </select>
                                 </div>
                             </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3">
-                                        <label class="control-label">日期</label>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
+                            <div class="d-block d-md-grid custom-outer">
+                                <div class="mb-4 mb-md-0 custom-title">
+                                    <label>日期</label>
+                                    <div class="d-flex align-items-center">
+                                        <div class="form-group mb-0">
                                             <div class="input-group" id="select_start_date_flatpickr">
                                                 <input type="text" class="form-control" name="select_start_date" id="select_start_date" value="{{ request()->input('select_start_date') }}" autocomplete="off" data-input />
                                                 <span class="input-group-btn" data-toggle>
@@ -84,12 +69,8 @@
                                                 </span>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-sm-1 text-center">
-                                        <label class="control-label">～</label>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
+                                        <span>～</span>
+                                        <div class="form-group mb-0">
                                             <div class="input-group" id="select_end_date_flatpickr">
                                                 <input type="text" class="form-control" name="select_end_date" id="select_end_date" value="{{ request()->input('select_end_date') }}" autocomplete="off" data-input />
                                                 <span class="input-group-btn" data-toggle>
@@ -101,35 +82,22 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3">
-                                        <label class="control-label">請購單號</label>
-                                    </div>
-                                    <div class="col-sm-9">
+                                <div class="mb-4 mb-md-0 custom-title">
+                                        <label>請購單號</label>
                                         <input class="form-control" name="doc_number" id="doc_number"
                                         value="{{ request()->input('doc_number') }}">
-                                    </div>
                                 </div>
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3">
-                                        <label class="control-label">採購單號</label>
-                                    </div>
-                                    <div class="col-sm-9">
+                                <div class="mb-4 custom-title">
+                                        <label>採購單號</label>
                                         <input class="form-control" name="order_supplier_number" id="order_supplier_number"
                                         value="{{ request()->input('order_supplier_number') }}">
-                                    </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-sm-9"></div>
-                                <div class="col-sm-3 text-right">
-                                    <div class="col-sm-12">
-                                        @if ($share_role_auth['auth_query'])
-                                            <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i></i>
-                                                查詢</button>
-                                        @endif
-                                    </div>
-                                </div>
+                            <div class="text-right" style="padding: 0 5px;">
+                                @if ($share_role_auth['auth_query'])
+                                    <button class="btn btn-warning"><span class="fa-solid fa-magnifying-glass"></span></i>
+                                        查詢</button>
+                                @endif
                             </div>
                         </form>
                     </div>

@@ -45,6 +45,8 @@
             </div>
         </div>
         <div id="DivAddRow">
+            {{-- 品項 --}}
+            <h5 class="fw-bold" style="font-size: 15px;">品項</h5>
             <div class='col-ms-12'>
                 <table class='table table-striped table-bordered table-hover' style='width:100%' id='table_list2'>
                     <thead>
@@ -78,7 +80,7 @@
                     </tbody>
                 </table>
             </div>
-            <label>簽核紀錄</label>
+            <h5 class="fw-bold" style="font-size: 15px;">簽核紀錄</h5>
             <div class='col-ms-12'>
                 <table class='table table-striped table-bordered table-hover' style='width:100%' id='table_list2'>
                     <thead>

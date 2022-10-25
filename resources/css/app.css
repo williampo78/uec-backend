@@ -140,3 +140,12 @@ span.error {
 .page-header{
     font-size: 28px;
 }
+
+.custom-outer{ grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+    padding: 0 5px;
+}
+.custom-title{ display: grid;
+    grid-template-columns: 100px 1fr;
+    align-items: center;
+}

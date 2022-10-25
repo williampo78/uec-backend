@@ -8,7 +8,7 @@
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa-solid fa-arrow-right-to-bracket"></i> 報價單</h1>
+                <h1 class="page-header"><span class="fa-solid fa-arrow-right-to-bracket"></span> 報價單</h1>
             </div>
         </div>
 
@@ -16,40 +16,30 @@
             <div class="col-sm-12">
                 <div class="panel panel-default">
                     <!-- 功能按鈕(新增) -->
-                    <div class="panel-heading">
+                    <div class="panel-heading p-4">
                         <form role="form" id="select-form" method="GET" action="" enctype="multipart/form-data">
-                            <div class="row">
-                                <div class="col-sm-5">
-                                    <div class="col-sm-2">
-                                        <h5>供應商</h5>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <select class="form-control select2-default" name="supplier" id="supplier">
-                                            <option value=""></option>
-                                            @foreach ($supplier as $v)
-                                                <option value='{{ $v['id'] }}'
-                                                    {{ $v['id'] == request()->input('supplier') ? 'selected' : '' }}>
-                                                    {{ $v['name'] }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                            <div class="d-block d-md-grid custom-outer">
+                                <div class="mb-4 custom-title">
+                                    <label>供應商</label>
+                                    <select class="form-control select2-default" name="supplier" id="supplier">
+                                        <option value=""></option>
+                                        @foreach ($supplier as $v)
+                                            <option value='{{ $v['id'] }}'
+                                                {{ $v['id'] == request()->input('supplier') ? 'selected' : '' }}>
+                                                {{ $v['name'] }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
 
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3">
-                                        <h5>供應商統編</h5>
-                                    </div>
-                                    <div class="col-sm-9">
+                                <div class="mb-4 custom-title">
+                                        <label>供應商統編</label>
                                         <input class="form-control" name="company_number" id="company_number"
                                             value="{{ request()->input('company_number') }}">
-                                    </div>
                                 </div>
 
-                                <div class="col-sm-3">
-                                    <div class="col-sm-3">
-                                        <h5>狀態</h5>
-                                    </div>
-                                    <div class="col-sm-9">
+                                <div class="mb-4 custom-title">
+                                    <label custom-title>狀態</label>
+                                    <div>
                                         <select class="form-control select2-default" name="status" id="status">
                                             <option value=''></option>
                                             <option value='drafted'
@@ -68,14 +58,11 @@
                                     </div>
                                 </div>
                             </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-sm-5">
-                                    <div class="col-sm-2">
-                                        <h5>報價日期：</h5>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
+                            <div class="d-block d-md-grid custom-outer">
+                                <div class="mb-4 mb-md-0 custom-title">
+                                    <label>報價日期</label>
+                                    <div class="d-flex align-items-center">
+                                        <div class="form-group mb-0">
                                             <div class="input-group" id="select_start_date_flatpickr">
                                                 <input type="text" class="form-control" name="select_start_date" id="select_start_date" value="{{ request()->input('select_start_date') }}" autocomplete="off" data-input />
                                                 <span class="input-group-btn" data-toggle>
@@ -85,12 +72,8 @@
                                                 </span>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-sm-1">
-                                        <h5>～</h5>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <div class="form-group">
+                                        <span>～</span>
+                                        <div class="form-group mb-0">
                                             <div class="input-group" id="select_end_date_flatpickr">
                                                 <input type="text" class="form-control" name="select_end_date" id="select_end_date" value="{{ request()->input('select_end_date') }}" autocomplete="off" data-input />
                                                 <span class="input-group-btn" data-toggle>
@@ -103,25 +86,19 @@
                                     </div>
                                 </div>
 
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3">
-                                        <h5>報價單號</h5>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" name="doc_number" id="doc_number"
-                                            value="{{ request()->input('doc_number') }}">
-                                    </div>
+                                <div class="mb-4 mb-md-0 custom-title">
+                                    <label>報價單號</label>
+                                    <input class="form-control" name="doc_number" id="doc_number"
+                                        value="{{ request()->input('doc_number') }}">
                                 </div>
 
-                                <div class="col-sm-3 text-right">
-                                    <div class="col-sm-12">
-                                        @if ($share_role_auth['auth_query'])
-                                            <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i></i> 查詢</button>
-                                            <button type="button" class="btn btn-danger" id="btn-reset">
-                                                <i class="fa-solid fa-eraser"></i> 清除
-                                            </button>
-                                        @endif
-                                    </div>
+                                <div class="text-right">
+                                    @if ($share_role_auth['auth_query'])
+                                        <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i></i> 查詢</button>
+                                        <button type="button" class="btn btn-danger" id="btn-reset">
+                                            <i class="fa-solid fa-eraser"></i> 清除
+                                        </button>
+                                    @endif
                                 </div>
                             </div>
                         </form>

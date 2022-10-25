@@ -160,99 +160,101 @@
                             <textarea style="display:none"> @{{ detailsCount }}</textarea>
                             <hr>
                             <h4><i class="fa-solid fa-table-cells-large"></i> 品項 </h4>
-                            <div id="ItemDiv">
-                                <div class="add_row">
-                                    <div class="row">
-                                        <div class="col-sm-2 text-left">品項<span class="text-red">*</span></div>
-                                        <div class="col-sm-1 text-left">規格一</div>
-                                        <div class="col-sm-1 text-left">規格二</div>
-                                        <div class="col-sm-1 text-left">贈品</div>
-                                        <div class="col-sm-1 text-left">單價<span class="text-red">*</span></div>
-                                        <div class="col-sm-1 text-left">數量<span class="text-red">*</span></div>
-                                        <div class="col-sm-1 text-left">單位</div>
-                                        <div class="col-sm-1 text-left">最小採購量</div>
-                                        <div class="col-sm-1 text-left">原幣小計<span class="text-red">*</span></div>
-                                        <div class="col-sm-1 text-left">報價單號</div>
-                                        <div class="col-sm-1 text-left">功能</div>
+                            <div class="overflow-auto">
+
+                                <div id="ItemDiv" style="width: 100%; max-width: 1800px;">
+                                    <div class="add_row" style="min-width: 1800px">
+                                        <div class="row">
+                                            <div class="col-sm-2 text-left">品項<span class="text-red">*</span></div>
+                                            <div class="col-sm-1 text-left">規格一</div>
+                                            <div class="col-sm-1 text-left">規格二</div>
+                                            <div class="col-sm-1 text-left">贈品</div>
+                                            <div class="col-sm-1 text-left">單價<span class="text-red">*</span></div>
+                                            <div class="col-sm-1 text-left">數量<span class="text-red">*</span></div>
+                                            <div class="col-sm-1 text-left">單位</div>
+                                            <div class="col-sm-1 text-left">最小採購量</div>
+                                            <div class="col-sm-1 text-left">原幣小計<span class="text-red">*</span></div>
+                                            <div class="col-sm-1 text-left">報價單號</div>
+                                            <div class="col-sm-1 text-left">功能</div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="add_row detailsdata" v-for="(detail, detailKey) in details">
-                                    <div class="row">
+                                    <div class="add_row detailsdata" v-for="(detail, detailKey) in details" style="min-width: 1800px">
+                                        <div class="row">
+                                            <div class="col-sm-2">
+                                                <select2 :selectkey="detailKey" :item_options="itemOptions"
+                                                    :details="details" :requisitions_purchase="requisitions_purchase"
+                                                    v-model="details[detailKey].product_item_id"> </select2>
+                                            </div>
+                                            {{-- 規格一 --}}
+                                            <div class="col-sm-1">
+                                                <div class="form-group">
+                                                    <input class="form-control spec_1_value"  readonly
+                                                        v-model="details[detailKey].spec_1_value"
+                                                        :name="'spec_1_value[' + detailKey + ']'">
+                                                </div>
+                                            </div>
+                                            {{-- 規格二 --}}
+                                            <div class="col-sm-1">
+                                                <div class="form-group">
+                                                    <input class="form-control spec_2_value" readonly
+                                                        v-model="details[detailKey].spec_2_value"
+                                                        :name="'spec_2_value[' + detailKey + ']'">
+                                                </div>
+                                            </div>
+                                            {{--  --}}
+                                            <div class="col-sm-1">
+                                                <input type="checkbox" class="big-checkbox w-auto"
+                                                    v-model="details[detailKey].is_gift" :true-value="1"
+                                                    :false-value="0">
+                                            </div>
 
-                                        <div class="col-sm-2">
-                                            <select2 :selectkey="detailKey" :item_options="itemOptions"
-                                                :details="details" :requisitions_purchase="requisitions_purchase"
-                                                v-model="details[detailKey].product_item_id"> </select2>
-                                        </div>
-                                        {{-- 規格一 --}}
-                                        <div class="col-sm-1">
-                                            <div class="form-group">
-                                                <input class="form-control spec_1_value"  readonly
-                                                    v-model="details[detailKey].spec_1_value"
-                                                    :name="'spec_1_value[' + detailKey + ']'">
+                                            {{-- 單價 --}}
+                                            <div class="col-sm-1">
+                                                <div class="form-group">
+                                                    <input class="form-control qty item_price" type="number" readonly
+                                                        v-model="details[detailKey].item_price"
+                                                        :name="'item_price[' + detailKey + ']'">
+                                                </div>
                                             </div>
-                                        </div>
-                                        {{-- 規格二 --}}
-                                        <div class="col-sm-1">
-                                            <div class="form-group">
-                                                <input class="form-control spec_2_value" readonly
-                                                    v-model="details[detailKey].spec_2_value"
-                                                    :name="'spec_2_value[' + detailKey + ']'">
+                                            {{-- 數量 --}}
+                                            <div class="col-sm-1">
+                                                <div class="form-group">
+                                                    <input class="form-control item_qty" v-model="details[detailKey].item_qty"
+                                                        :name="'item_qty[' + detailKey + ']'" :min="0"
+                                                        type="number">
+                                                </div>
                                             </div>
-                                        </div>
-                                        {{--  --}}
-                                        <div class="col-sm-1">
-                                            <input type="checkbox" class="big-checkbox"
-                                                v-model="details[detailKey].is_gift" :true-value="1"
-                                                :false-value="0">
-                                        </div>
-
-                                        {{-- 單價 --}}
-                                        <div class="col-sm-1">
-                                            <div class="form-group">
-                                                <input class="form-control qty item_price" type="number" readonly
-                                                    v-model="details[detailKey].item_price"
-                                                    :name="'item_price[' + detailKey + ']'">
+                                            {{-- 單位 --}}
+                                            <div class="col-sm-1"><input class="form-control" readonly
+                                                    v-model="details[detailKey].item_uom">
                                             </div>
-                                        </div>
-                                        {{-- 數量 --}}
-                                        <div class="col-sm-1">
-                                            <div class="form-group">
-                                                <input class="form-control item_qty" v-model="details[detailKey].item_qty"
-                                                    :name="'item_qty[' + detailKey + ']'" :min="0"
-                                                    type="number">
+                                            {{-- 最小採購量 --}}
+                                            <div class="col-sm-1"><input class="form-control" readonly
+                                                    v-model="details[detailKey].min_purchase_qty">
                                             </div>
-                                        </div>
-                                        {{-- 單位 --}}
-                                        <div class="col-sm-1"><input class="form-control" readonly
-                                                v-model="details[detailKey].item_uom">
-                                        </div>
-                                        {{-- 最小採購量 --}}
-                                        <div class="col-sm-1"><input class="form-control" readonly
-                                                v-model="details[detailKey].min_purchase_qty">
-                                        </div>
-                                        {{-- 原幣小計 --}}
-                                        <div class="col-sm-1"><input class="form-control" readonly
-                                                v-model="details[detailKey].original_subtotal_price">
-                                        </div>
-                                        <div class="col-sm-1">
-                                            <div class="form-group">
-                                                <input class="form-control quotation_doc_number" readonly
-                                                    v-model="details[detailKey].quotation_doc_number"
-                                                    :name="'quotation_doc_number[' + detailKey + ']'">
+                                            {{-- 原幣小計 --}}
+                                            <div class="col-sm-1"><input class="form-control" readonly
+                                                    v-model="details[detailKey].original_subtotal_price">
                                             </div>
-                                        </div>
-                                        {{-- 功能 --}}
-                                        <div class="col-sm-1">
-                                            <button type="button" class="btn btn-danger"
-                                                @click="ItemListDel(details[detailKey].id,detailKey)">
-                                                <i class="fa-solid fa-ban"></i>刪除
-                                            </button>
+                                            <div class="col-sm-1">
+                                                <div class="form-group">
+                                                    <input class="form-control quotation_doc_number" readonly
+                                                        v-model="details[detailKey].quotation_doc_number"
+                                                        :name="'quotation_doc_number[' + detailKey + ']'">
+                                                </div>
+                                            </div>
+                                            {{-- 功能 --}}
+                                            <div class="col-sm-1">
+                                                <button type="button" class="btn btn-danger"
+                                                    @click="ItemListDel(details[detailKey].id,detailKey)">
+                                                    <i class="fa-solid fa-ban"></i>刪除
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row form-group">
+                            <div class="row form-group mt-2">
                                 <div class="col-sm-12">
                                     <a class="btn btn-warning" id="btn-addNewRow" @click="ItemListAdd">
                                         <i class="fa-solid fa-plus"></i> 新增品項
@@ -510,7 +512,7 @@
                         if ($('#old_supplier_id').val() !== '') {
                             if ($('#old_supplier_id').val() !== $('#supplier_id').find(":selected")
                                 .val()) {
-                                alert('請先將品項刪除在切換供應商')
+                                alert('請先將品項刪除再切換供應商')
                                 $("#supplier_id").val($('#old_supplier_id').val()).trigger('change');
                             }
                         }

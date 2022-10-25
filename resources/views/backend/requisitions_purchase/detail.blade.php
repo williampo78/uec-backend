@@ -56,7 +56,7 @@
                         </div>
                     </div>
                     {{-- 品項 --}}
-                    <h5>品項</h5>
+                    <h5 class="fw-bold" style="font-size: 15px;">品項</h5>
                     <div class="row" id="DivAddRow">
                         <div class="col-sm-12">
                             <table class="table table-striped table-bordered table-hover">
@@ -94,7 +94,7 @@
                         </div>
                     </div>
                     {{--  --}}
-                    <h5>簽核紀錄</h5>
+                    <h5 class="fw-bold" style="font-size: 15px;">簽核紀錄</h5>
                     <div class="row" id="DivAddRow">
                         <div class="col-sm-12">
                             <table class="table table-striped table-bordered table-hover">

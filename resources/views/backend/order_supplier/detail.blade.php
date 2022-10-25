@@ -1,4 +1,4 @@
-<!-- 報價單明細 -->
+<!-- 採購單明細 -->
 <div class="modal fade" id="row_detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
     aria-hidden="true">
 
@@ -13,83 +13,67 @@
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-sm-12">
-                            <div class="row">
-                                <div class="form-group">
-                                    <div class="col-sm-2 text-right"><label> 採購單號</label></div>
-                                    <div class="col-sm-4">@{{ show_supplier . number }}</div>
-                                    <div class="col-sm-2 text-right"><label> 供應商</label></div>
-                                    <div class="col-sm-4">@{{ show_supplier . supplier_name }}</div>
-                                </div>
+                            <div class="row form-group">
+                                <div class="col-sm-2"><label> 採購單號</label></div>
+                                <div class="col-sm-4">@{{ show_supplier . number }}</div>
+                                <div class="col-sm-2"><label> 供應商</label></div>
+                                <div class="col-sm-4">@{{ show_supplier . supplier_name }}</div>
                             </div>
-                            <div class="row">
 
-                                <div class="form-group">
-                                    <div class="col-sm-2 text-right"><label> 幣別</label></div>
-                                    <div class="col-sm-4">新台幣</div>
-                                    <div class="col-sm-2 text-right"><label> 狀態</label></div>
-                                    <div class="col-sm-4">
-                                        <div v-if="show_supplier.status == 'DRAFTED'">草稿</div>
-                                        <div v-else-if="show_supplier.status == 'REVIEWING'">簽核中</div>
-                                        <div v-else-if="show_supplier.status == 'APPROVED'">已核准</div>
-                                        <div v-else-if="show_supplier.status == 'REJECTED'">已駁回</div>
-                                        {{-- status --}}
-                                    </div>
+                            <div class="row form-group">
+                                <div class="col-sm-2"><label> 幣別</label></div>
+                                <div class="col-sm-4">新台幣</div>
+                                <div class="col-sm-2"><label> 狀態</label></div>
+                                <div class="col-sm-4">
+                                    <div v-if="show_supplier.status == 'DRAFTED'">草稿</div>
+                                    <div v-else-if="show_supplier.status == 'REVIEWING'">簽核中</div>
+                                    <div v-else-if="show_supplier.status == 'APPROVED'">已核准</div>
+                                    <div v-else-if="show_supplier.status == 'REJECTED'">已駁回</div>
+                                    {{-- status --}}
                                 </div>
                             </div>
-                            <div class="row">
 
-                                <div class="form-group">
-                                    <div class="col-sm-2 text-right"><label> 原幣稅額</label></div>
-                                    <div class="col-sm-4">@{{ show_supplier . original_total_tax_price }}</div>
-                                    <div class="col-sm-2 text-right"><label> 原幣總金額</label></div>
-                                    <div class="col-sm-4">@{{ show_supplier . original_total_price }}</div>
-                                </div>
+                            <div class="row form-group">
+                                <div class="col-sm-2"><label> 原幣稅額</label></div>
+                                <div class="col-sm-4">@{{ show_supplier . original_total_tax_price }}</div>
+                                <div class="col-sm-2"><label> 原幣總金額</label></div>
+                                <div class="col-sm-4">@{{ show_supplier . original_total_price }}</div>
                             </div>
-                            <div class="row">
-                                <div class="form-group">
-                                    <div class="col-sm-2 text-right"><label> 稅額</label></div>
-                                    <div class="col-sm-4">@{{ show_supplier . total_tax_price }}</div>
-                                    <div class="col-sm-2 text-right"><label> 總金額</label></div>
-                                    <div class="col-sm-4">@{{ show_supplier . total_price }}</div>
-                                </div>
+                            <div class="row form-group">
+                                <div class="col-sm-2"><label> 稅額</label></div>
+                                <div class="col-sm-4">@{{ show_supplier . total_tax_price }}</div>
+                                <div class="col-sm-2"><label> 總金額</label></div>
+                                <div class="col-sm-4">@{{ show_supplier . total_price }}</div>
                             </div>
-                            <div class="row">
-                                <div class="form-group">
-                                    <div class="col-sm-2 text-right"><label> 請購單號</label></div>
-                                    <div class="col-sm-4">@{{ show_supplier . requisitions_purchase_number }}
-                                    </div>
-                                    <div class="col-sm-2 text-right"><label> 發票抬頭</label></div>
-                                    <div class="col-sm-4">@{{ show_supplier . invoice_name }}</div>
+                            <div class="row form-group">
+                                <div class="col-sm-2"><label> 請購單號</label></div>
+                                <div class="col-sm-4">@{{ show_supplier . requisitions_purchase_number }}
                                 </div>
+                                <div class="col-sm-2"><label> 發票抬頭</label></div>
+                                <div class="col-sm-4">@{{ show_supplier . invoice_name }}</div>
                             </div>
-                            <div class="row">
-                                <div class="form-group">
-                                    <div class="col-sm-2 text-right"><label> 發票統編</label></div>
-                                    <div class="col-sm-4">@{{ show_supplier . invoice_company_number }}</div>
-                                    <div class="col-sm-2 text-right"><label> 發票地址</label></div>
-                                    <div class="col-sm-4">@{{ show_supplier . invoice_address }}</div>
-                                </div>
+                            <div class="row form-group">
+                                <div class="col-sm-2"><label> 發票統編</label></div>
+                                <div class="col-sm-4">@{{ show_supplier . invoice_company_number }}</div>
+                                <div class="col-sm-2"><label> 發票地址</label></div>
+                                <div class="col-sm-4">@{{ show_supplier . invoice_address }}</div>
                             </div>
-                            <div class="row">
-                                <div class="form-group">
-                                    <div class="col-sm-2 text-right"><label> 備註</label></div>
-                                    <div class="col-sm-4">@{{ show_supplier . remark }}</div>
-                                    <div class="col-sm-2 text-right"><label> 倉庫</label></div>
-                                    <div class="col-sm-4">@{{ show_supplier . warehouse_name }}</div>
-                                </div>
+                            <div class="row form-group">
+                                <div class="col-sm-2"><label> 備註</label></div>
+                                <div class="col-sm-4">@{{ show_supplier . remark }}</div>
+                                <div class="col-sm-2"><label> 倉庫</label></div>
+                                <div class="col-sm-4">@{{ show_supplier . warehouse_name }}</div>
                             </div>
-                            <div class="row">
-                                <div class="form-group">
-                                    <div class="col-sm-2 text-right"><label> 廠商交貨日</label></div>
-                                    <div class="col-sm-4">@{{ show_supplier . supplier_deliver_date }}</div>
-                                    <div class="col-sm-2 text-right"><label> 預計進貨日</label></div>
-                                    <div class="col-sm-4">@{{ show_supplier . expect_deliver_date }}</div>
-                                </div>
+                            <div class="row form-group">
+                                <div class="col-sm-2"><label> 廠商交貨日</label></div>
+                                <div class="col-sm-4">@{{ show_supplier . supplier_deliver_date }}</div>
+                                <div class="col-sm-2"><label> 預計進貨日</label></div>
+                                <div class="col-sm-4">@{{ show_supplier . expect_deliver_date }}</div>
                             </div>
                         </div>
                     </div>
                     {{-- 品項 --}}
-                    <h5>品項</h5>
+                    <h5 class="fw-bold" style="font-size: 15px;">品項</h5>
                     <div class="row" id="DivAddRow">
                         <div class="col-sm-12">
                             <table class="table table-striped table-bordered table-hover">

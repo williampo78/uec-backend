@@ -1,59 +1,44 @@
 @extends('backend.layouts.master')
 @section('title', '採購單')
 @section('content')
-<style>
-    .no-pa {
-        padding:0
-    }
-</style>
     <!--列表-->
     <div id="page-wrapper">
 
         <!-- 表頭名稱 -->
         <div class="row">
             <div class="col-sm-12">
-                <h1 class="page-header"><i class="fa-solid fa-arrow-right-to-bracket"></i> 採購單</h1>
+                <h1 class="page-header"><span class="fa-solid fa-arrow-right-to-bracket"></span> 採購單</h1>
             </div>
         </div>
 
-        <div class="row" >
-            <div class="col-sm-12" >
+        <div class="row">
+            <div class="col-sm-12">
                 <div class="panel panel-default">
                     <!-- 功能按鈕(新增) -->
-                    <div class="panel-heading">
+                    <div class="panel-heading p-4">
                         <form role="form" id="select-form" method="GET" action="" enctype="multipart/form-data">
-                            <div class="row" style="margin-bottom: 30px">
-                                <div class="col-sm-5">
-                                    <div class="col-sm-2 no-pa">
-                                        <h5>供應商</h5>
-                                    </div>
-                                    <div class="col-sm-10 no-pa">
-                                        <select class="form-control js-select2-department" name="supplier" id="supplier">
-                                            <option value=""></option>
-                                            @foreach ($data['supplier'] as $v)
-                                                <option value='{{ $v['id'] }}'
-                                                    {{ isset($data['getData']['supplier']) && $v['id'] == $data['getData']['supplier'] ? 'selected' : '' }}>
-                                                    {{ $v['name'] }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                            <div class="d-block d-md-grid custom-outer">
+                                <div class="mb-4 custom-title">
+                                    <label>供應商</label>
+                                    <select class="form-control js-select2-department" name="supplier" id="supplier">
+                                        <option value=""></option>
+                                        @foreach ($data['supplier'] as $v)
+                                            <option value='{{ $v['id'] }}'
+                                                {{ isset($data['getData']['supplier']) && $v['id'] == $data['getData']['supplier'] ? 'selected' : '' }}>
+                                                {{ $v['name'] }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
 
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3 no-pa">
-                                        <h5>供應商統編</h5>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" name="company_number" id="company_number"
-                                            value="{{ $data['getData']['company_number'] ?? '' }}">
-                                    </div>
+                                <div class="mb-4 custom-title">
+                                    <label>供應商統編</label>
+                                    <input class="form-control" name="company_number" id="company_number"
+                                        value="{{ $data['getData']['company_number'] ?? '' }}">
                                 </div>
 
-                                <div class="col-sm-3">
-                                    <div class="col-sm-3 no-pa">
-                                        <h5>狀態</h5>
-                                    </div>
-                                    <div class="col-sm-9">
+                                <div class="mb-4 custom-title">
+                                    <label>狀態</label>
+                                    <div class="d-inline-block">
                                         <select class="form-control js-select2" name="status" id="status">
                                             <option value=''></option>
                                             <option value='drafted'
@@ -72,29 +57,33 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-sm-5">
-                                    <div class="col-sm-2 no-pa">
-                                        <h5>採購日期</h5>
-                                    </div>
-                                    <div class="col-sm-10 no-pa" style="display: flex; justify-content:space-between">
-                                        <div class="form-group" id="div_select_start_date">
+                            <div class="d-block d-md-grid custom-outer">
+                                <div class="mb-4 mb-md-0 custom-title">
+                                    <label>採購日期</label>
+                                    <div class="d-flex align-items-center">
+                                        <div class="form-group mb-0" id="div_select_start_date">
                                             <div class="input-group" id="select_start_date_flatpickr">
-                                                <input type="text" class="form-control" name="select_start_date" id="select_start_date" value="{{ $data['getData']['select_start_date'] ?? '' }}" autocomplete="off" data-input />
+                                                <input type="text" class="form-control" name="select_start_date"
+                                                    id="select_start_date"
+                                                    value="{{ $data['getData']['select_start_date'] ?? '' }}"
+                                                    autocomplete="off" data-input />
                                                 <span class="input-group-btn" data-toggle>
                                                     <button class="btn btn-default" type="button">
-                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                        <span class="fa-solid fa-calendar-days"></span>
                                                     </button>
                                                 </span>
                                             </div>
                                         </div>
-                                        <h5>~</h5>
-                                        <div class="form-group" id="div_select_end_date">
+                                        <span>~</span>
+                                        <div class="form-group mb-0" id="div_select_end_date">
                                             <div class="input-group" id="select_end_date_flatpickr">
-                                                <input type="text" class="form-control" name="select_end_date" id="select_end_date" value="{{ $data['getData']['select_end_date'] ?? '' }}" autocomplete="off" data-input />
+                                                <input type="text" class="form-control" name="select_end_date"
+                                                    id="select_end_date"
+                                                    value="{{ $data['getData']['select_end_date'] ?? '' }}"
+                                                    autocomplete="off" data-input />
                                                 <span class="input-group-btn" data-toggle>
                                                     <button class="btn btn-default" type="button">
-                                                        <i class="fa-solid fa-calendar-days"></i>
+                                                        <span class="fa-solid fa-calendar-days"></span>
                                                     </button>
                                                 </span>
                                             </div>
@@ -102,38 +91,24 @@
                                     </div>
                                 </div>
 
-                                <div class="col-sm-4">
-                                    <div class="col-sm-3 no-pa">
-                                        <h5>採購單號</h5>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" name="order_number" id="order_number"
-                                            value="{{ $data['getData']['order_number'] ?? '' }}">
-                                    </div>
+                                <div class="mb-4 mb-md-0 custom-title">
+                                    <label>採購單號</label>
+                                    <input class="form-control" name="order_number" id="order_number"
+                                        value="{{ $data['getData']['order_number'] ?? '' }}">
                                 </div>
 
-                                <div class="col-sm-3">
-                                    <div class="col-sm-3 no-pa">
-                                        <h5>請購單號</h5>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" name="requisitions_purchase_number" id="order_number"
-                                            value="{{ $data['getData']['requisitions_purchase_number'] ?? '' }}">
-                                    </div>
-                                </div>
-
-                                <div class="col-sm-9">
-                                </div>
-
-                                <div class="col-sm-3 text-right">
-                                    <div class="col-sm-12">
-                                        {{-- @if ($share_role_auth['auth_query']) --}}
-                                        <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i></i> 查詢</button>
-                                        {{-- @endif --}}
-                                    </div>
+                                <div class="mb-4 custom-title">
+                                    <label>請購單號</label>
+                                    <input class="form-control" name="requisitions_purchase_number" id="order_number"
+                                        value="{{ $data['getData']['requisitions_purchase_number'] ?? '' }}">
                                 </div>
                             </div>
-
+                            <div class="text-right" style="padding: 0 5px;">
+                                {{-- @if ($share_role_auth['auth_query']) --}}
+                                <button class="btn btn-warning"><span class="fa-solid fa-magnifying-glass"></span>
+                                    查詢</i> </button>
+                                {{-- @endif --}}
+                            </div>
                         </form>
                     </div>
 
@@ -176,8 +151,7 @@
                                         </form>
                                         <td class="text-nowrap">
                                             @if ($share_role_auth['auth_query'])
-                                                <button class="btn btn-info btn-sm"
-                                                    @click="showBtn({{ $v['id'] }})">
+                                                <button class="btn btn-info btn-sm" @click="showBtn({{ $v['id'] }})">
                                                     <i class="fa-solid fa-magnifying-glass"></i>
                                                 </button>
                                             @endif
@@ -186,11 +160,10 @@
                                                     href="{{ route('order_supplier.edit', $v['id']) }}">編輯</a>
                                             @endif
                                             @if ($share_role_auth['auth_update'] && $v['status'] == 'APPROVED' && $v['created_by'] == $data['user_id'])
-
-                                            <button class="btn btn-warning btn-sm" data-toggle="modal"
-                                                data-target="#row_supplier_deliver"
-                                                @click="supplier_deliver({{ $v }})">預進日
-                                            </button>
+                                                <button class="btn btn-warning btn-sm" data-toggle="modal"
+                                                    data-target="#row_supplier_deliver"
+                                                    @click="supplier_deliver({{ $v }})">預進日
+                                                </button>
                                             @endif
                                             @if ($share_role_auth['auth_delete'] && $v['status'] == 'DRAFTED' && $v['created_by'] == $data['user_id'])
                                                 <button class="btn btn-danger btn-sm" type="button"
@@ -225,8 +198,8 @@
             data: function() {
                 return {
                     order_supplier: {},
-                    show_supplier:{} ,
-                    show_detail:{} ,
+                    show_supplier: {},
+                    show_detail: {},
                 }
             },
             methods: {
@@ -238,8 +211,8 @@
                             'id': id
                         })
                         .then(function(response) {
-                            vm.show_supplier = response.data.orderSupplier ;
-                            vm.show_detail = response.data.orderSupplierDetail ;
+                            vm.show_supplier = response.data.orderSupplier;
+                            vm.show_detail = response.data.orderSupplierDetail;
                             $('.toggle-show-model').click();
                         })
                         .catch(function(error) {
@@ -334,31 +307,31 @@
                 rules: {
                     supplier_deliver_date: {
                         dateGreaterEqualThan: function() {
-                                let obj = {
-                                    date: $('#trade_date').text().trim(),
-                                    depends: true,
-                                }
-                                if ($('#supplier_deliver_date').val() !== '') {
-                                    obj.depends = true;
-                                } else {
-                                    obj.depends = false;
-                                }
-                                return obj;
-                            },
+                            let obj = {
+                                date: $('#trade_date').text().trim(),
+                                depends: true,
+                            }
+                            if ($('#supplier_deliver_date').val() !== '') {
+                                obj.depends = true;
+                            } else {
+                                obj.depends = false;
+                            }
+                            return obj;
+                        },
                     },
                     expect_deliver_date: {
                         dateGreaterEqualThan: function() {
-                                let obj = {
-                                    date: $('#supplier_deliver_date').val(),
-                                    depends: true,
-                                }
-                                if ($('#expect_deliver_date').val() !== '') {
-                                    obj.depends = true;
-                                } else {
-                                    obj.depends = false;
-                                }
-                                return obj;
-                            },
+                            let obj = {
+                                date: $('#supplier_deliver_date').val(),
+                                depends: true,
+                            }
+                            if ($('#expect_deliver_date').val() !== '') {
+                                obj.depends = true;
+                            } else {
+                                obj.depends = false;
+                            }
+                            return obj;
+                        },
                     }
                 },
                 messages: {

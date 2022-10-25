@@ -188,7 +188,7 @@
                 if($('.js-select2-item').length > 0){
                     if($('#old_supplier_id').val() !== ''){
                         if($('#old_supplier_id').val() !== $(this).find(":selected").val()){
-                            alert('請先將品項刪除在切換供應商')
+                            alert('請先將品項刪除再切換供應商')
                             $("#supplier_id").val($('#old_supplier_id').val()).trigger('change');
                         }
                     }
