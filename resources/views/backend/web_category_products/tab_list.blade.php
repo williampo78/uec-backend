@@ -52,17 +52,17 @@
         v-bind:class="category_hierarchy_content.content_type == 'M' ?'active':''">
         <div class="panel-body">
             <form class="form-horizontal">
-                <div class="form-group">
-                    <label class="col-sm-1">行銷活動<span class="text-red">*</span></label>
-                    <div class="col-sm-2">
+                <div class="form-group d-md-flex align-items-center gap-4">
+                    <label class="flex-shrink-0">行銷活動<span class="text-red">*</span></label>
+                    <div>
                         <button type="button" class="btn btn-block btn-warning btn-sm" data-toggle="modal"
                             data-target="#promotion_campaign_model">挑選賣場</button>
                     </div>
-                    <div class="col-sm-5 my-4 my-md-0">
+                    <div class="my-4 my-md-0 col-md-5 px-0">
                         <input type="text" id="campaign_brief" name="campaign_brief" v-model="category_hierarchy_content.campaign_brief" class="form-control" readonly>
                         <input type="hidden" name="promotion_campaign_id" v-model="category_hierarchy_content.promotion_campaign_id" class="form-control" readonly>
                     </div>
-                    <div class="col-sm-1" v-show="category_hierarchy_content.promotion_campaign_id !== null">
+                    <div v-show="category_hierarchy_content.promotion_campaign_id !== null">
                         <button type="button" class="btn btn-block btn-danger btn-sm" @click="del_promotion_campaign_id">刪除</button>
                     </div>
                 </div>
