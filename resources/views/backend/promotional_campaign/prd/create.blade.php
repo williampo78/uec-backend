@@ -35,8 +35,7 @@
                                     <div class="col-sm-12">
                                         <div class="row form-group">
                                             <div class="col-sm-2">
-                                                <label class="pt-md-2">活動名稱 <span
-                                                        style="color: red;">*</span></label>
+                                                <label class="pt-md-2">活動名稱 <span style="color: red;">*</span></label>
                                             </div>
                                             <div class="col-sm-10">
                                                 <input type="text" class="form-control" name="campaign_name"
@@ -46,8 +45,7 @@
 
                                         <div class="row form-group">
                                             <div class="col-sm-2">
-                                                <label class="pt-md-2">狀態 <span
-                                                        style="color: red;">*</span></label>
+                                                <label class="pt-md-2">狀態 <span style="color: red;">*</span></label>
                                             </div>
                                             <div class="col-sm-10">
                                                 <label class="radio-inline">
@@ -62,8 +60,7 @@
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-sm-2">
-                                                <label class="pt-md-2">活動類型 <span
-                                                        style="color: red;">*</span></label>
+                                                <label class="pt-md-2">活動類型 <span style="color: red;">*</span></label>
                                             </div>
                                             <div class="col-sm-10">
                                                 <select2 class="form-control" :options="campaignTypes"
@@ -75,8 +72,7 @@
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-sm-2">
-                                                <label class="pt-md-2">N (滿額) = <span
-                                                        style="color: red;">*</span></label>
+                                                <label class="pt-md-2">N (滿額) = <span style="color: red;">*</span></label>
                                             </div>
                                             <div class="col-sm-10">
                                                 <div class="row">
@@ -137,8 +133,7 @@
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-sm-2">
-                                                <label class="pt-md-2">前台文案 <span
-                                                        style="color: red;">*</span></label>
+                                                <label class="pt-md-2">前台文案 <span style="color: red;">*</span></label>
                                             </div>
                                             <div class="col-sm-10">
                                                 <input type="text" class="form-control" name="campaign_brief"
@@ -178,8 +173,7 @@
                                         </div>
                                         <div class="row form-group">
                                             <div class="col-sm-2">
-                                                <label class="pt-md-2">適用對象 <span
-                                                        style="color: red;">*</span></label>
+                                                <label class="pt-md-2">適用對象 <span style="color: red;">*</span></label>
                                             </div>
                                             <div class="col-sm-10">
                                                 <label class="radio-inline">
@@ -325,10 +319,8 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <prd-campaign-product-modal :modal="productModal" @save="saveProductModalProducts"></prd-campaign-product-modal>
-    <prd-campaign-product-modal :modal="giveawayModal" @save="saveGiveawayModalProducts"></prd-campaign-product-modal>
+        <prd-campaign-product-modal :modal="productModal" @save="saveProductModalProducts"></prd-campaign-product-modal>
+        <prd-campaign-product-modal :modal="giveawayModal" @save="saveGiveawayModalProducts"></prd-campaign-product-modal>
     </div>
 @endsection
 
