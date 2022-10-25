@@ -1,6 +1,6 @@
 <div class="modal fade" id="model_requisitions_log" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog" style="width:100%;">
+    <div class="modal-dialog" style="width:70%;">
         <div class="modal-content modal-primary panel-primary">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>

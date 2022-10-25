@@ -73,15 +73,15 @@ return [
     // 付款方式
     'payment_method_options' => [
         'TAPPAY_CREDITCARD' => '信用卡一次付清',
-        'TAPPAY_INSTAL'=>'分期付款',
         'TAPPAY_LINEPAY' => 'LINE Pay',
+        'TAPPAY_INSTAL'=>'分期付款',
         'TAPPAY_JKOPAY' => '街口支付',
     ],
     //付款方式有的預設鎖死不能更改
     'payment_method_options_lock' => [
         'TAPPAY_CREDITCARD' => true, //信用卡一次付清
-        'TAPPAY_INSTAL' => false,//分期付款
         'TAPPAY_LINEPAY' => true,//LINE Pay
+        'TAPPAY_INSTAL' => false,//分期付款
         'TAPPAY_JKOPAY' => true,//街口支付
     ],
 

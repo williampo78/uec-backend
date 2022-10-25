@@ -1471,8 +1471,13 @@ class ProductService
      */
     public function getProductPromotionalLog($id)
     {
-        $promotionalCampaignProduct = PromotionalCampaignProduct::with(['promotionalCampaign'])->where('product_id', $id)->get();
+        $promotionalCampaignProduct = PromotionalCampaignProduct::whereHas('promotionalCampaign', function (Builder $query) {
+            $query->where('start_at', '<=', now())->where('end_at','>=',now()); //正在活動
+        })
+        ->where('product_id', $id)
+        ->get();
         $result = collect();
+
         foreach ($promotionalCampaignProduct as $obj) {
             $pushData = collect();
             $pushData->id = $obj->promotionalCampaign->id;

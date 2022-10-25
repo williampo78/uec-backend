@@ -300,7 +300,7 @@
                                 <div class="col-sm-3">
                                     <label class="control-label">
                                         <a href="#" data-toggle="modal"
-                                            data-target="#model_requisitions_log">請購紀錄</a>
+                                            data-target="#model_requisitions_log">請採記錄</a>
                                     </label>
                                 </div>
                             </div>
