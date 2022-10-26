@@ -644,7 +644,7 @@ class APIOrderService
             $order_details = OrderDetail::getOrderDetails($newOrder->id);
             foreach ($order_details as $detail) {
                 $stock = $this->stockService->getStockByItem($warehouseCode, $detail->product_item_id);
-                if ($stock['stockQty'] <= 0) {
+                if ( !$this->hasEnoughStockQty($stock['stockQty'], $detail->qty ?? 0)) {
                     $result['status'] = 403;
                     $result['payment_url'] = null;
                     Log::channel('tappay_api_log')->error('庫存不足 ! product_item_id :' . $detail->product_item_id);
@@ -1395,7 +1395,7 @@ class APIOrderService
             $order_details = OrderDetail::getOrderDetails($newOrder->id);
             foreach ($order_details as $detail) {
                 $stock = $this->stockService->getStockByItem($warehouseCode, $detail->product_item_id);
-                if ($stock['stockQty'] <= 0) {
+                if ( !$this->hasEnoughStockQty($stock['stockQty'], $detail->qty ?? 0)) {
                     $result['status'] = 403;
                     $result['payment_url'] = null;
                     Log::channel('tappay_api_log')->error('庫存不足 ! product_item_id :' . $detail->product_item_id);
@@ -1666,4 +1666,20 @@ class APIOrderService
         return $result;
     }
 
+    /**
+     * 檢查訂購庫存是否足夠供訂購
+     *
+     * @param $stockQty 庫存數量
+     * @param $orderQty 訂購數量
+     *
+     * @return bool
+     */
+    private function hasEnoughStockQty($stockQty, $orderQty): bool
+    {
+        if (($stockQty <= 0) || ($stockQty < $orderQty)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 }
