@@ -285,19 +285,20 @@
                         <table class="table table-striped table-bordered table-hover" style="width:100%" id="table_data">
                             <thead>
                                 <tr>
-                                    <th style="width: 15%">功能</th>
-                                    <th style="width: 1%">項次</th>
-                                    <th style="width: 10%">供應商</th>
-                                    <th style="width: 10%">商品序號</th>
-                                    <th style="width: 10%">商品名稱</th>
-                                    <th style="width: 5%">售價(含稅)</th>
-                                    <th style="width: 5%">成本(含稅)</th>
-                                    <th style="width: 5%">毛利(%)</th>
-                                    <th style="width: 5%">商品類型</th>
-                                    <th style="width: 5%">建檔日期</th>
-                                    <th style="width: 6%">上架狀態</th>
-                                    <th style="width: 10%">上架時間起</th>
-                                    <th style="width: 10%">上架時間訖</th>
+                                    <th>功能</th>
+                                    <th>項次</th>
+                                    <th>供應商</th>
+                                    <th>商品序號</th>
+                                    <th>商品名稱</th>
+                                    <th>售價(含稅)</th>
+                                    <th>成本(含稅)</th>
+                                    <th>毛利(%)</th>
+                                    <th>商品類型</th>
+                                    <th>建檔日期</th>
+                                    <th>開賣時間</th>
+                                    <th>上架狀態</th>
+                                    <th>上架時間起</th>
+                                    <th>上架時間訖</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -345,6 +346,9 @@
                                             {{ $val->created_at }}
                                         </td>
                                         <td>
+                                            {{$val->start_selling_at}}
+                                        </td>
+                                        <td>
                                             {{ $val->launched_status }}
                                         </td>
                                         <td>{{ $val->start_launched_at }}</td>
@@ -352,7 +356,6 @@
                                     </tr>
                                 @endforeach
                                 {{-- {{$category_products_list}} --}}
-
                             </tbody>
                         </table>
                     </div>
