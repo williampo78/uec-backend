@@ -218,9 +218,9 @@
                                         </td>
                                         <td>@{{ product . product_no }}</td>
                                         <td>@{{ product . product_name }}</td>
-                                        <td>@{{ product . product_name }}</td>
+                                        <td>@{{ product . selling_price }}</td>
                                         <td>@{{ product . start_launched_at }}</td>
-                                        <td>@{{ product . launched_status_desc }}</td>
+                                        <td>@{{ product . launched_status }}</td>
                                         <td>@{{ product . gross_margin }}</td>
                                         <td>@{{ product . supplier_name }}</td>
 
