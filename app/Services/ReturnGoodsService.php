@@ -30,6 +30,7 @@ class ReturnGoodsService
     private array $orderDetailIdToNewId = [];
     private array $verifyResult = [];
     private array $params = [];
+    private array $updateReturnRequestData = [];
 
     public function __construct(
         ReturnRequest $returnRequestEntity,
@@ -213,35 +214,10 @@ class ReturnGoodsService
      */
     private function updateReturnRequest()
     {
-        $targetReturnExaminations = $this->returnExamination->where('is_returnable', 1);
-
-        $refundAmount = $targetReturnExaminations->sum('returnable_amount');
-        $statusCode = 'PROCESSING';
-        $completedAt = $this->returnRequest->completed_at;
-        $refundStatus = 'PENDING';
-
-        //退貨申請單金額為空
-        if (empty($refundAmount)) {
-            $statusCode = 'COMPLETED';
-            $completedAt = now();
-            $refundStatus = 'NA';
-        }
+        $this->updateReturnRequestData['new_order_id'] = $this->newOrder->id;
 
         $this->returnRequest
-            ->update([
-                //處理中
-                'status_code'           => $statusCode,
-                //退款金額
-                'refund_amount'         => $refundAmount,
-                //歸還點數
-                'refund_points'         => $targetReturnExaminations->sum('returnable_points'),
-                //歸還點數價值
-                'refund_point_discount' => $targetReturnExaminations->sum('returnable_point_discount'),
-                //待退款
-                'refund_status'         => $refundStatus,
-                'new_order_id'          => $this->newOrder->id,
-                'completed_at'          => $completedAt
-            ]);
+            ->update($this->updateReturnRequestData);
     }
 
     /**
@@ -312,7 +288,7 @@ class ReturnGoodsService
             //已退點數
             'returned_points'          => $this->createOrderDetailData->sum('returned_points'),
             //退款狀態
-            'refund_status'            => empty($this->returnRequest->refund_amount) ? 'NA' : 'PENDING',
+            'refund_status'            => $this->updateReturnRequestData['refund_status'],
             'created_by'               => $this->getUserId(),
             'updated_by'               => $this->getUserId(),
         ];
@@ -784,6 +760,43 @@ class ReturnGoodsService
     }
 
     /**
+     * 整理更新return_request資料
+     * @Author: Eric
+     * @DateTime: 2022/10/25 下午 05:25
+     */
+    private function handleUpdateReturnRequestData()
+    {
+        $targetReturnExaminations = $this->returnExamination->where('is_returnable', 1);
+
+        $refundAmount = $targetReturnExaminations->sum('returnable_amount');
+        $statusCode   = 'PROCESSING';
+        $completedAt  = $this->returnRequest->completed_at;
+        $refundStatus = 'PENDING';
+
+        //退貨申請單金額為空
+        if (empty($refundAmount)) {
+            $statusCode   = 'COMPLETED';
+            $completedAt  = now();
+            $refundStatus = 'NA';
+        }
+
+        $this->updateReturnRequestData = [
+            //處理中
+            'status_code'           => $statusCode,
+            //退款金額
+            'refund_amount'         => $refundAmount,
+            //歸還點數
+            'refund_points'         => $targetReturnExaminations->sum('returnable_points'),
+            //歸還點數價值
+            'refund_point_discount' => $targetReturnExaminations->sum('returnable_point_discount'),
+            //待退款
+            'refund_status'         => $refundStatus,
+            //'new_order_id'          => $this->newOrder->id,
+            'completed_at'          => $completedAt
+        ];
+    }
+
+    /**
      * 處理退款流程
      * @return array
      * @Author: Eric
@@ -815,8 +828,9 @@ class ReturnGoodsService
             DB::beginTransaction();
             $this->updateOrder();
             $this->handleCreateOrderDetailAndReturnOrderDetailData();
-            $this->updateReturnRequest();
+            $this->handleUpdateReturnRequestData();
             $this->createOrder();
+            $this->updateReturnRequest();
             $this->updateReturnExamination();
             $this->createOrderDetail();
             $this->createOrderCampaignDiscount();
