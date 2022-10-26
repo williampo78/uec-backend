@@ -1,6 +1,6 @@
 @extends('backend.layouts.master')
 
-@section('title', '商品主檔 -基本資訊管理')
+@section('title', '商品主檔 -商品上架審核')
 
 @section('content')
     <!--列表-->

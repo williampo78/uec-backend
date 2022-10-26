@@ -376,7 +376,7 @@
                                             <label class="control-label">促銷小標</label>
                                         </div>
                                         <div class="col-sm-6">
-                                            <input class="form-control" name="promotion_desc"
+                                            <input class="form-control" id="promotion_desc" name="promotion_desc"
                                                 value="{{ $products->promotion_desc }}">
                                         </div>
                                     </div>
@@ -2115,6 +2115,16 @@
                     order_limited_qty: {
                         required: true,
                         digits: true,
+                    },
+                    promotion_start_at: {
+                        required: function() {
+                            return $('#promotion_desc').val() !== '';
+                        },
+                    },
+                    promotion_end_at: {
+                        required: function() {
+                            return $('#promotion_desc').val() !== '';
+                        },
                     },
                 },
                 errorClass: "help-block",
