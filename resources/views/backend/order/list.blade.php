@@ -196,7 +196,6 @@
                                         <th class="text-nowrap">項次</th>
                                         <th class="text-nowrap">訂單時間</th>
                                         <th class="text-nowrap">訂單編號</th>
-                                        <th class="text-nowrap">前台顯示</th>
                                         <th class="text-nowrap">訂單狀態</th>
                                         <th class="text-nowrap">付款方式</th>
                                         <th class="text-nowrap">物流方式</th>
@@ -221,7 +220,6 @@
                                                 <td>{{ $key + 1 }}</td>
                                                 <td>{{ $order['ordered_date'] ?? '' }}</td>
                                                 <td>{{ $order['order_no'] ?? '' }}</td>
-                                                <td>{{ $order['order_status_desc'] ?? '' }}</td>
                                                 <td>{{ $order['status_code'] ?? '' }}</td>
                                                 <td>{{ $order['payment_method'] ?? '' }}</td>
                                                 <td>{{ $order['lgst_method'] ?? '' }}</td>
@@ -385,6 +383,9 @@
                         $('#modal-point-discount').empty().text(order.point_discount);
                         $('#modal-shipping-fee').empty().text(order.shipping_fee);
                         $('#modal-paid-amount').empty().text(order.paid_amount);
+
+                        // 訂單備註
+                        $('#modal-buyer-remark').empty().text(order.buyer_remark);
 
                         // 訂單明細
                         $("#tab-order-detail tbody").empty();
