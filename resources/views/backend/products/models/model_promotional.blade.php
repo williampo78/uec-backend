@@ -1,6 +1,6 @@
 <div class="modal fade" id="model_promotional" tabindex="-1" role="dialog" aria-labelledby="model_promotional"
     aria-hidden="true">
-    <div class="modal-dialog" style="width:70%;">
+    <div class="modal-dialog" style="width:70%;max-width: 800px;">
         <div class="modal-content modal-primary panel-primary">
             <div class="modal-header panel-heading">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -15,7 +15,7 @@
                     </div> --}}
 
                     <!-- Table list -->
-                    <div class="panel-body">
+                    <div class="panel-body" style="max-height: 435px; overflow-y: auto;">
 
                         {{-- <br> --}}
                         <table class="table table-striped table-bordered table-hover" style="width:100%"
