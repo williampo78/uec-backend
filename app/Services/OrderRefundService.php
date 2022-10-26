@@ -195,7 +195,8 @@ class OrderRefundService
                 'is_pkg_returned',
                 'pkg_ret_remark',
                 'returnable_point_discount',
-                'returnable_amount'
+                'returnable_amount',
+                'pkg_ret_failed_reason'
             ]);
     }
 
@@ -215,7 +216,7 @@ class OrderRefundService
             //供應商自出
             if ($returnExamination->returnRequest->ship_from_whs == 'SUP') {
                 $code                  = $returnExamination->sup_lgst_company;
-                $numberOrLogisticsName = optional($lookupValuesVs->where('code', $code)->first())->description;
+                $numberOrLogisticsName = optional($lookupValuesVs->where('type_code', 'SUP_LGST_COMPANY')->where('code', $code)->first())->description;
             }
 
             //細項
@@ -280,6 +281,14 @@ class OrderRefundService
                 $negoResult = $returnExamination->nego_result == 1 ? '允許退貨' : '不允許退貨';
             }
 
+            //回件/檢驗結果說明
+            $examinationRemark = $returnExamination->examination_remark ?? $returnExamination->pkg_ret_remark ?? '';
+            $pkgReturnFailedRsn = optional($lookupValuesVs->where('type_code', 'PKG_RETURN_FAILED_RSN')->where('code', $returnExamination->pkg_ret_failed_reason)->first())->description;
+
+            if (is_null($pkgReturnFailedRsn) === false) {
+                $examinationRemark = "【{$pkgReturnFailedRsn}】{$examinationRemark}";
+            }
+
             return [
                 'buttons'                  => $buttons,
                 'return_examination_id'    => $returnExamination->id,
@@ -300,7 +309,7 @@ class OrderRefundService
                 //回件/檢驗結果
                 'is_examination_passed'    => $isExaminationPassed,
                 //回件/檢驗結果說明
-                'examination_remark'       => $returnExamination->examination_remark ?? $returnExamination->pkg_ret_remark ?? '',
+                'examination_remark'       => $examinationRemark,
                 //協商結果
                 'nego_result'              => $negoResult,
                 //協商退款金額
@@ -537,6 +546,8 @@ class OrderRefundService
 
             //訂單身份
             $item->record_identity = config('uec.order_record_identity_options')[$item->record_identity] ?? null;
+            //退貨檢驗單狀態
+            $item->re_status_code = config('uec.return_examination_status_codes')[$item->re_status_code] ?? null;
 
             return [
                 (string)$index + 1, //項次
