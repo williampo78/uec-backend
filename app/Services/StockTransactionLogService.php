@@ -16,7 +16,6 @@ class StockTransactionLogService
      */
     public function getIndexData(array $payload = []): Collection
     {
-
         $builder = StockTransactionLog::select(['id', 'transaction_type', 'transaction_date', 'warehouse_id', 'product_item_id', 'transaction_qty', 'source_doc_no', 'source_table_name'])
             ->with(['warehouse:id,name', 'productItem' => function ($query) {
                 $query->select(['id', 'product_id', 'spec_1_value', 'spec_2_value', 'item_no'])
