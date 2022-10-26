@@ -25,6 +25,6 @@ class PromotionalCampaignProduct extends Model
      */
     public function promotionalCampaign()
     {
-        return $this->belongsTo(PromotionalCampaign::class, 'promotional_campaign_id');
+        return $this->hasOne(PromotionalCampaign::class, 'id','promotional_campaign_id');
     }
 }

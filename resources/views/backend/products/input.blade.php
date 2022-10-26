@@ -433,18 +433,22 @@
                                     <div class="col-sm-2">
                                         <label class="control-label">付款方式</label>
                                     </div>
-                                    @foreach ($payment_method_options as $key => $val)
-                                        <label class="radio-inline">
-                                            @if ($payment_method_options_lock[$key])
-                                                <input class="payment_method" type="checkbox" name="payment_method[]" value="{{ $key }}" checked onclick="return false">
-                                                {{ $val }}
-                                            @else
-                                                <input class="payment_method" type="checkbox" name="payment_method[]"
-                                                    value="{{ $key }}">
-                                                {{ $val }}
-                                            @endif
-                                        </label>
-                                    @endforeach
+                                    <div class="row">
+                                        @foreach ($payment_method_options as $key => $val)
+                                        <div class="col-sm-6">
+                                            <label class="radio-inline ps-3">
+                                                @if ($payment_method_options_lock[$key])
+                                                    <input class="payment_method" type="checkbox" name="payment_method[]" value="{{ $key }}" checked onclick="return false">
+                                                    {{ $val }}
+                                                @else
+                                                    <input class="payment_method" type="checkbox" name="payment_method[]"
+                                                        value="{{ $key }}">
+                                                    {{ $val }}
+                                                @endif
+                                            </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             </div>
                         </div>
