@@ -4,6 +4,9 @@ namespace App\Services;
 
 use App\Models\Shipment;
 use App\Models\ShipmentDetail;
+use App\Models\ShipmentProgressLog;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 
 class ShipmentService
 {
@@ -31,13 +34,19 @@ class ShipmentService
             'shipments.overdue_confirmed_at',
             'shipments.created_at',
             'shipments.lgst_company_code',
+            DB::raw('(case when orders.ship_from_whs = "SUP" then (select lk.description from lookup_values_v lk where lk.type_code = "SUP_LGST_COMPANY" and lk.code = shipments.sup_lgst_company)
+                else shipments.lgst_company_code end) as lgst_company'),
             'shipments.edi_exported_at',
 
             'orders.id AS orders_id',
             'orders.member_account',
             'orders.buyer_name',
+            'orders.ship_from_whs',
+
+            'supplier.name AS supplier_name',
         )
-            ->leftJoin('orders', 'shipments.order_id', '=', 'orders.id');
+            ->leftJoin('orders', 'shipments.order_id', '=', 'orders.id')
+            ->leftJoin('supplier', 'shipments.supplier_id', '=', 'supplier.id');
 
         // 出貨單id
         if (isset($query_datas['shipment_id'])) {
@@ -88,12 +97,18 @@ class ShipmentService
 
             'products.product_no',
             'products.product_name',
+            'products.supplier_product_no',
 
             'product_items.spec_1_value',
             'product_items.spec_2_value',
+            'product_items.supplier_item_no',
+
+            'supplier.name AS supplier_name',
         )
             ->leftJoin('product_items', 'shipment_details.product_item_id', 'product_items.id')
-            ->leftJoin('products', 'product_items.product_id', 'products.id');
+            ->leftJoin('products', 'product_items.product_id', 'products.id')
+            ->leftJoin('shipments', 'shipment_details.shipment_id', '=', 'shipments.id')
+            ->leftJoin('supplier', 'shipments.supplier_id', '=', 'supplier.id');
 
         // 商品序號
         if (isset($query_datas['product_no'])) {
@@ -136,5 +151,21 @@ class ShipmentService
         });
 
         return $shipments;
+    }
+
+    /**
+     * 取得出貨配送歷程
+     *
+     * @param int $id
+     * @return \Illuminate\Support\Collection
+     */
+    public function getProgressLogs(int $id): Collection
+    {
+        return ShipmentProgressLog::with([
+            'supShipProgress',
+            'loggedBy',
+        ])
+            ->where('shipment_id', $id)
+            ->get();
     }
 }

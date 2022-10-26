@@ -203,11 +203,13 @@
                                         <th class="text-nowrap">出貨單狀態</th>
                                         <th class="text-nowrap">出貨時間</th>
                                         <th class="text-nowrap">物流廠商</th>
+                                        <th class="text-nowrap">託運單號</th>
                                         <th class="text-nowrap">會員帳號</th>
                                         <th class="text-nowrap">訂購人</th>
                                         <th class="text-nowrap">收件者</th>
                                         <th class="text-nowrap">收件手機</th>
                                         <th class="text-nowrap">收件地址</th>
+                                        <th class="text-nowrap">供應商</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -232,12 +234,14 @@
                                                 <td>{{ $shipment['lgst_method'] ?? '' }}</td>
                                                 <td>{{ $shipment['status_code'] ?? '' }}</td>
                                                 <td>{{ $shipment['shipped_at'] ?? '' }}</td>
-                                                <td>{{ $shipment['lgst_company_code'] ?? '' }}</td>
+                                                <td>{{ $shipment['lgst_company'] ?? '' }}</td>
+                                                <td>{{ $shipment['package_no'] ?? '' }}</td>
                                                 <td>{{ $shipment['member_account'] ?? '' }}</td>
                                                 <td>{{ $shipment['buyer_name'] ?? '' }}</td>
                                                 <td>{{ $shipment['ship_to_name'] ?? '' }}</td>
                                                 <td>{{ $shipment['ship_to_mobile'] ?? '' }}</td>
                                                 <td>{{ $shipment['ship_to_address'] ?? '' }}</td>
+                                                <td>{{ $shipment['supplier_name'] ?? '' }}</td>
                                             </tr>
                                         @endforeach
                                     @endisset
@@ -249,6 +253,7 @@
             </div>
         </div>
         @include('backend.shipment.detail')
+        @include('backend.shipment.progress-log')
         <!-- /.modal -->
 
     </div>
@@ -345,19 +350,28 @@
 
             $(document).on('click', '.shipment_detail', function() {
                 let shipment_id = $(this).attr("data-shipment");
+                console.log('shipment_id=['+shipment_id+']');
 
                 axios.get(`/backend/shipment/${shipment_id}`)
                     .then(function(response) {
                         let shipment = response.data;
-                        let package_no = shipment.package_no ?
-                            `<a href="http://query2.e-can.com.tw/%E5%A4%9A%E7%AD%86%E6%9F%A5%E4%BB%B6A.htm" target="_blank">${shipment.package_no}</a>` :
-                            '';
+                        let package_no = shipment.package_no ? shipment.package_no : '';
+
+                        if (shipment.ship_from_whs == 'WHS') {
+                            package_no = '<a href="http://query2.e-can.com.tw/%E5%A4%9A%E7%AD%86%E6%9F%A5%E4%BB%B6A.htm" target="_blank">' + package_no + '</a>';
+                        }
+
+                        if (shipment.ship_from_whs == 'SUP') {
+                            $('#modal-progress-log').show();
+                        } else {
+                            $('#modal-progress-log').hide();
+                        }
 
                         $('#modal-shipment-no').empty().text(shipment.shipment_no);
                         $('#modal-created-at').empty().text(shipment.created_at_format);
                         $('#modal-status-code').empty().text(shipment.status_code);
                         $('#modal-lgst-method').empty().text(shipment.lgst_method);
-                        $('#modal-lgst-company-code').empty().text(shipment.lgst_company_code);
+                        $('#modal-lgst-company').empty().text(shipment.lgst_company);
                         $('#modal-order-no').empty().text(shipment.order_no);
                         $('#modal-ship-to-name').empty().text(shipment.ship_to_name);
                         $('#modal-ship-to-mobile').empty().text(shipment.ship_to_mobile);
@@ -383,6 +397,12 @@
                                     shipment_detail.spec_1_value : '';
                                 let spec_2_value = shipment_detail.spec_2_value ?
                                     shipment_detail.spec_2_value : '';
+                                let supplier_product_no = shipment_detail.supplier_product_no ? shipment_detail
+                                .supplier_product_no : '';
+                                let supplier_item_no = shipment_detail.supplier_item_no ? shipment_detail
+                                .supplier_item_no : '';
+                                let supplier_name = shipment_detail.supplier_name ? shipment_detail
+                                .supplier_name : '';
 
                                 $("#modal-product-table tbody").append(`
                                     <tr>
@@ -392,6 +412,9 @@
                                         <td>${spec_1_value}</td>
                                         <td>${spec_2_value}</td>
                                         <td>${shipment_detail.qty}</td>
+                                        <td>${supplier_product_no}</td>
+                                        <td>${supplier_item_no}</td>
+                                        <td>${supplier_name}</td>
                                     </tr>
                                 `);
                             });
@@ -403,6 +426,42 @@
                         console.log(error);
                     });
             });
+
+            $(document).on('click', '.progress_log_detail', function() {
+                let shipment_id = $(this).attr("data-shipment");
+                let shipment_no = $('#modal-shipment-no').text();
+
+                axios.get(`/backend/shipment/${shipment_id}/progress-logs`)
+                    .then(function(response) {
+                        let progress_log = response.data;
+
+                        $('#modal-log-shipment-no').empty().text(shipment_no);
+                        $("#modal-log-table tbody").empty();
+
+                        if (progress_log.payload) {
+                            $.each(progress_log.payload, function(key, log) {
+                                let log_memo = log.memo ? log.memo : '';
+                                let log_agreed_date = log.agreed_date ? log.agreed_date : '';
+
+                                $("#modal-log-table tbody").append(`
+                                    <tr>
+                                        <td>${log.logged_at}</td>
+                                        <td>${log.progress_code_name}</td>
+                                        <td>${log_memo}</td>
+                                        <td>${log_agreed_date}</td>
+                                        <td>${log.logged_by}</td>
+                                    </tr>
+                                `);
+                            });
+                        }
+
+                        $('#progress_log_detail').modal('show');
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+            });
+
         });
     </script>
 @endsection

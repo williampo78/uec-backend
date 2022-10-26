@@ -100,14 +100,15 @@ return [
 
     // 出貨單狀態
     'shipment_status_code_options' => [
-        'CREATED' => '新建立',
+        'CREATED' => '接獲訂單',
         'SHIPPING' => '備貨中',
         'STORE_ARRIVED' => '已到店',
-        'SHIPPED' => '已出貨',
-        'DELIVERED' => '已配達',
+        'SHIPPED' => '出貨中',
+        'DELIVERED' => '已到貨',
         'REFUSED' => '客拒收 / 客未取',
         'CANCELLED' => '已取消',
         'VOIDED' => '已作廢',
+        'M_CLOSED' => '異常結案',
     ],
 
     // 訂單類型

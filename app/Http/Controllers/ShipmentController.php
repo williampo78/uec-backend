@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Services\ShipmentService;
+use App\Http\Resources\Shipment\Show;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 
 class ShipmentController extends Controller
 {
@@ -59,7 +61,7 @@ class ShipmentController extends Controller
             }
 
             // 物流廠商
-            $shipment->lgst_company_code = config('uec.lgst_company_code_options')[$shipment->lgst_company_code] ?? null;
+            $shipment->lgst_company = $shipment->lgst_company ? ($shipment->lgst_company == 'CHOICE' ? config('uec.lgst_company_code_options')[$shipment->lgst_company] : $shipment->lgst_company) : null;
 
             // 收件地址
             $address = '';
@@ -76,12 +78,14 @@ class ShipmentController extends Controller
                 'lgst_method',
                 'status_code',
                 'shipped_at',
-                'lgst_company_code',
+                'lgst_company',
+                'package_no',
                 'member_account',
                 'buyer_name',
                 'ship_to_name',
                 'ship_to_mobile',
                 'ship_to_address',
+                'supplier_name',
             ]);
         })
             ->toArray();
@@ -129,7 +133,7 @@ class ShipmentController extends Controller
         $shipment->status_code = config('uec.shipment_status_code_options')[$shipment->status_code] ?? null;
 
         // 物流廠商
-        $shipment->lgst_company_code = config('uec.lgst_company_code_options')[$shipment->lgst_company_code] ?? null;
+        $shipment->lgst_company = $shipment->lgst_company ? ($shipment->lgst_company == 'CHOICE' ? config('uec.lgst_company_code_options')[$shipment->lgst_company] : $shipment->lgst_company) : null;
 
         // 收件地址
         $address = '';
@@ -194,6 +198,9 @@ class ShipmentController extends Controller
                     'spec_1_value',
                     'spec_2_value',
                     'qty',
+                    'supplier_product_no',
+                    'supplier_item_no',
+                    'supplier_name',
                 ]);
             });
         }
@@ -202,8 +209,9 @@ class ShipmentController extends Controller
             'shipment_no',
             'created_at_format',
             'status_code',
+            'ship_from_whs',
             'lgst_method',
-            'lgst_company_code',
+            'lgst_company',
             'order_no',
             'ship_to_name',
             'ship_to_mobile',
@@ -255,5 +263,20 @@ class ShipmentController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * 取得出貨配送歷程
+     *
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getProgressLogs(int $id): JsonResponse
+    {
+        $progressLogs = $this->shipmentService->getProgressLogs($id);
+
+        return response()->json([
+            'payload' => Show\ProgressLogResource::collection($progressLogs),
+        ]);
     }
 }
