@@ -318,6 +318,7 @@ class ProductService
         $skuList = json_decode($in['SkuListdata'], true);
         $specListJson = json_decode($in['SpecListJson'], true);
         $imgJson = json_decode($in['imgJson'], true);
+        $readyDeletePhotosJson = json_decode($in['readyDeletePhotosJson'], true);
         DB::beginTransaction();
         try {
             $update = [
@@ -382,6 +383,14 @@ class ProductService
             ];
             ProductAuditLog::create($logCreateIn);
             $uploadPath = 'products/' . $products_id;
+            $deletedPhoto = collect([]) ;
+            if(count($readyDeletePhotosJson)>0){ //刪除圖片
+                foreach($readyDeletePhotosJson as $photo){
+                    $productPhoto = ProductPhoto::where('id',$photo['id'])->first();
+                    $deletedPhoto->push($productPhoto->photo_name);
+                    ProductPhoto::where('id',$photo['id'])->delete();
+                }
+            }
             foreach ($imgJson as $key => $val) {
                 if (isset($val['id'])) {
                     $updateImg = [
@@ -404,7 +413,22 @@ class ProductService
                     ProductPhoto::create($insertImg);
                 }
             }
+
+
+            if($deletedPhoto->count() > 0){
+                $changePhoto = ProductPhoto::where('product_id',$products_id)->orderBy('sort','DESC')->first();
+                foreach($deletedPhoto as $photoName){
+                    if(ProductItem::where('product_id',$products_id)->where('photo_name',$photoName)->count() > 0){
+                        $result['alertMessage'] ='刪除的商品圖片原有item使用，系統已自動將圖片替換成封面圖，請記得到商城資訊頁確認item圖片是否正確';
+                    }
+                    ProductItem::where('product_id',$products_id)->where('photo_name',$photoName)->update([
+                        'photo_name'=>$changePhoto->photo_name,
+                    ]);
+                }
+            }
+
             $add_item_no = ProductItem::where('product_id', $products_id)->count();
+
             foreach ($skuList as $key => $val) {
                 $skuList[$key]['safty_qty'] = ltrim($val['safty_qty'], '0');
                 if ($val['id'] == '') {
@@ -459,6 +483,7 @@ class ProductService
             ]);
             DB::commit();
             $result['status'] = true;
+
         } catch (\Exception $e) {
             DB::rollBack();
             Log::warning($e->getMessage());

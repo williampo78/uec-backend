@@ -68,4 +68,10 @@
             </div>
         </div>
     </div>
+    @isset($alertMessage)
+    <script>
+        let alertMessage = @json($alertMessage) ;
+        alert(alertMessage);
+    </script>
+    @endisset
 @endsection

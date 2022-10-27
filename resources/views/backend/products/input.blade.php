@@ -647,7 +647,7 @@
                                     <div class="form-group">
 
                                         <div class="col-sm-1 ">
-                                            <label class="control-label">商品圖檔</label>
+                                            <label class="control-label">商品圖檔<span class="text-red">*</span></label>
                                         </div>
                                         <div class="col-sm-10">
                                             <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
@@ -683,6 +683,7 @@
                                 </div>
                                 {{-- </div> --}}
                             </div>
+                            <textarea style="display: none" name="imgJson" id="imgJson" cols="30" rows="10">@{{ images }}</textarea>
                         </div>
                     </div>
                     <hr>
@@ -1174,6 +1175,7 @@
                     $(this).rules("add", {
                         required: true,
                         digits: true,
+                        notOnlyZero:true,
                         messages: {
                             digits: '請輸入正整數'
                         },
@@ -1241,10 +1243,18 @@
                         alert('至少輸入一個品項')
                         return false;
                     }
+                    var imgJson = JSON.parse($('#imgJson').val()).length;
+                    if (imgJson <= 0) {
+                        alert('至少上傳一張圖片')
+                        return false;
+                    }
                     $('#save_data').prop('disabled', true);
                     form.submit();
                 },
                 rules: {
+                    selling_channel:{
+                        required: true,
+                    },
                     is_with_warranty: {
                         required: true,
                     },
