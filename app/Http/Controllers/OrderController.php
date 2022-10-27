@@ -82,7 +82,6 @@ class OrderController extends Controller
             return $order->only([
                 'id',
                 'ordered_date',
-                'order_status_desc',
                 'order_no',
                 'status_code',
                 'payment_method',
@@ -150,6 +149,7 @@ class OrderController extends Controller
             'point_discount' => number_format($order->point_discount),
             'shipping_fee' => number_format($order->shipping_fee),
             'paid_amount' => number_format($order->paid_amount),
+            'buyer_remark' => $order->buyer_remark,
             'shipment' => null,
             'order_details' => null,
             'invoice_usage' => config('uec.invoice_usage_options')[$order->invoice_usage] ?? null,

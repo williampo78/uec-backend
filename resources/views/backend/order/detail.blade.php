@@ -72,8 +72,7 @@
                         </table>
                     </div>
                     <div class="col-lg-4">
-                        <h5 style="font-weight: bold; font-size:16px">
-                        金額</h5>
+                        <h5 style="font-weight: bold; font-size:16px">金額</h5>
                         <table style="table-layout: fixed" class="table table-bordered">
                             <tr>
                                 <th colspan="4" class="active">{{ config('uec.cart_p_discount_split') == 1 ? '折後商品總價' : '商品總價' }} (A)：</th>
@@ -92,6 +91,8 @@
                                 <td class="text-right" colspan="3" id="modal-paid-amount"></td>
                             </tr>
                         </table>
+                        <h5 style="font-weight: bold; font-size:16px">訂單備註</h5>
+                        <textarea name="modal-buyer-remark" id="modal-buyer-remark" cols="50" rows="5" disabled></textarea>
                     </div>
                 </div>
 

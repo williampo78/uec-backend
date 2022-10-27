@@ -99,10 +99,7 @@ class OrderService
             }
         }
 
-        return $orders->select()
-            ->addSelect(DB::raw('get_order_status_desc(order_no) AS order_status_desc'))
-            ->orderBy('ordered_date', 'desc')
-            ->get();
+        return $orders->orderBy('ordered_date', 'desc')->get();
     }
 
     /**
