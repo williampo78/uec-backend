@@ -392,3 +392,11 @@ jQuery.validator.addMethod(
     },
     "必須為前2碼大寫英文、後8碼數字"
 );
+
+jQuery.validator.addMethod(
+    "notOnlyZero",
+    function (value, element, params) {
+        return this.optional(element) || parseInt(value) > 0;
+    },
+    "不能為 0"
+);

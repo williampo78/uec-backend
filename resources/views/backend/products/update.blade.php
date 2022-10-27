@@ -778,7 +778,7 @@
                                 <div class="col-sm-12">
                                     <div class="form-group">
                                         <div class="col-sm-1 no-pa">
-                                            <label class="control-label">商品圖檔</label>
+                                            <label class="control-label">商品圖檔<span class="text-red">*</span></label>
                                         </div>
                                         <div class="col-sm-10">
                                             <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
@@ -813,7 +813,8 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <textarea style="display:none;" name="imgJson" id="" cols="30" rows="10">@{{ images }}</textarea>
+                                        <textarea style="display: none" name="imgJson" id="imgJson" cols="30" rows="10">@{{ images }}</textarea>
+                                        <textarea style="display: none" name="readyDeletePhotosJson" id="readyDeletePhotos" cols="30" rows="10">@{{readyDeletePhotos}}</textarea>
                                     </div>
                                 </div>
                             </div>
@@ -1403,6 +1404,7 @@
                     images: [],
                     old_imges: @json($product_photos),
                     file_cdn: @json(config('filesystems.disks.s3.url')),
+                    readyDeletePhotos:[],
                 }
             },
             mounted() {
@@ -1478,17 +1480,7 @@
                     var yes = confirm('你確定要刪除嗎？');
                     if (yes) {
                         if (this.images[index].id) {
-                            axios.post('/backend/del_photos', {
-                                    id: this.images[index].id,
-                                    _token: '{{ csrf_token() }}',
-                                    type: 'products',
-                                })
-                                .then(function(response) {
-
-                                })
-                                .catch(function(error) {
-                                    console.log(error);
-                                });
+                            this.readyDeletePhotos.push(this.images[index]);
                             this.$delete(this.images, index);
                         } else {
                             this.$delete(this.images, index);
@@ -1648,6 +1640,7 @@
                     $(this).rules("add", {
                         required: true,
                         digits: true,
+                        notOnlyZero:true,
                         messages: {
                             digits: '請輸入正整數'
                         },
@@ -1714,6 +1707,11 @@
                         alert('至少輸入一個品項')
                         return false;
                     }
+                    var imgJson = JSON.parse($('#imgJson').val()).length;
+                    if (imgJson <= 0) {
+                        alert('至少上傳一張圖片')
+                        return false;
+                    }
                     $('#save_data').prop('disabled', true);
                     form.submit();
                 },
@@ -1731,6 +1729,9 @@
                         required: true,
                     },
                     brand_id: {
+                        required: true,
+                    },
+                    selling_channel:{
                         required: true,
                     },
                     uom: {

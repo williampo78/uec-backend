@@ -204,6 +204,9 @@ class ProductController extends Controller
         $result = [];
         $execution = $this->productService->editProducts($request->input(), $request->file());
         $result['status'] = $execution['status'];
+        if(!empty($execution['alertMessage'])){
+            $result['alertMessage'] = $execution['alertMessage'] ;
+        }
         $result['route_name'] = 'products';
         $result['act'] = 'upd';
         if ($result['status']) {
