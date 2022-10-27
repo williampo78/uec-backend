@@ -42,7 +42,7 @@
                                     </div>
                                     <div class="col-sm-8">
                                         <p class="form-control-static" id="modal-progress-log">
-                                            <button type="button" class="btn btn-primary btn-sm progress_log_detail" data-shipment="{{ $shipment['shipments_id'] }}">出貨配送歷程</button>
+                                            <button type="button" class="btn btn-primary btn-sm progress_log_detail">出貨配送歷程</button>
                                         </p>
                                     </div>
 

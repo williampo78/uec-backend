@@ -348,9 +348,9 @@
                 },
             });
 
+            let shipment_id = 0;
             $(document).on('click', '.shipment_detail', function() {
-                let shipment_id = $(this).attr("data-shipment");
-                console.log('shipment_id=['+shipment_id+']');
+                shipment_id = $(this).attr("data-shipment");
 
                 axios.get(`/backend/shipment/${shipment_id}`)
                     .then(function(response) {
@@ -428,7 +428,6 @@
             });
 
             $(document).on('click', '.progress_log_detail', function() {
-                let shipment_id = $(this).attr("data-shipment");
                 let shipment_no = $('#modal-shipment-no').text();
 
                 axios.get(`/backend/shipment/${shipment_id}/progress-logs`)
