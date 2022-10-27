@@ -116,9 +116,9 @@ class OrderRefundController extends Controller
         //檢驗單資料
         $returnExaminations = $this->orderRefundService->getReturnExaminationWithDetails($id);
         //設定的資料
-        $lookupValuesVs = LookupValuesV::where('type_code', 'SUP_LGST_COMPANY')
+        $lookupValuesVs = LookupValuesV::whereIn('type_code', ['SUP_LGST_COMPANY', 'PKG_RETURN_FAILED_RSN'])
             ->where('agent_id', Auth::user()->agent_id)
-            ->get(['description', 'code']);
+            ->get(['description', 'code', 'type_code']);
 
         //退貨申請單資料
         $ReturnRequest = $this->orderRefundService->getReturnRequest($id, $request->share_role_auth);
