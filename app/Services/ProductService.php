@@ -416,7 +416,7 @@ class ProductService
 
 
             if($deletedPhoto->count() > 0){
-                $changePhoto = ProductPhoto::where('product_id',$products_id)->orderBy('sort','DESC')->first();
+                $changePhoto = ProductPhoto::where('product_id',$products_id)->orderBy('sort','ASC')->first();
                 foreach($deletedPhoto as $photoName){
                     if(ProductItem::where('product_id',$products_id)->where('photo_name',$photoName)->count() > 0){
                         $result['alertMessage'] ='刪除的商品圖片原有item使用，系統已自動將圖片替換成封面圖，請記得到商城資訊頁確認item圖片是否正確';
