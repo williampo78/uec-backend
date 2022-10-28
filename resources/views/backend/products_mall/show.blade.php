@@ -236,6 +236,99 @@
 
                                 </div>
                             </div>
+                            <div class="row" style="margin-bottom: 16px">
+                                <div class="col-sm-10">
+                                    <div class="form-group">
+                                        <div class="col-sm-2 text-right">
+                                            <label class="control-label">認證：</label>
+                                        </div>
+                                        <div class="col-sm-10">
+                                            <div style="width:50%;display:flex; flex-wrap:wrap;gap:10px">
+                                                @foreach ($product_attribute_lov['CERTIFICATE'] as $key => $obj)
+                                                    <div style="width:48%">
+                                                        <label class="radio-inline">
+                                                            <input class="CERTIFICATE" type="checkbox"
+                                                                name="CERTIFICATE[]" value="{{ $obj->id }}"
+                                                                {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }} disabled>
+                                                            {{ $obj->description }}
+                                                        </label>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-bottom: 16px">
+                                <div class="col-sm-10">
+                                    <div class="form-group">
+                                        <div class="col-sm-2 text-right">
+                                            <label class="control-label">成分：</label>
+                                        </div>
+                                        <div class="col-sm-10">
+                                            <div style="width:50%;display:flex; flex-wrap:wrap;gap:10px">
+                                                @foreach ($product_attribute_lov['INGREDIENT'] as $key => $obj)
+                                                    <div  style="width:48%">
+                                                        <label class="radio-inline">
+                                                            <input class="INGREDIENT" type="checkbox" name="INGREDIENT[]"
+                                                                value="{{ $obj->id }}"
+                                                                {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }} disabled>
+                                                            {{ $obj->description }}
+                                                        </label>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-bottom: 16px">
+                                <div class="col-sm-10">
+                                    <div class="form-group">
+                                        <div class="col-sm-2 text-right">
+                                            <label class="control-label">適用族群：</label>
+                                        </div>
+                                        <div class="col-sm-10">
+                                            <div style="width:50%;display:flex; flex-wrap:wrap;gap:10px">
+                                        @foreach ($product_attribute_lov['GROUP'] as $key => $obj)
+                                            <div style="width:48%">
+                                                <label class="radio-inline">
+                                                    <input class="GROUP" type="checkbox" name="GROUP[]"
+                                                        value="{{ $obj->id }}"
+                                                        {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }} disabled>
+                                                    {{ $obj->description }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" style="margin-bottom: 16px">
+                                <div class="col-sm-10">
+                                    <div class="form-group">
+                                        <div class="col-sm-2 text-right">
+                                            <label class="control-label">劑型：</label>
+                                        </div>
+                                        <div class="col-sm-10">
+                                            <div style="width:50%;display:flex; flex-wrap:wrap;gap:10px">
+                                        @foreach ($product_attribute_lov['DOSAGE_FORM'] as $key => $obj)
+                                            <div style="width:48%">
+                                                <label class="radio-inline">
+                                                    <input class="DOSAGE_FORM" type="checkbox" name="DOSAGE_FORM[]"
+                                                        value="{{ $obj->id }}"
+                                                        {{ isset($product_attributes[$obj->id]) ? 'checked' : '' }} disabled>
+                                                    {{ $obj->description }}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="col-sm-10">
                                     <div class="form-group">
