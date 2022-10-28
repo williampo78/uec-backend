@@ -166,7 +166,7 @@ class SummaryStockService
             "begin_qty", "begin_amount", "item_cost",
             "rcv_qty", "rcv_amount", "rtv_qty", "rtv_amount",
             "sales_qty", "sales_amount", "sales_return_qty", "sales_return_amount",
-            "end_qty", "end_amount",
+            "end_qty", "end_amount", "stock_type",
             "created_by", "updated_by", "created_at", "updated_at"
         ];
         $new = 0;
@@ -194,7 +194,7 @@ class SummaryStockService
             $data = $data->where(function ($query) {
                 $query->where('end_qty', '<>', 0);
                 $query->orwhere('end_amount', '<>', 0);
-            });
+            })->with('product:id,stock_type');
 
             $data = $data->whereExists(function ($query) {
                 $query->select(DB::raw(1))
@@ -223,6 +223,7 @@ class SummaryStockService
                     round($value->sales_return_amount, 2),
                     $value->end_qty,
                     round($value->end_amount, 2),
+                    optional($value->product)->stock_type,
                     $user_id,
                     $user_id,
                     $now,
@@ -254,6 +255,7 @@ class SummaryStockService
                 DB::raw("0 as end_qty"),
                 DB::raw("0 as end_amount")
             )
+                ->with(['productItem.product:id,stock_type'])
                 ->where('transaction_date', '>=', date("Y-m-01", strtotime($smonth . "-01")))
                 ->where('transaction_date', '<', date("Y-m-01", strtotime($next_month . "-01")))
                 ->whereNotExists(function ($query) use ($smonth) {
@@ -261,6 +263,9 @@ class SummaryStockService
                         ->from('stock_monthly_summary')
                         ->where('stock_monthly_summary.transaction_month', date("Y-m", strtotime($smonth)))
                         ->whereRaw('stock_monthly_summary.product_item_id = stock_transaction_log.product_item_id ');
+                })
+                ->whereHas('productItem.product', function ($query) {
+                    $query->whereIn('stock_type', ['A', 'B']);
                 })
                 ->orderBy('product_item_id', 'asc')->get();
             $webDataAdd = [];
@@ -283,6 +288,7 @@ class SummaryStockService
                     round($value->sales_return_amount, 2),
                     $value->end_qty,
                     round($value->end_amount, 2),
+                    optional(optional($value->productItem)->product)->stock_type,
                     $user_id,
                     $user_id,
                     $now,
@@ -338,29 +344,30 @@ class SummaryStockService
             'id',
             'begin_qty',
             'begin_amount',
+            'stock_type',
             DB::raw("IFNULL((select sum(transaction_qty)
                     from stock_transaction_log stl
                     where stl.transaction_date >= STR_TO_DATE(concat('" . $smonth . "-01'), '%Y-%m-%d')
                     and stl.transaction_date < STR_TO_DATE(concat('" . $next_month . "-01'), '%Y-%m-%d')
-                    and stl.transaction_type = 'PO_RCV'
+                    and stl.transaction_type in ('PO_RCV', 'MISC_REC')
                     and stl.product_item_id = stock_monthly_summary.product_item_id),0) as rcv_qty"),
             DB::raw("IFNULL((select sum(transaction_nontax_amount)
                     from stock_transaction_log stl
                     where stl.transaction_date >= STR_TO_DATE(concat('" . $smonth . "-01'), '%Y-%m-%d')
                     and stl.transaction_date < STR_TO_DATE(concat('" . $next_month . "-01'), '%Y-%m-%d')
-                    and stl.transaction_type = 'PO_RCV'
+                    and stl.transaction_type in ('PO_RCV', 'MISC_REC')
                     and stl.product_item_id = stock_monthly_summary.product_item_id),0) as rcv_amount"),
             DB::raw("IFNULL((select sum(transaction_qty)
                     from stock_transaction_log stl
                     where stl.transaction_date >= STR_TO_DATE(concat('" . $smonth . "-01'), '%Y-%m-%d')
                     and stl.transaction_date < STR_TO_DATE(concat('" . $next_month . "-01'), '%Y-%m-%d')
-                    and stl.transaction_type = 'PO_RTV'
+                    and stl.transaction_type in ('PO_RTV', 'MISC_ISSUE')
                     and stl.product_item_id = stock_monthly_summary.product_item_id),0) as rtv_qty"),
             DB::raw("IFNULL((select sum(transaction_nontax_amount)
                     from stock_transaction_log stl
                     where stl.transaction_date >= STR_TO_DATE(concat('" . $smonth . "-01'), '%Y-%m-%d')
                     and stl.transaction_date < STR_TO_DATE(concat('" . $next_month . "-01'), '%Y-%m-%d')
-                    and stl.transaction_type = 'PO_RTV'
+                    and stl.transaction_type in ('PO_RTV', 'MISC_ISSUE')
                     and stl.product_item_id = stock_monthly_summary.product_item_id),0) as rtv_amount"),
             DB::raw("IFNULL((select sum(transaction_qty)
                     from stock_transaction_log stl
@@ -373,16 +380,32 @@ class SummaryStockService
                     where stl.transaction_date >= STR_TO_DATE(concat('" . $smonth . "-01'), '%Y-%m-%d')
                     and stl.transaction_date < STR_TO_DATE(concat('" . $next_month . "-01'), '%Y-%m-%d')
                     and stl.transaction_type in('ORDER_CANCEL', 'ORDER_VOID', 'ORDER_RTN')
-                    and stl.product_item_id = stock_monthly_summary.product_item_id),0) as sales_return_qty")
+                    and stl.product_item_id = stock_monthly_summary.product_item_id),0) as sales_return_qty"),
+            DB::raw("IFNULL((select sum(transaction_nontax_amount)
+                    from stock_transaction_log stl
+                    where stl.transaction_date >= STR_TO_DATE(concat('" . $smonth . "-01'), '%Y-%m-%d')
+                    and stl.transaction_date < STR_TO_DATE(concat('" . $next_month . "-01'), '%Y-%m-%d')
+                    and stl.transaction_type in('ORDER_CANCEL', 'ORDER_VOID', 'ORDER_RTN')
+                    and stl.product_item_id = stock_monthly_summary.product_item_id),0) as sales_transaction_nontax_amount")
         )
             ->where('transaction_month', $smonth)->orderBy('id', 'asc')->get();
         $webDataUpd = [];
         foreach ($data as $key => $value) {
             $end_qty = ($value->begin_qty + $value->rcv_qty + $value->rtv_qty + $value->sales_qty + $value->sales_return_qty);//推算期末數
             $net_qty = ($value->begin_qty + $value->rcv_qty + $value->rtv_qty);//本期進貨淨量
-            $item_cost = round((round($value->begin_amount, 2) + $value->rcv_amount + $value->rtv_amount) / ($net_qty == 0 ? 1 : $net_qty), 2);//推算單位成本
-            $sales_amount = round($value->sales_qty * $item_cost, 2);//推算銷貨金額
-            $sales_return_amount = round($value->sales_return_qty * $item_cost, 2);//推算銷退金額
+
+            //買斷
+            if($value->stock_type == 'A'){
+                $item_cost = round((round($value->begin_amount, 2) + $value->rcv_amount + $value->rtv_amount) / ($net_qty == 0 ? 1 : $net_qty), 2);//推算單位成本
+                $sales_amount = round($value->sales_qty * $item_cost, 2);//推算銷貨金額
+                $sales_return_amount = round($value->sales_return_qty * $item_cost, 2);//推算銷退金額
+            //寄售
+            } else if ($value->stock_type == 'B') {
+                $item_cost = 0;
+                $sales_amount = $value->sales_transaction_nontax_amount;
+                $sales_return_amount = $value->sales_transaction_nontax_amount;
+            }
+
             $end_amount = round(($end_qty * $item_cost), 2);
             $webDataUpd[$key] = [
                 "id" => $value->id,
