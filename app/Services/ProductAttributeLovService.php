@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ProductAttribute;
 use App\Models\ProductAttributeLov;
 
 class ProductAttributeLovService
@@ -13,6 +14,7 @@ class ProductAttributeLovService
         if (isset($in['attribute_type']) && $in['attribute_type'] !== '') {
             $result = $result->where('attribute_type', $in['attribute_type']);
         };
+        $result = $result->orderBy('sort','asc')->orderBy('id', 'asc');
         $result = $result->get();
 
         return $result;

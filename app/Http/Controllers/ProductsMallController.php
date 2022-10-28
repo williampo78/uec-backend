@@ -19,6 +19,7 @@ class ProductsMallController extends Controller
      * @return \Illuminate\Http\Response
      */
     private $productService;
+    private $productAttributesService;
     public function __construct(ProductService $productService,
         SupplierService $supplierService,
         BrandsService $brandsService,
@@ -91,6 +92,11 @@ class ProductsMallController extends Controller
         $result['spac_list'] = $this->productService->getProductSpac($id);
         $result['product_spec_info'] = $this->productService->getProduct_spec_info($id);
         $result['related_products'] = $this->productService->getRelatedProducts($id);
+        $result['product_attribute_lov'] = $this->productAttributeLovService->assembleAttributeLov(); //取checkbox 設定
+        $result['product_attributes'] = $this->productAttributesService->getProductAttributes([
+            'product_id' => $id,
+        ]);
+
         return view('backend.products_mall.show', $result);
     }
 
@@ -117,9 +123,7 @@ class ProductsMallController extends Controller
         $result['product_attribute_lov'] = $this->productAttributeLovService->assembleAttributeLov(); //取checkbox 設定
         $result['product_attributes'] = $this->productAttributesService->getProductAttributes([
             'product_id' => $id,
-            'attribute_type' => 'CERTIFICATE',
-        ])->keyBy('product_attribute_lov_id')
-        ->toArray();
+        ]);
         return view('backend.products_mall.input', $result);
     }
 
