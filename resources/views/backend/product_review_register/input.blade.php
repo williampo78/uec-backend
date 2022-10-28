@@ -19,7 +19,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-3">
                                         <label class="control-label">庫存類型</label>
                                     </div>
                                     <input type="hidden" id="products_id" value="{{ $products->id }}">
@@ -52,7 +52,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-3">
                                         <label class="control-label ">商品序號</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -65,7 +65,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-3">
                                         <label class="control-label">供應商</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -76,7 +76,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class=" form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-3">
                                         <label class="control-label">商品名稱</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -89,7 +89,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-3">
                                         <label class="control-label">市價(含稅)</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -100,7 +100,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class=" form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-3">
                                         <label class="control-label">售價(含稅)</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -113,7 +113,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-3">
                                         <label class="control-label">成本</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -124,7 +124,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class=" form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-3">
                                         <label class="control-label">毛利(%)</label>
                                     </div>
                                     <div class="col-sm-9">
@@ -137,7 +137,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2">
+                                    <div class="col-sm-3">
                                         <label class="control-label">上架時間起<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
@@ -155,7 +155,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class=" form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-3">
                                         <label class="control-label">上架時間訖<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
@@ -175,7 +175,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2">
+                                    <div class="col-sm-3">
                                         <label class="control-label">開賣時間<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-9">
