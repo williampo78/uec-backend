@@ -592,11 +592,16 @@ class ProductBatchService
                 }
                 $web_category_hierarchy_id_array = explode(",", $productBasice['web_category_hierarchy_ids']);
                 foreach ($web_category_hierarchy_id_array as $web_category_hierarchy_id) {
-                    if (!$getMaxLevelCategories->find($web_category_hierarchy_id)) {
+                    if (!$getMaxLevelCategories->where('id',$web_category_hierarchy_id)->first()) {
                         $errorContent['errorMessage'] = "找不到ID:{$web_category_hierarchy_id}的前台分類";
                         array_push($result, $errorContent);
                     }
+                    if($getMaxLevelCategories->where('content_type','M')->where('id',$web_category_hierarchy_id)->first()){
+                        $errorContent['errorMessage'] = "前台分類 ID :{$web_category_hierarchy_id}不可為指定賣場";
+                        array_push($result, $errorContent);
+                    }
                 }
+
                 //  「最小入庫量」未填寫
                 if (empty($productBasice['min_purchase_qty'])) {
                     $errorContent['errorMessage'] = '「最小入庫量」未填寫';
