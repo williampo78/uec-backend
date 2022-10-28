@@ -28,8 +28,23 @@ class SummaryStockController extends Controller
             'item_id_start',
             'item_id_end',
             'product_name',
+            'export'
         ]);
-        $data['info'] = ($getData ? $this->summaryStock->getSummaryStock($getData) : []);
+        $data['info'] = ($getData ? $this->summaryStock->getSummaryStock($getData) : collect());
+
+        $data['info']->transform(function ($item) {
+            if (in_array($item->stock_type, ['A', 'B'], true)) {
+                $item->begin_amount_display = null; //期初金額
+                $item->item_cost_display    = null; //單位成本
+                $item->end_amount_display   = null; //期末金額
+            }
+            if ($item->stock_type == 'A') {
+                $item->sales_amount_display        = null; //銷貨金額
+                $item->sales_return_amount_display = null; //銷退金額
+            }
+            return $item;
+        });
+
         $data['sum'] = ($getData ? $this->summaryStock->getSummarySum($getData) : []);
         if (count($getData) > 0) {
             $data['excel_url'] = url("/") . $request->getRequestUri() . '&export=true';

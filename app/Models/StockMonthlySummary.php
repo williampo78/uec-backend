@@ -20,4 +20,9 @@ class StockMonthlySummary extends Model
     {
         return self::where('transaction_month', '=', $month)->count();
     }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id');
+    }
 }
