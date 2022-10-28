@@ -357,7 +357,7 @@
                         let shipment = response.data;
                         let package_no = shipment.package_no ? shipment.package_no : '';
 
-                        if (shipment.ship_from_whs == 'WHS') {
+                        if (shipment.ship_from_whs == 'SELF') {
                             package_no = '<a href="http://query2.e-can.com.tw/%E5%A4%9A%E7%AD%86%E6%9F%A5%E4%BB%B6A.htm" target="_blank">' + package_no + '</a>';
                         }
 
