@@ -196,7 +196,8 @@ class OrderRefundService
                 'pkg_ret_remark',
                 'returnable_point_discount',
                 'returnable_amount',
-                'pkg_ret_failed_reason'
+                'pkg_ret_failed_reason',
+                'examination_failed_reason'
             ]);
     }
 
@@ -282,11 +283,25 @@ class OrderRefundService
             }
 
             //回件/檢驗結果說明
+            //備註
             $examinationRemark = $returnExamination->examination_remark ?? $returnExamination->pkg_ret_remark ?? '';
-            $pkgReturnFailedRsn = optional($lookupValuesVs->where('type_code', 'PKG_RETURN_FAILED_RSN')->where('code', $returnExamination->pkg_ret_failed_reason)->first())->description;
+            //未回件原因
+            $pkgReturnFailedRsn = optional($lookupValuesVs
+                ->where('type_code', 'PKG_RETURN_FAILED_RSN')
+                ->where('code', $returnExamination->pkg_ret_failed_reason)
+                ->first())
+                ->description;
+            //不合格原因
+            $examinationFailedRsn = optional($lookupValuesVs
+                ->where('type_code', 'EXAMINATION_FAILED_RSN')
+                ->where('code', $returnExamination->examination_failed_reason)
+                ->first())
+                ->description;
 
             if (is_null($pkgReturnFailedRsn) === false) {
                 $examinationRemark = "【{$pkgReturnFailedRsn}】{$examinationRemark}";
+            } elseif (is_null($examinationFailedRsn) === false) {
+                $examinationRemark = "【{$examinationFailedRsn}】{$examinationRemark}";
             }
 
             return [
