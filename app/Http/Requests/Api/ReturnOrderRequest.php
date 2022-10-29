@@ -53,7 +53,7 @@ class ReturnOrderRequest extends FormRequest
             'telephone_ext' => 'max:10',
             'city' => 'required|max:10',
             'district' => 'required|max:10',
-            'address' => 'required|max:40',
+            'address' => 'required|max:255',
             'zip_code' => 'required|max:10',
         ];
     }
