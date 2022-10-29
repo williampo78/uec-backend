@@ -385,8 +385,14 @@ class SummaryStockService
                     from stock_transaction_log stl
                     where stl.transaction_date >= STR_TO_DATE(concat('" . $smonth . "-01'), '%Y-%m-%d')
                     and stl.transaction_date < STR_TO_DATE(concat('" . $next_month . "-01'), '%Y-%m-%d')
-                    and stl.transaction_type in('ORDER_CANCEL', 'ORDER_VOID', 'ORDER_RTN')
-                    and stl.product_item_id = stock_monthly_summary.product_item_id),0) as sales_transaction_nontax_amount")
+                    and stl.transaction_type = 'ORDER_SHIP'
+                    and stl.product_item_id = stock_monthly_summary.product_item_id),0) as sales_transaction_nontax_amount"),
+            DB::raw("IFNULL((select sum(transaction_nontax_amount)
+                    from stock_transaction_log stl
+                    where stl.transaction_date >= STR_TO_DATE(concat('" . $smonth . "-01'), '%Y-%m-%d')
+                    and stl.transaction_date < STR_TO_DATE(concat('" . $next_month . "-01'), '%Y-%m-%d')
+                    and stl.transaction_type in ('ORDER_CANCEL', 'ORDER_VOID', 'ORDER_RTN')
+                    and stl.product_item_id = stock_monthly_summary.product_item_id),0) as sales_return_transaction_nontax_amount")
         )
             ->where('transaction_month', $smonth)->orderBy('id', 'asc')->get();
         $webDataUpd = [];
@@ -402,8 +408,8 @@ class SummaryStockService
             //寄售
             } else if ($value->stock_type == 'B') {
                 $item_cost = 0;
-                $sales_amount = $value->sales_transaction_nontax_amount;
-                $sales_return_amount = $value->sales_transaction_nontax_amount;
+                $sales_amount = round($value->sales_transaction_nontax_amount, 2);
+                $sales_return_amount = round($value->sales_return_transaction_nontax_amount, 2);
             }
 
             $end_amount = round(($end_qty * $item_cost), 2);
