@@ -120,7 +120,7 @@ class ReturnGoodsService
         if ($this->returnRequest->status_code == 'VOIDED') {
             $this->verifyResult = [
                 'status'           => true,
-                'code'             => 'S200',
+                'code'             => 'S201',
                 'http_status_code' => 200,
                 'message'          => '更新失敗，此退貨申請單已作廢'
             ];
@@ -577,6 +577,7 @@ class ReturnGoodsService
      */
     private function handleRefund()
     {
+        //沒有退款金額和點數則不處理
         if (empty($this->returnRequest->refund_amount) && empty($this->returnRequest->refund_points)) {
             return;
         }
@@ -669,8 +670,13 @@ class ReturnGoodsService
 
         //金額
         $amount = $this->oldOrderPayment->amount - $this->oldOrderPayment->fee_of_instal + $this->returnRequest->refund_amount;
-        //手續費
-        $feeOfInstal = $this->getFee($amount, $this->oldOrderPayment->interest_rate_of_instal);
+        $feeOfInstal = 0;
+        //如果為分期，計算手續費
+        if ($this->newOrder->payment_method == 'TAPPAY_INSTAL') {
+            //手續費
+            $feeOfInstal = $this->getFee($amount, $this->oldOrderPayment->interest_rate_of_instal);
+        }
+
         $amount = $amount + $feeOfInstal;
 
         //新增請款單
@@ -821,7 +827,7 @@ class ReturnGoodsService
             //驗證資料
             $this->verify();
 
-            if ($this->verifyResult['status'] === false) {
+            if ($this->verifyResult['status'] === false || $this->verifyResult['code'] === 'S201') {
                 return $this->verifyResult;
             }
 
