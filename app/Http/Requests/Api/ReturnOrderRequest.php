@@ -91,7 +91,7 @@ class ReturnOrderRequest extends FormRequest
         $errors = $validator->errors();
 
         $response = response()->json([
-            'message' => '參數錯誤',
+            'message' => $errors->first() ?? '參數錯誤',
             'errors' => $errors,
         ], 400);
 
