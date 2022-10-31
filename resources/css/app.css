@@ -149,3 +149,28 @@ span.error {
     grid-template-columns: 100px 1fr;
     align-items: center;
 }
+.column-full{
+    grid-column: 2/5;
+}
+.custom-viewer-title{
+    display: grid;
+    grid-template-columns: 135px 1fr;
+    align-items: center;
+    border-bottom:  1px solid #DDDDDD;
+ }
+.custom-viewer-outer{
+    grid-template-columns: 1fr 1fr 1fr;
+    border: 1px solid #DDDDDD;
+    border-radius: 2px;
+}
+.custom-label-title{
+    padding: 10px;
+    background-color: #F5F5F5;
+    width: 100%;
+    margin-bottom: 0;
+}
+@media screen and (min-width: 768px) {
+    .border-bottom-md-0{
+        border-bottom: none;
+    }
+}
