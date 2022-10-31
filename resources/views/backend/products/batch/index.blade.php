@@ -80,35 +80,36 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                    <hr>
-                                    <h5 class="fw-bold" style="font-size: 15px;">注意事項</h5>
-                                    <div class="d-md-flex gap-4">
-                                        <ol class="ps-4" style="line-height: 1.5;">
-                                            <li>商品Excel (<a href="/backend/download-sample/product-batch-upload-sample.xlsx?rename=商品主檔批次上傳-範例&type=xlsx">下載範例檔</a>)
-                                                <ul class="ps-5">
-                                                    <li>包含「items」、「photos」2個頁籤
-                                                        <ul class="ps-5">
-                                                            <li>第1列為欄位名稱、第2列為欄位說明，須保留</li>
-                                                            <li>第3列開始才是真正的資料內容</li>
-                                                        </ul>
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li>圖片ZIP
-                                                <ul class="ps-5">
-                                                    <li>附檔名須為zip</li>
-                                                    <li>各商品請獨立一個資料夾存放圖片</li>
-                                                    <li>單張圖片的寬與高的比例須為1:1、至少須為480*480</li>
-                                                </ul>
-                                            </li>
-                                            <li>上傳檔案「商品Excel」、「圖片ZIP」加總大小上限為400MB</li>
-                                            <li>執行匯入後，約須10~20分鐘的等待時間，執行結果可於此功能的「匯入記錄」頁籤查看。</li>
-                                        </ol>
-                                        <picture style="max-width: 431px;">
-                                            <img src="{{ asset('asset/img/req-batch-image-sample.jpg') }}" alt="圖片ZIP示意圖" width="431" height="220" class="w-100 h-auto">
-                                        </picture>
+                                    <div style="padding: 15px; background: aliceblue; margin-top: 15px;">
+                                        <h5 class="fw-bold" style="font-size: 15px;">注意事項</h5>
+                                        <div class="d-md-flex gap-4">
+                                            <ol class="ps-4" style="line-height: 1.5;">
+                                                <li>商品Excel (<a href="/backend/download-sample/product-batch-upload-sample.xlsx?rename=商品主檔批次上傳-範例&type=xlsx">下載範例檔</a>)
+                                                    <ul class="ps-5">
+                                                        <li>包含「items」、「photos」2個頁籤
+                                                            <ul class="ps-5">
+                                                                <li>第1列為欄位名稱、第2列為欄位說明，須保留</li>
+                                                                <li>第3列開始才是真正的資料內容</li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                                <li>圖片ZIP
+                                                    <ul class="ps-5">
+                                                        <li>附檔名須為zip</li>
+                                                        <li>各商品請獨立一個資料夾存放圖片</li>
+                                                        <li>單張圖片的寬與高的比例須為1:1、至少須為480*480</li>
+                                                    </ul>
+                                                </li>
+                                                <li>上傳檔案「商品Excel」、「圖片ZIP」加總大小上限為400MB</li>
+                                                <li>執行匯入後，約須10~20分鐘的等待時間，執行結果可於此功能的「匯入記錄」頁籤查看。</li>
+                                            </ol>
+                                            <picture style="max-width: 431px;">
+                                                <img src="{{ asset('asset/img/req-batch-image-sample.jpg') }}" alt="圖片ZIP示意圖" width="431" height="220" class="w-100 h-auto">
+                                            </picture>
+                                        </div>
                                     </div>
+
                                 </form>
                             </div>
                         </div>
