@@ -1268,7 +1268,7 @@ class OrderService
             ->where('orders.order_no', $orderNo)
             ->where('order_details.seq', $seq)
             ->where('orders.is_latest', 1)
-            ->get();
+            ->first();
 
         return $data;
     }

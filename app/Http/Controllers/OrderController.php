@@ -315,7 +315,7 @@ class OrderController extends Controller
 
                 // 出貨單狀態
                 if (!empty($shipmentData)) {
-                    $orderDetails['shipment_no'] = $shipmentData->status_code;
+                    $orderDetails['status_code'] = $shipmentData->status_code;
                 }
 
                 $payload['order_details'][] = $orderDetails;
@@ -367,7 +367,7 @@ class OrderController extends Controller
                     $invoices['amount'] = number_format($combineInvoice->total_amount);
 
                     // 備註
-                    $invoices['remark'] = $combineInvoice->rtn_code . '-' . $combineInvoice->rtn_msg;
+                    $invoices['remark'] = '發票拋轉狀態 : ' . $combineInvoice->rtn_code . '-' . $combineInvoice->rtn_msg;
 
                     // 隨機碼
                     $invoices['random_no'] = $combineInvoice->random_no;
@@ -417,7 +417,7 @@ class OrderController extends Controller
                     $invoices['amount'] = number_format($combineInvoice->allowance_amount);
 
                     // 備註
-                    $invoices['remark'] = $combineInvoice->rtn_code . '-' . $combineInvoice->rtn_msg;
+                    $invoices['remark'] = '折讓拋轉狀態 : ' . $combineInvoice->rtn_code . '-' . $combineInvoice->rtn_msg;
 
                     // 隨機碼
                     $invoices['random_no'] = $combineInvoice->invoice->random_no;
