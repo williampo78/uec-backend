@@ -63,6 +63,7 @@
                                 <thead>
                                     <tr>
                                         <th>商品編號</th>
+                                        <th>POS品號</th>
                                         <th>商品名稱</th>
                                         <th>單價</th>
                                         <th>請購量</th>
@@ -76,6 +77,7 @@
                                 <tbody v-for="(item, itemKey) in requisitionsPurchaseDetail">
                                     <tr>
                                         <td>@{{ item.item_number }}</td>
+                                        <td>@{{ item.pos_item_no }}</td>
                                         <td>@{{ item.combination_name }}</td>
                                         <td>@{{ item.item_price }}</td>
                                         <td>@{{ item.item_qty }}</td>

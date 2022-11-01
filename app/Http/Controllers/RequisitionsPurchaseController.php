@@ -139,7 +139,7 @@ class RequisitionsPurchaseController extends Controller
 
             $brandsName = isset($brands[$obj->brand_id]['brand_name']) ? $brands[$obj->brand_id]['brand_name'] : '品牌已被刪除';
 
-            $obj->combination_name = $obj->product_items_no . '-' . $brandsName . '-' . $obj->product_name;
+            $obj->combination_name = $brandsName . '-' . $obj->product_name;
 
             if ($obj->spec_1_value !== '') {
                 $obj->combination_name .= '-' . $obj->spec_1_value;
