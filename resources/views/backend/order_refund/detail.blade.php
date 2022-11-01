@@ -130,6 +130,7 @@
                                         <th class="text-nowrap">對象</th>
                                         <th class="text-nowrap">金額</th>
                                         <th class="text-nowrap">狀態</th>
+                                        <th class="text-nowrap">金流方式</th>
                                         <th class="text-nowrap">備註</th>
                                     </tr>
                                 </thead>

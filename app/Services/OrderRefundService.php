@@ -363,24 +363,36 @@ class OrderRefundService
      */
     public function getReturnInformation(int $id)
     {
-        $select = "created_at, '退款'  as payment_type_desc,
-               amount,
-                (case when payment_status = 'PENDING' then '待退款'
-             when payment_status = 'COMPLETED' then '退款成功'
-             when payment_status = 'FAILED' then '退款失敗'
-             when payment_status = 'VOIDED' then '已作廢'
-             else '' end) as payment_status_desc,
-            remark";
-
         $order_payments = DB::table('order_payments')
-            ->selectRaw($select)
             ->where('source_table_name', 'return_requests')
             ->where('source_table_id', $id)
-            ->get();
+            ->get([
+                'id', 'amount', 'payment_status', 'payment_type', 'payment_method', 'remark', 'created_at'
+            ]);
 
-        $order_payments->transform(function ($order_payment) {
+        //金流類型
+        $paymentTypes = config('uec.payment_type_options');
+        //金流狀態-請款
+        $paymentPayStatus = config('uec.payment_pay_status_options');
+        //金流狀態-退款
+        $paymentRefundStatus = config('uec.payment_refund_status_options');
+        //金流方式
+        $paymentMethods = config('uec.payment_method_options');
+
+        $order_payments->transform(function ($order_payment) use ($paymentTypes, $paymentPayStatus, $paymentRefundStatus, $paymentMethods) {
+            //金流類型
+            $order_payment->payment_type_desc = $paymentTypes[$order_payment->payment_type] ?? '';
+            //預設為請款
+            $order_payment->payment_status_desc = $paymentPayStatus[$order_payment->payment_status] ?? '';
+            //為退款
+            if ($order_payment->payment_type === 'REFUND') {
+                $order_payment->payment_status_desc = $paymentRefundStatus[$order_payment->payment_status] ?? '';
+            }
+
             // 建立時間
             $order_payment->created_at = Carbon::parse($order_payment->created_at)->format('Y-m-d H:i');
+            //金流方式
+            $order_payment->payment_method = $paymentMethods[$order_payment->payment_method] ?? '';
 
             return $order_payment;
         });
