@@ -802,6 +802,7 @@
                             <td class="text-nowrap">Tappay</td>
                             <td class="text-nowrap">${value.amount}</td>
                             <td class="text-nowrap">${value.payment_status_desc}</td>
+                            <td class="text-nowrap">${value.payment_method}</td>
                             <td class="text-nowrap">${value.remark == null ? '' : value.remark}</td>
                         </tr>`;
                 index++;
