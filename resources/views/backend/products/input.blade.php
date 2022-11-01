@@ -194,9 +194,9 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-sm-6">
+                            <div class="col-sm-12">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-1">
                                         <label class="control-label">商品通路<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-3">
@@ -217,14 +217,45 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-6">
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
-                                        <label class="control-label">溫層<span class="text-red">*</span></label>
+                                    <div class="col-sm-1 ">
+                                        <label class="control-label">配送溫層<span class="text-red">*</span></label>
                                     </div>
-                                    <div class="col-sm-9">
+                                    <div class="col-sm-2">
                                         <label class="radio-inline">
                                             <input type="radio" name="lgst_temperature" value="NORMAL" checked> 常溫
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="lgst_temperature" value="CHILLED"> 冷藏
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="col-sm-1 ">
+                                        <label class="control-label">存放溫層<span class="text-red">*</span></label>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="storage_temperature" value="NORMAL" checked> 常溫
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="storage_temperature" value="AIR"> 空調
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="storage_temperature" value="CHILLED"> 冷藏
                                         </label>
                                     </div>
                                 </div>
