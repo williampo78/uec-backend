@@ -315,7 +315,7 @@ class OrderController extends Controller
 
                 // 出貨單狀態
                 if (!empty($shipmentData)) {
-                    $orderDetails['status_code'] = $shipmentData->status_code;
+                    $orderDetails['status_code'] = config('uec.shipment_status_code_options')[$shipmentData->status_code];
                 }
 
                 $payload['order_details'][] = $orderDetails;
