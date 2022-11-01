@@ -96,6 +96,7 @@
                                 <thead>
                                     <tr>
                                         <th>商品編號</th>
+                                        <th>POS品號</th>
                                         <th>商品名稱</th>
                                         <th>單價</th>
                                         <th>採購量</th>
@@ -109,6 +110,7 @@
                                 <tbody>
                                     <tr v-for="(detail, index) in show_detail">
                                         <td>@{{detail.item_no}}</td>
+                                        <td>@{{detail.pos_item_no}}</td>
                                         <td>@{{detail.combination_name}}</td>
                                         <td>@{{detail.item_price}}</td>
                                         <td>@{{detail.item_qty}}</td>

@@ -60,6 +60,7 @@
             <thead>
                 <tr>
                     <th>商品編號</th>
+                    <th>POS品號</th>
                     <th>商品名稱</th>
                     <th>到期日</th>
                     <th>庫別</th>
@@ -73,6 +74,8 @@
                     <tr>
                         {{-- 商品編號 --}}
                         <td>{{$val->item_no}}</td>
+                        {{-- POS品號 --}}
+                        <td>{{$val->pos_item_no}}</td>
                         {{-- 商品名稱 --}}
                         <td>{{$val->combination_name}}</td>
                         {{-- 到期日 --}}

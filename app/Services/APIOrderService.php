@@ -1,4 +1,4 @@
-<?php
+ <?php
 
 namespace App\Services;
 
@@ -643,7 +643,7 @@ class APIOrderService
             //庫存與LOG相關
             $order_details = OrderDetail::getOrderDetails($newOrder->id);
             foreach ($order_details as $detail) {
-                $stock = $stock_info_array[$detail->product_item_id] ?? null;
+                $stock = $this->stockService->getStockByItem($warehouseCode, $detail->product_item_id);
                 if ( !$this->hasEnoughStockQty($stock['stockQty'], $detail->qty ?? 0)) {
                     $result['status'] = 403;
                     $result['payment_url'] = null;

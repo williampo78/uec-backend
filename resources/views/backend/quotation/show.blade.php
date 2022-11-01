@@ -50,8 +50,8 @@
                     <thead>
                         <tr>
                             <th>商品編號</th>
-                            <th>商品名稱</th>
                             <th>POS品號</th>
+                            <th>商品名稱</th>
                             <th>進貨成本</th>
                             <th>最小採購量</th>
                         </tr>
@@ -60,6 +60,7 @@
                         @foreach ($quotationDetails as $val)
                             <tr>
                                 <td>{{ $val->product_items_no }}</td>
+                                <td>{{ $val->pos_item_no }}</td>
                                 <td>
                                     @if (!$val->combination_name)
                                         <span class="text-red">該商品異常</span>
@@ -67,7 +68,6 @@
                                         {{ $val->combination_name }}
                                     @endif
                                 </td>
-                                <td>{{ $val->pos_item_no }}</td>
                                 <td>{{ $val->original_unit_price }}</td>
                                 <td>{{ $val->min_purchase_qty }}</td>
                             </tr>
