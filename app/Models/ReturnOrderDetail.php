@@ -55,6 +55,8 @@ class ReturnOrderDetail extends Model
             $response = 1;
         } elseif ($this->data_type == 'CAMPAIGN') {
             $response = 2;
+        } else { // INSTAL_FEE
+            $response = 3;
         }
 
         return $response;
