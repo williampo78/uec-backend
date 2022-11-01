@@ -307,13 +307,13 @@ class OrderController extends Controller
                 $orderDetails['returned_point_discount'] = number_format($orderDetail->returned_point_discount);
 
                 // 出貨單號
-                if (isset($orderDetail->shipmentDetail)) {
-                    $orderDetails['shipment_no'] = $orderDetail->shipmentDetail->shipment->shipment_no;
+                if (isset($orderDetail->shipmentDetailSeq)) {
+                    $orderDetails['shipment_no'] = $orderDetail->shipmentDetailSeq->shipment->shipment_no;
                 }
 
                 // 出貨單狀態
-                if (isset($orderDetail->shipmentDetail)) {
-                    $orderDetails['status_code'] = config('uec.shipment_status_code_options')[$orderDetail->shipmentDetail->shipment->status_code];
+                if (isset($orderDetail->shipmentDetailSeq)) {
+                    $orderDetails['status_code'] = config('uec.shipment_status_code_options')[$orderDetail->shipmentDetailSeq->shipment->status_code];
                 }
 
                 $payload['order_details'][] = $orderDetails;
@@ -365,7 +365,7 @@ class OrderController extends Controller
                     $invoices['amount'] = number_format($combineInvoice->total_amount);
 
                     // 備註
-                    $invoices['remark'] = $combineInvoice->remark;
+                    $invoices['remark'] = $combineInvoice->rtn_code . '-' . $combineInvoice->rtn_msg;
 
                     // 隨機碼
                     $invoices['random_no'] = $combineInvoice->random_no;
@@ -415,7 +415,7 @@ class OrderController extends Controller
                     $invoices['amount'] = number_format($combineInvoice->allowance_amount);
 
                     // 備註
-                    $invoices['remark'] = $combineInvoice->invoice->remark;
+                    $invoices['remark'] = $combineInvoice->rtn_code . '-' . $combineInvoice->rtn_msg;
 
                     // 隨機碼
                     $invoices['random_no'] = $combineInvoice->invoice->random_no;
@@ -527,7 +527,7 @@ class OrderController extends Controller
                 $returnOrderDetails = [
                     'request_no' => $returnOrderDetail->request_no,
                     'data_type' => config('uec.data_type_options')[$returnOrderDetail->data_type] ?? null,
-                    'dtl_desc' => null,
+                    'dtl_desc' => '',
                     'selling_price' => null,
                     'qty' => $returnOrderDetail->qty,
                     'subtotal' => null,
@@ -549,15 +549,15 @@ class OrderController extends Controller
                     }
 
                     if ($temp['spec_dimension'] == 0) {
-                        $returnOrderDetails['dtl_desc'] = $temp['item_no'] . '_' . $temp['product_name'];
+                        $returnOrderDetails['dtl_desc'] = ($temp['item_no'] . '_' . $temp['product_name']) ?? '';
                     } elseif ($temp['spec_dimension'] == 1) {
-                        $returnOrderDetails['dtl_desc'] = $temp['item_no'] . '_' . $temp['product_name'] . '_' . $temp['spec_1_value'];
+                        $returnOrderDetails['dtl_desc'] = ($temp['item_no'] . '_' . $temp['product_name'] . '_' . $temp['spec_1_value']) ?? '';
                     } elseif ($temp['spec_dimension'] == 2) {
-                        $returnOrderDetails['dtl_desc'] = $temp['item_no'] . '_' . $temp['product_name'] . '_' . $temp['spec_1_value'] . '/' . $temp['spec_2_value'];
+                        $returnOrderDetails['dtl_desc'] = ($temp['item_no'] . '_' . $temp['product_name'] . '_' . $temp['spec_1_value'] . '/' . $temp['spec_2_value']) ?? '';
                     }
                 } elseif ($returnOrderDetail->data_type == 'CAMPAIGN') {
                     if (isset($returnOrderDetail->promotionalCampaign)) {
-                        $returnOrderDetails['dtl_desc'] = $returnOrderDetail->promotionalCampaign->campaign_brief;
+                        $returnOrderDetails['dtl_desc'] = ($returnOrderDetail->promotionalCampaign->campaign_brief) ?? '';
                     }
                 }
 

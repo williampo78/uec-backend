@@ -45,6 +45,14 @@ class OrderDetail extends Model
     }
 
     /**
+     * 建立與出貨單明細項次的關聯
+     */
+    public function shipmentDetailSeq()
+    {
+        return $this->hasOne(ShipmentDetail::class, 'order_detail_seq', 'seq');
+    }
+
+    /**
      * 取得 訂單單身
      *
      */
