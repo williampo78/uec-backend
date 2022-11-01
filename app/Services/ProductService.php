@@ -203,6 +203,7 @@ class ProductService
                 'model' => $in['model'],
                 'lgst_method' => $in['lgst_method'],
                 'lgst_temperature' => $in['lgst_temperature'],
+                'storage_temperature' => $in['storage_temperature'],
                 'uom' => $in['uom'],
                 'min_purchase_qty' => $in['min_purchase_qty'],
                 'has_expiry_date' => $in['has_expiry_date'],
@@ -322,6 +323,7 @@ class ProductService
                 'model' => $in['model'],
                 'lgst_method' => $in['lgst_method'],
                 'lgst_temperature' => $in['lgst_temperature'],
+                'storage_temperature' => $in['storage_temperature'],
                 'uom' => $in['uom'],
                 'min_purchase_qty' => $in['min_purchase_qty'],
                 'has_expiry_date' => $in['has_expiry_date'],
@@ -1168,13 +1170,31 @@ class ProductService
                 $obj->category_name = '分類異常';
                 $obj->tertiary_categories_name = '分類異常';
             }
-            //溫層
+            //配送溫層
             switch ($obj->lgst_temperature) {
                 case 'NORMAL':
                     $obj->lgst_temperature_cn = '常溫';
                     break;
+                case 'CHILLED':
+                    $obj->lgst_temperature_cn = '冷藏';
+                    break;
                 default:
                     $obj->lgst_temperature_cn = '';
+                    break;
+            }
+            //存放溫層
+            switch ($obj->storage_temperature) {
+                case 'NORMAL':
+                    $obj->storage_temperature_cn = '常溫';
+                    break;
+                case 'AIR':
+                    $obj->storage_temperature_cn = '空調';
+                    break;
+                case 'CHILLED':
+                    $obj->storage_temperature_cn = '冷藏';
+                    break;
+                default:
+                    $obj->storage_temperature_cn = '';
                     break;
             }
             //商品交期

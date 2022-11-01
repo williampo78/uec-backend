@@ -252,7 +252,8 @@ class ProductController extends Controller
             "brand_name" => "品牌",
             "model" => "商品型號",
             "selling_channel_cn" => "商品通路", //商品通路
-            "lgst_temperature_cn" => "溫層",
+            "lgst_temperature_cn" => "配送溫層",
+            "storage_temperature_cn" => "存放溫層",
             "lgst_method_cn" => "配送方式",
             "delivery_type_cn" => "商品交期",
             "has_expiry_date_cn" => "效期控管",

@@ -199,14 +199,47 @@
                                     </label>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row form-group">
                             <div class="col-sm-6">
                                 <div class="col-sm-2 no-pa">
-                                    <label class="control-label">溫層<span class="text-red">*</span></label>
+                                    <label class="control-label">配送溫層<span class="text-red">*</span></label>
                                 </div>
-                                <div class="col-sm-9">
+                                <div class="col-sm-2">
                                     <label class="radio-inline">
                                         <input type="radio" name="lgst_temperature" value="NORMAL"
                                             {{ $products->lgst_temperature == 'NORMAL' ? 'checked' : 'disabled' }}> 常溫
+                                    </label>
+                                </div>
+                                <div class="col-sm-2">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="lgst_temperature" value="CHILLED"
+                                            {{ $products->lgst_temperature == 'CHILLED' ? 'checked' : 'disabled' }}> 冷藏
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row form-group">
+                            <div class="col-sm-6">
+                                <div class="col-sm-2 no-pa">
+                                    <label class="control-label">存放溫層<span class="text-red">*</span></label>
+                                </div>
+                                <div class="col-sm-2">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="storage_temperature" value="NORMAL"
+                                            {{ $products->storage_temperature == 'NORMAL' ? 'checked' : 'disabled' }}> 常溫
+                                    </label>
+                                </div>
+                                <div class="col-sm-2">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="storage_temperature" value="AIR"
+                                            {{ $products->storage_temperature == 'AIR' ? 'checked' : 'disabled' }}> 空調
+                                    </label>
+                                </div>
+                                <div class="col-sm-2">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="storage_temperature" value="CHILLED"
+                                            {{ $products->storage_temperature == 'CHILLED' ? 'checked' : 'disabled' }}> 冷藏
                                     </label>
                                 </div>
                             </div>
