@@ -306,14 +306,16 @@ class OrderController extends Controller
                 // 累計已銷退的會員點數扣抵金額
                 $orderDetails['returned_point_discount'] = number_format($orderDetail->returned_point_discount);
 
+                $shipmentData = $this->orderService->getShipmentByOrderNoAndSeq($payload['order_no'], $orderDetail->seq);
+
                 // 出貨單號
-                if (isset($orderDetail->shipmentDetailSeq)) {
-                    $orderDetails['shipment_no'] = $orderDetail->shipmentDetailSeq->shipment->shipment_no;
+                if (!empty($shipmentData)) {
+                    $orderDetails['shipment_no'] = $shipmentData->shipment_no;
                 }
 
                 // 出貨單狀態
-                if (isset($orderDetail->shipmentDetailSeq)) {
-                    $orderDetails['status_code'] = config('uec.shipment_status_code_options')[$orderDetail->shipmentDetailSeq->shipment->status_code];
+                if (!empty($shipmentData)) {
+                    $orderDetails['shipment_no'] = $shipmentData->status_code;
                 }
 
                 $payload['order_details'][] = $orderDetails;

@@ -1250,6 +1250,30 @@ class OrderService
     }
 
     /**
+     * 依訂單編號與項次找出出貨貨態
+     *
+     * @param string $orderNo
+     * @param string $seq
+     * @return Collection
+     */
+    public function getShipmentByOrderNoAndSeq(string $orderNo, string $seq)
+    {
+        $data = Order::select('shipments.shipment_no', 'shipments.status_code')
+            ->join('order_details', 'order_details.order_id', 'orders.id')
+            ->join('shipments', 'shipments.order_no', 'orders.order_no')
+            ->join("shipment_details", function ($join) {
+                $join->on('shipment_details.shipment_id', 'shipments.id')
+                    ->on('shipment_details.order_detail_seq', 'order_details.seq');
+            })
+            ->where('orders.order_no', $orderNo)
+            ->where('order_details.seq', $seq)
+            ->where('orders.is_latest', 1)
+            ->get();
+
+        return $data;
+    }
+
+    /**
      * 檢查會員訂單前一版訂單
      *
      * @param string $orderNo
