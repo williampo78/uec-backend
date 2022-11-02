@@ -557,16 +557,10 @@
                                         @foreach ($payment_method_options as $key => $val)
                                             <div class="col-sm-6">
                                                 <label class="radio-inline ps-3">
-                                                    @if ($payment_method_options_lock[$key])
-                                                        <input class="payment_method" type="checkbox" name="payment_method[]"
-                                                            value="{{ $key }}" checked onclick="return false">
-                                                        {{ $val }}
-                                                    @else
-                                                        <input class="payment_method" type="checkbox" name="payment_method[]"
-                                                            value="{{ $key }}"
-                                                            {{ in_array($key, $payment_method) ? 'checked' : '' }}>
-                                                        {{ $val }}
-                                                    @endif
+                                                    <input class="payment_method" type="checkbox" name="payment_method[]"
+                                                        value="{{ $key }}"
+                                                        {{ in_array($key, $payment_method) ? 'checked' : '' }}>
+                                                    {{ $val }}
                                                 </label>
                                             </div>
                                         @endforeach

@@ -358,10 +358,12 @@ class ProductService
                 'updated_by' => $user_id,
                 'updated_at' => $now,
             ];
-             //付款方式
-             if (isset($in['payment_method'])) {
+            //付款方式
+            if (isset($in['payment_method'])) {
                 $payment_method_string = implode(",", $in['payment_method']);
-                $insert['payment_method'] = $payment_method_string;
+                $update['payment_method'] = $payment_method_string;
+            } else {
+                $update['payment_method'] = '';
             }
             if (isset($in['spec_dimension']) && $in['spec_dimension'] !== '') {
                 $update['spec_dimension'] = $in['spec_dimension'];
