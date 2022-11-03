@@ -770,7 +770,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return axios({
         method: "POST",
         url: "/backend/promotional-campaign-cart-v2/product-modal/products",
-        data: data
+        params: data
       }).then(function (response) {
         return response.data;
       })["catch"](function (error) {

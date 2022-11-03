@@ -2714,7 +2714,7 @@ jQuery.validator.addMethod("compareDiscountAndSellingPrice", function (value, el
   var productNo = '';
   var errorCount = 0;
   products.forEach(function (product) {
-    if (product.sellingPrice <= value) {
+    if (Number(product.sellingPrice) <= Number(value)) {
       if (errorCount >= 10) {
         productNo += '...';
         return;
