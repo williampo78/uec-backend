@@ -331,8 +331,7 @@ class OrderRefundService
                 'nego_refund_amount'       => is_null($returnExamination->nego_refund_amount) ? '' : number_format($returnExamination->nego_refund_amount),
                 //協商內容備註
                 'nego_remark'              => $returnExamination->nego_remark ?? '',
-                //'refundable_amount'        => number_format($returnExamination->returnable_point_discount - $returnExamination->returnable_amount),
-                'refundable_amount'        => $returnExamination->returnable_point_discount - $returnExamination->returnable_amount,
+                'refundable_amount'        => (int)$returnExamination->returnable_amount,
                 'details'                  => $details ?? []
             ];
         });
@@ -631,11 +630,9 @@ class OrderRefundService
                 'message' => '發生錯誤，檢驗單不存在'
             ];
         }
-        //可退金額的上限
-        $refundableAmount = $returnExamination->returnable_point_discount - $returnExamination->returnable_amount;
 
         //退款金額大於可退金額
-        if($payload['nego_refund_amount'] > $refundableAmount){
+        if ($payload['nego_refund_amount'] > $returnExamination->returnable_amount) {
             return [
                 'status'  => false,
                 'message' => '發生錯誤，退款金額大於可退款金額'
