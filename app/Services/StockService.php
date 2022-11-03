@@ -42,6 +42,27 @@ class StockService
         return $stock;
     }
 
+    /**
+     *
+     * @param $number
+     * @param $productId
+     *
+     * @return mixed
+     */
+    public function getHasStockItem($number, $productId)
+    {
+        $productItemIds = ProductItem::where('product_id', $productId)->get('id')->pluck('id');
+        return WarehouseStock::select("warehouse_stock.stock_qty as stockQty", "products.order_limited_qty as limitedQty", "warehouse_stock.warehouse_id", "product_items.id", "product_items.item_no")
+            ->join("warehouse", "warehouse.id", "=", "warehouse_stock.warehouse_id")
+            ->join("product_items", "product_items.id", "=", "warehouse_stock.product_item_id")
+            ->join("products", "products.id", "=", "product_items.product_id")
+            ->where("warehouse.delete", "=", "0")
+            ->where("warehouse.number", "=", $number)
+            ->whereIn("warehouse_stock.product_item_id", $productItemIds)
+            ->where("warehouse_stock.stockQty", '>', 0)
+            ->first();
+    }
+
     /*
      * 找出商城的倉庫代碼
      */

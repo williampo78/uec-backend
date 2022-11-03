@@ -738,6 +738,12 @@ class APIOrderService
         return $result;
     }
 
+    private function getGiftProductItem($warehouseCode, $productId)
+    {
+        $productItem = $this->stockService->getHasStockItem($warehouseCode, $productId);
+        return $productItem ? $productItem->toArray() : null;
+    }
+
     /**
      * 訂單
      * @param 購物車清單, 前端的訂單資料
@@ -756,19 +762,20 @@ class APIOrderService
             $utm_info[$utm->product_item_id] = $utm;
         }
 
+        // TODO:
         $product_items = ProductItem::all();
         $prod_info = [];
         $prod_items = [];
-        $prod_gift = [];
         foreach ($product_items as $product_item) {
             $prod_info[$product_item->product_id] = $product_item;
             $prod_items[$product_item->product_id][$product_item->id] = $product_item;
-            $stock = $this->stockService->getStockByItem($warehouseCode, $product_item->id);
-            if (isset($stock)) {
-                if ($stock['stockQty'] > 0) {
-                    $prod_gift[$product_item->product_id] = $product_item;
-                }
-            }
+//          TODO: Remove
+//            $stock = $this->stockService->getStockByItem($warehouseCode, $product_item->id);
+//            if (isset($stock)) {
+//                if ($stock['stockQty'] > 0) {
+//                    $prod_gift[$product_item->product_id] = $product_item;
+//                }
+//            }
         }
         //行銷活動
         $campaign_group = [];
@@ -1006,12 +1013,13 @@ class APIOrderService
                                 if ($productID != $products['productID']) {
                                     foreach ($item['campaignGiftAway']['campaignProdList'] as $gifts => $gift) {
                                         $seq++;
+                                        $tmpGift = $this->getGiftProductItem($warehouseCode, $gift['productId']);
                                         $details[$seq] = [
                                             "order_id" => $newOrder->id,
                                             "seq" => $seq,
                                             "product_id" => $gift['productId'],
-                                            "product_item_id" => $prod_gift[$gift['productId']]['id'],
-                                            "item_no" => $prod_gift[$gift['productId']]['item_no'],
+                                            "product_item_id" => $tmpGift['id'],
+                                            "item_no" => $tmpGift['item_no'],
                                             "selling_price" => $gift['sellingPrice'],
                                             "qty" => $gift['assignedQty'],
                                             "unit_price" => 0,
@@ -1044,8 +1052,8 @@ class APIOrderService
                                             "order_detail_id" => $order_detail_id,
                                             "promotion_campaign_id" => $item['campaignGiftAway']['campaignGiftId'],
                                             "product_id" => $gift['productId'],
-                                            "product_item_id" => $prod_gift[$gift['productId']]['id'],
-                                            "item_no" => $prod_gift[$gift['productId']]['item_no'],
+                                            "product_item_id" => $tmpGift['id'],
+                                            "item_no" => $tmpGift['item_no'],
                                             "discount" => 0,
                                             "record_identity" => "G",
                                             "created_by" => $member_id,
@@ -1089,12 +1097,13 @@ class APIOrderService
                 $campaign_id_gift = 0;
                 foreach ($cart['giftAway'] as $gift) {
                     $seq++;
+                    $tmpGift = $this->getGiftProductItem($warehouseCode, $gift['productId']);
                     $details[$seq] = [
                         "order_id" => $newOrder->id,
                         "seq" => $seq,
                         "product_id" => $gift['productId'],
-                        "product_item_id" => $prod_gift[$gift['productId']]['id'],
-                        "item_no" => $prod_gift[$gift['productId']]['item_no'],
+                        "product_item_id" => $tmpGift['id'],
+                        "item_no" => $tmpGift['item_no'],
                         "selling_price" => $gift['sellingPrice'],
                         "qty" => $gift['assignedQty'],
                         "unit_price" => 0,
@@ -1130,8 +1139,8 @@ class APIOrderService
                         "order_detail_id" => $order_detail_id,
                         "promotion_campaign_id" => $gift['campaignId'],
                         "product_id" => $gift['productId'],
-                        "product_item_id" => $prod_gift[$gift['productId']]['id'],
-                        "item_no" => $prod_gift[$gift['productId']]['item_no'],
+                        "product_item_id" => $tmpGift['id'],
+                        "item_no" => $tmpGift['item_no'],
                         "discount" => 0,
                         "record_identity" => "G",
                         "created_by" => $member_id,
@@ -1270,16 +1279,18 @@ class APIOrderService
                                     ];
                                     OrderCampaignDiscount::insert($campaign_details[$seq]);
 
+
                                     //同滿額活動不累贈
                                     if ($campaignID != $threshold['campaignID']) {
                                         foreach ($threshold['campaignProdList'] as $gift) {
+                                            $tmpGift = $this->getGiftProductItem($warehouseCode, $gift['productId']);
                                             $seq++;
                                             $details[$seq] = [
                                                 "order_id" => $newOrder->id,
                                                 "seq" => $seq,
                                                 "product_id" => $gift['productId'],
-                                                "product_item_id" => $prod_gift[$gift['productId']]['id'],
-                                                "item_no" => $prod_gift[$gift['productId']]['item_no'],
+                                                "product_item_id" => $tmpGift['id'],
+                                                "item_no" => $tmpGift['item_no'],
                                                 "selling_price" => $gift['sellingPrice'],
                                                 "qty" => $gift['assignedQty'],
                                                 "unit_price" => 0,
@@ -1312,8 +1323,8 @@ class APIOrderService
                                                 "order_detail_id" => $order_detail_id,
                                                 "promotion_campaign_id" => $threshold['campaignID'],
                                                 "product_id" => $gift['productId'],
-                                                "product_item_id" => $prod_gift[$gift['productId']]['id'],
-                                                "item_no" => $prod_gift[$gift['productId']]['item_no'],
+                                                "product_item_id" => $tmpGift['id'],
+                                                "item_no" => $tmpGift['item_no'],
                                                 "discount" => 0,
                                                 "record_identity" => "G",
                                                 "campaign_threshold_id" => $threshold_prod['thresholdGiftaway'][$product_id],
