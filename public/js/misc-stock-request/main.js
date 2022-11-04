@@ -1564,8 +1564,8 @@ var render = function () {
                 _c(
                   "div",
                   {
-                    staticClass: "table-responsive overflow-scroll",
-                    staticStyle: { "max-height": "50vh" },
+                    staticClass: "table-responsive",
+                    staticStyle: { "max-height": "50vh", "overflow-y": "auto" },
                   },
                   [
                     _c(

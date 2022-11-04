@@ -19,6 +19,12 @@
         @endif
 
         <div id="page-wrapper">
+             <!-- 表頭名稱 -->
+             <div class="row">
+                <div class="col-sm-12">
+                    <h1 class="page-header"><span class="fa-solid fa-plus"></span> 單品活動 編輯資料</h1>
+                </div>
+            </div>
             <div class="row">
                 <div class="col-sm-12">
                     <div class="panel panel-default">
@@ -30,291 +36,243 @@
                                 @csrf
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        <div class="form-horizontal">
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <div class="col-sm-2">
-                                                            <label class="control-label">活動名稱 <span
-                                                                    style="color: red;">*</span></label>
-                                                        </div>
-                                                        <div class="col-sm-10">
-                                                            <input type="text" class="form-control" name="campaign_name"
-                                                                v-model="form.campaignName">
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <div class="col-sm-2">
-                                                            <label class="control-label">狀態 <span
-                                                                    style="color: red;">*</span></label>
-                                                        </div>
-                                                        <div class="col-sm-10">
-                                                            <label class="radio-inline">
-                                                                <input type="radio" name="active" value="1"
-                                                                    v-model="form.active">生效
-                                                            </label>
-                                                            <label class="radio-inline">
-                                                                <input type="radio" name="active" value="0"
-                                                                    v-model="form.active">失效
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <br />
-
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <div class="col-sm-2">
-                                                            <label class="control-label">活動類型 <span
-                                                                    style="color: red;">*</span></label>
-                                                        </div>
-                                                        <div class="col-sm-10">
-                                                            <select2
-                                                                class="form-control"
-                                                                :options="campaignTypes"
-                                                                v-model="form.campaignType"
-                                                                name="campaign_type"
-                                                                @select2-selecting="onCampaignTypeSelecting"
-                                                                :allow-clear="false"
-                                                            >
-                                                                <option disabled value=""></option>
-                                                            </select2>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <div class="row">
-                                                        <div class="col-sm-6">
-                                                            <div class="form-group">
-                                                                <div class="col-sm-4">
-                                                                    <label class="control-label">N (滿額) = <span
-                                                                            style="color: red;">*</span></label>
-                                                                </div>
-                                                                <div class="col-sm-8">
-                                                                    <input type="number" class="form-control"
-                                                                        name="n_value" v-model="form.nValue" min="1"
-                                                                        :disabled="isNowGreaterThanOrEqualToStartAt">
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-6" v-if="showXValue">
-                                                            <div class="form-group">
-                                                                <div class="col-sm-3">
-                                                                    <label class="control-label">X (折扣) = <span
-                                                                            style="color: red;">*</span></label>
-                                                                </div>
-                                                                <div class="col-sm-5">
-                                                                    <input type="number" class="form-control"
-                                                                        name="x_value" v-model="form.xValue"
-                                                                        :disabled="isNowGreaterThanOrEqualToStartAt">
-                                                                </div>
-                                                                <div class="col-sm-4" v-if="showXValueHint">
-                                                                    <p class="form-control-static">打85折，輸入0.85</p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <br />
-
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <div class="col-sm-2">
-                                                            <label class="control-label">上架時間起 <span
-                                                                    style="color: red;">*</span></label>
-                                                        </div>
-                                                        <div class="col-sm-10">
-                                                            <div class="input-group" id="start_at_flatpickr">
-                                                                <input type="text" class="form-control" name="start_at"
-                                                                    autocomplete="off" data-input v-model="form.startAt"
-                                                                    :disabled="isNowGreaterThanOrEqualToStartAt">
-                                                                <span class="input-group-btn" data-toggle>
-                                                                    <button class="btn btn-default" type="button">
-                                                                        <i class="fa-solid fa-calendar-days"></i>
-                                                                    </button>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <div class="col-sm-2">
-                                                            <label class="control-label">上架時間訖 <span
-                                                                    style="color: red;">*</span></label>
-                                                        </div>
-                                                        <div class="col-sm-10">
-                                                            <div class="input-group" id="end_at_flatpickr">
-                                                                <input type="text" class="form-control" name="end_at"
-                                                                    autocomplete="off" data-input v-model="form.endAt">
-                                                                <span class="input-group-btn" data-toggle>
-                                                                    <button class="btn btn-default" type="button">
-                                                                        <i class="fa-solid fa-calendar-days"></i>
-                                                                    </button>
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <br />
-
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <div class="col-sm-2">
-                                                            <label class="control-label">前台文案 <span
-                                                                    style="color: red;">*</span></label>
-                                                        </div>
-                                                        <div class="col-sm-10">
-                                                            <input type="text" class="form-control" name="campaign_brief"
-                                                                v-model="form.campaignBrief">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <div class="col-sm-2">
-                                                            <label class="control-label">
-                                                                庫存類型 <span style="color: red;">*</span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="col-sm-10">
-                                                            <label class="radio-inline">
-                                                                <input
-                                                                    type="radio"
-                                                                    name="stock_type"
-                                                                    value="A_B"
-                                                                    v-model="form.stockType"
-                                                                    @click="clickStockType"
-                                                                    :disabled="isNowGreaterThanOrEqualToStartAt"
-                                                                >買斷 / 寄售
-                                                            </label>
-                                                            <label class="radio-inline">
-                                                                <input
-                                                                    type="radio"
-                                                                    name="stock_type"
-                                                                    value="T"
-                                                                    v-model="form.stockType"
-                                                                    @click="clickStockType"
-                                                                    :disabled="isNowGreaterThanOrEqualToStartAt"
-                                                                >轉單
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-6">
-                                                    <div class="form-group">
-                                                        <div class="col-sm-2">
-                                                            <label class="control-label">
-                                                                供應商 <span style="color: red;">*</span>
-                                                            </label>
-                                                        </div>
-                                                        <div class="col-sm-10">
-                                                            <select2
-                                                                class="form-control"
-                                                                :options="suppliers"
-                                                                v-model="form.supplierId"
-                                                                name="supplier_id"
-                                                                :allow-clear="false"
-                                                                @select2-selecting="onSupplierSelecting"
-                                                                :disabled="isNowGreaterThanOrEqualToStartAt"
-                                                            >
-                                                                <option disabled value=""></option>
-                                                            </select2>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <hr style="border-top: 1px solid gray;" />
-                                        </div>
-
-                                        <div>
-                                            <div class="form-group">
-                                                <label class="control-label">適用對象 <span
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">活動名稱 <span
                                                         style="color: red;">*</span></label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" name="campaign_name"
+                                                    v-model="form.campaignName">
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">狀態 <span
+                                                        style="color: red;">*</span></label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="active" value="1"
+                                                        v-model="form.active">生效
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="active" value="0"
+                                                        v-model="form.active">失效
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">活動類型 <span
+                                                        style="color: red;">*</span></label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <select2
+                                                    class="form-control"
+                                                    :options="campaignTypes"
+                                                    v-model="form.campaignType"
+                                                    name="campaign_type"
+                                                    @select2-selecting="onCampaignTypeSelecting"
+                                                    :allow-clear="false"
+                                                >
+                                                    <option disabled value=""></option>
+                                                </select2>
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">N (滿額) = <span
+                                                        style="color: red;">*</span></label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <div class="row">
+                                                    <div class="col-sm-5 mb-md-0 mb-4">
+                                                        <input type="number" class="form-control"
+                                                            name="n_value" v-model="form.nValue" min="1"
+                                                            :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                    </div>
+                                                    <div class="col-sm-2" v-if="showXValue">
+                                                        <label class="pt-md-2">X (折扣) = <span
+                                                                style="color: red;">*</span></label>
+                                                    </div>
+                                                    <div class="col-sm-3" v-if="showXValue">
+                                                        <input type="number" class="form-control"
+                                                            name="x_value" v-model="form.xValue"
+                                                            :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                    </div>
+                                                    <div class="col-sm-2" v-if="showXValue && showXValueHint">
+                                                        <p class="form-control-static fs-6">打85折，輸入0.85</p>
+                                                    </div>
 
-                                                <div class="row" style="margin-left: 1rem;">
-                                                    <div class="col-sm-2">
-                                                        <label class="radio-inline">
-                                                            <input type="radio" name="target_groups" value="all"
-                                                                v-model="form.targetGroups"
-                                                                :disabled="isNowGreaterThanOrEqualToStartAt">所有會員
-                                                        </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">上架時間 <span
+                                                        style="color: red;">*</span></label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <div class="row">
+                                                    <div class="col-sm-5">
+                                                        <div class="input-group" id="start_at_flatpickr">
+                                                            <input type="text" class="form-control" name="start_at"
+                                                                autocomplete="off" data-input v-model="form.startAt"
+                                                                :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                            <span class="input-group-btn" data-toggle>
+                                                                <button class="btn btn-default" type="button">
+                                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                                </button>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-2 text-center">
+                                                        <label class="pt-md-2">～</label>
+                                                    </div>
+                                                    <div class="col-sm-5">
+                                                        <div class="input-group" id="end_at_flatpickr">
+                                                            <input type="text" class="form-control" name="end_at"
+                                                                autocomplete="off" data-input v-model="form.endAt">
+                                                            <span class="input-group-btn" data-toggle>
+                                                                <button class="btn btn-default" type="button">
+                                                                    <i class="fa-solid fa-calendar-days"></i>
+                                                                </button>
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <hr style="border-top: 1px solid gray;" />
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">前台文案 <span
+                                                        style="color: red;">*</span></label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" name="campaign_brief"
+                                                    v-model="form.campaignBrief">
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">
+                                                    庫存類型 <span style="color: red;">*</span>
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <label class="radio-inline">
+                                                    <input
+                                                        type="radio"
+                                                        name="stock_type"
+                                                        value="A_B"
+                                                        v-model="form.stockType"
+                                                        @click="clickStockType"
+                                                        :disabled="isNowGreaterThanOrEqualToStartAt"
+                                                    >買斷 / 寄售
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input
+                                                        type="radio"
+                                                        name="stock_type"
+                                                        value="T"
+                                                        v-model="form.stockType"
+                                                        @click="clickStockType"
+                                                        :disabled="isNowGreaterThanOrEqualToStartAt"
+                                                    >轉單
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">
+                                                    供應商 <span style="color: red;">*</span>
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <select2
+                                                    class="form-control"
+                                                    :options="suppliers"
+                                                    v-model="form.supplierId"
+                                                    name="supplier_id"
+                                                    :allow-clear="false"
+                                                    @select2-selecting="onSupplierSelecting"
+                                                    :disabled="isNowGreaterThanOrEqualToStartAt"
+                                                >
+                                                    <option disabled value=""></option>
+                                                </select2>
+                                            </div>
+                                        </div>
+                                        <div class="row form-group">
+                                            <div class="col-sm-2">
+                                                <label class="pt-md-2">適用對象 <span
+                                                    style="color: red;">*</span></label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="target_groups" value="all"
+                                                        v-model="form.targetGroups"
+                                                        :disabled="isNowGreaterThanOrEqualToStartAt">所有會員
+                                                </label>
+                                            </div>
                                         </div>
 
-                                        <div>
-                                            <div class="row">
-                                                <div class="col-sm-1">
-                                                    <p>單品清單</p>
-                                                </div>
-                                                <div class="col-sm-2" v-if="!isNowGreaterThanOrEqualToStartAt">
-                                                    <button type="button" class="btn btn-warning btn-sm"
-                                                        @click="addProduct">
-                                                        <i class="fa-solid fa-plus"></i> 新增單品
-                                                    </button>
-                                                </div>
+                                        <hr style="border-top: 1px solid gray;" />
+                                        <div class="row">
+                                            <div class="col-sm-2">
+                                                <p>單品清單</p>
                                             </div>
-                                            <br>
-
-                                            <div class="table-responsive">
-                                                <table class='table table-striped table-bordered table-hover'
-                                                    style='width:100%'>
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="text-nowrap">項次</th>
-                                                            <th class="text-nowrap">商品序號</th>
-                                                            <th class="text-nowrap">商品名稱</th>
-                                                            <th class="text-nowrap">售價(含稅)</th>
-                                                            <th class="text-nowrap">上架日期</th>
-                                                            <th class="text-nowrap">上架狀態</th>
-                                                            <th class="text-nowrap">毛利(%)</th>
-                                                            <th class="text-nowrap"
-                                                                v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <tr v-for="(product, index) in form.products"
-                                                            :key="index">
-                                                            <input type="hidden" :name="`products[${index}][id]`"
-                                                                :value="product.id">
-                                                            <input type="hidden" :name="`products[${index}][product_id]`"
-                                                                :value="product.productId">
-                                                            <td>@{{ index + 1 }}</td>
-                                                            <td>@{{ product.productNo }}</td>
-                                                            <td>@{{ product.productName }}</td>
-                                                            <td>@{{ product.sellingPriceForDisplay }}</td>
-                                                            <td>@{{ product.launchedAt }}</td>
-                                                            <td>@{{ product.launchStatus }}</td>
-                                                            <td>@{{ product.grossMargin }}</td>
-                                                            <td v-if="!isNowGreaterThanOrEqualToStartAt">
-                                                                <button type="button" class="btn btn-danger"
-                                                                    @click="deleteProduct(index)">
-                                                                    <i class="fa-solid fa-trash-can"></i> 刪除
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                                            <div class="col-sm-10" v-if="!isNowGreaterThanOrEqualToStartAt">
+                                                <button type="button" class="btn btn-warning btn-sm"
+                                                    @click="addProduct">
+                                                    <i class="fa-solid fa-plus"></i> 新增單品
+                                                </button>
                                             </div>
+                                        </div>
+                                        <br>
 
-                                            <hr style="border-top: 1px solid gray;" />
+                                        <div class="table-responsive">
+                                            <table class='table table-striped table-bordered table-hover'
+                                                style='width:100%'>
+                                                <thead>
+                                                    <tr>
+                                                        <th class="text-nowrap">項次</th>
+                                                        <th class="text-nowrap">商品序號</th>
+                                                        <th class="text-nowrap">商品名稱</th>
+                                                        <th class="text-nowrap">售價(含稅)</th>
+                                                        <th class="text-nowrap">上架日期</th>
+                                                        <th class="text-nowrap">上架狀態</th>
+                                                        <th class="text-nowrap">毛利(%)</th>
+                                                        <th class="text-nowrap"
+                                                            v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(product, index) in form.products"
+                                                        :key="index">
+                                                        <input type="hidden" :name="`products[${index}][id]`"
+                                                            :value="product.id">
+                                                        <input type="hidden" :name="`products[${index}][product_id]`"
+                                                            :value="product.productId">
+                                                        <td>@{{ index + 1 }}</td>
+                                                        <td>@{{ product.productNo }}</td>
+                                                        <td>@{{ product.productName }}</td>
+                                                        <td>@{{ product.sellingPriceForDisplay }}</td>
+                                                        <td>@{{ product.launchedAt }}</td>
+                                                        <td>@{{ product.launchStatus }}</td>
+                                                        <td>@{{ product.grossMargin }}</td>
+                                                        <td v-if="!isNowGreaterThanOrEqualToStartAt">
+                                                            <button type="button" class="btn btn-danger"
+                                                                @click="deleteProduct(index)">
+                                                                <i class="fa-solid fa-trash-can"></i> 刪除
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
 
+                                            <hr style="border-top: 1px solid gray;" />
                                         <div v-if="showGiveaway">
                                             <div class="row">
                                                 <div class="col-sm-1">

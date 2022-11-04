@@ -80,15 +80,15 @@
                                                         <input type="number" class="form-control" name="n_value"
                                                             v-model="form.nValue" min="1">
                                                     </div>
-                                                    <div class="col-sm-2">
+                                                    <div class="col-sm-2" v-if="showXValue">
                                                         <label class="pt-md-2">X (折扣) = <span
                                                                 style="color: red;">*</span></label>
                                                     </div>
-                                                    <div class="col-sm-3">
+                                                    <div class="col-sm-3" v-if="showXValue">
                                                         <input type="number" class="form-control" name="x_value"
                                                             v-model="form.xValue">
                                                     </div>
-                                                    <div class="col-sm-2" v-if="showXValueHint">
+                                                    <div class="col-sm-2" v-if="showXValue && showXValueHint">
                                                         <p class="form-control-static fs-6">(打85折，輸入0.85)</p>
                                                     </div>
                                                 </div>

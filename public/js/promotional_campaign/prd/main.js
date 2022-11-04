@@ -470,14 +470,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     modal: {
@@ -2150,141 +2142,138 @@ var render = function () {
                 _vm._v(" "),
                 _c("div", { staticClass: "row" }, [
                   _c("div", { staticClass: "col-sm-12" }, [
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        attrs: { type: "button" },
-                        on: { click: _vm.checkAll },
-                      },
-                      [
-                        _c("i", { staticClass: "fa-solid fa-check" }),
-                        _vm._v(" 全勾選\n                                "),
-                      ]
-                    ),
+                    _c("label", { staticClass: "radio-inline" }, [
+                      _c("input", {
+                        attrs: { type: "radio", value: "checkValue" },
+                        on: { change: _vm.checkAll },
+                      }),
+                      _vm._v(" 全勾選\n                                "),
+                    ]),
                     _vm._v(" "),
-                    _c(
-                      "button",
-                      {
-                        staticClass: "btn btn-primary",
-                        attrs: { type: "button" },
-                        on: { click: _vm.cancelAll },
-                      },
-                      [
-                        _c("i", { staticClass: "fa-solid fa-xmark" }),
-                        _vm._v(" 全取消\n                                "),
-                      ]
-                    ),
+                    _c("label", { staticClass: "radio-inline" }, [
+                      _c("input", {
+                        attrs: { type: "radio", value: "checkValue" },
+                        on: { change: _vm.cancelAll },
+                      }),
+                      _vm._v(" 全取消\n                                "),
+                    ]),
                   ]),
                 ]),
                 _vm._v(" "),
                 _c("br"),
                 _vm._v(" "),
-                _c("div", { staticClass: "table-responsive" }, [
-                  _c(
-                    "table",
-                    {
-                      staticClass:
-                        "table table-striped table-bordered table-hover",
-                      staticStyle: { width: "100%" },
-                    },
-                    [
-                      _vm._m(17),
-                      _vm._v(" "),
-                      _c(
-                        "tbody",
-                        _vm._l(_vm.products, function (product, index) {
-                          return _c("tr", { key: index }, [
-                            _c("td", [_vm._v(_vm._s(index + 1))]),
-                            _vm._v(" "),
-                            _c("td", { staticClass: "text-center" }, [
-                              _c("input", {
-                                directives: [
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: product.checked,
-                                    expression: "product.checked",
+                _c(
+                  "div",
+                  {
+                    staticClass: "table-responsive",
+                    staticStyle: { "max-height": "50vh", "overflow-y": "auto" },
+                  },
+                  [
+                    _c(
+                      "table",
+                      {
+                        staticClass:
+                          "table table-striped table-bordered table-hover",
+                        staticStyle: { width: "100%" },
+                      },
+                      [
+                        _vm._m(17),
+                        _vm._v(" "),
+                        _c(
+                          "tbody",
+                          _vm._l(_vm.products, function (product, index) {
+                            return _c("tr", { key: index }, [
+                              _c("td", [_vm._v(_vm._s(index + 1))]),
+                              _vm._v(" "),
+                              _c("td", { staticClass: "text-center" }, [
+                                _c("input", {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: product.checked,
+                                      expression: "product.checked",
+                                    },
+                                  ],
+                                  staticStyle: {
+                                    width: "20px",
+                                    height: "20px",
+                                    cursor: "pointer",
                                   },
-                                ],
-                                staticStyle: {
-                                  width: "20px",
-                                  height: "20px",
-                                  cursor: "pointer",
-                                },
-                                attrs: { type: "checkbox" },
-                                domProps: {
-                                  checked: Array.isArray(product.checked)
-                                    ? _vm._i(product.checked, null) > -1
-                                    : product.checked,
-                                },
-                                on: {
-                                  change: function ($event) {
-                                    var $$a = product.checked,
-                                      $$el = $event.target,
-                                      $$c = $$el.checked ? true : false
-                                    if (Array.isArray($$a)) {
-                                      var $$v = null,
-                                        $$i = _vm._i($$a, $$v)
-                                      if ($$el.checked) {
-                                        $$i < 0 &&
-                                          _vm.$set(
-                                            product,
-                                            "checked",
-                                            $$a.concat([$$v])
-                                          )
+                                  attrs: { type: "checkbox" },
+                                  domProps: {
+                                    checked: Array.isArray(product.checked)
+                                      ? _vm._i(product.checked, null) > -1
+                                      : product.checked,
+                                  },
+                                  on: {
+                                    change: function ($event) {
+                                      var $$a = product.checked,
+                                        $$el = $event.target,
+                                        $$c = $$el.checked ? true : false
+                                      if (Array.isArray($$a)) {
+                                        var $$v = null,
+                                          $$i = _vm._i($$a, $$v)
+                                        if ($$el.checked) {
+                                          $$i < 0 &&
+                                            _vm.$set(
+                                              product,
+                                              "checked",
+                                              $$a.concat([$$v])
+                                            )
+                                        } else {
+                                          $$i > -1 &&
+                                            _vm.$set(
+                                              product,
+                                              "checked",
+                                              $$a
+                                                .slice(0, $$i)
+                                                .concat($$a.slice($$i + 1))
+                                            )
+                                        }
                                       } else {
-                                        $$i > -1 &&
-                                          _vm.$set(
-                                            product,
-                                            "checked",
-                                            $$a
-                                              .slice(0, $$i)
-                                              .concat($$a.slice($$i + 1))
-                                          )
+                                        _vm.$set(product, "checked", $$c)
                                       }
-                                    } else {
-                                      _vm.$set(product, "checked", $$c)
-                                    }
+                                    },
                                   },
-                                },
-                              }),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(product.productNo))]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(product.productName))]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(_vm._s(product.sellingPriceForDisplay)),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(
-                                "\n                                            " +
-                                  _vm._s(product.launchedAt) +
-                                  "\n                                        "
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [
-                              _vm._v(
-                                "\n                                            " +
-                                  _vm._s(product.launchStatus) +
-                                  "\n                                        "
-                              ),
-                            ]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(product.grossMargin))]),
-                            _vm._v(" "),
-                            _c("td", [_vm._v(_vm._s(product.supplier))]),
-                          ])
-                        }),
-                        0
-                      ),
-                    ]
-                  ),
-                ]),
+                                }),
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v(_vm._s(product.productNo))]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v(_vm._s(product.productName))]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(_vm._s(product.sellingPriceForDisplay)),
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  "\n                                            " +
+                                    _vm._s(product.launchedAt) +
+                                    "\n                                        "
+                                ),
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [
+                                _vm._v(
+                                  "\n                                            " +
+                                    _vm._s(product.launchStatus) +
+                                    "\n                                        "
+                                ),
+                              ]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v(_vm._s(product.grossMargin))]),
+                              _vm._v(" "),
+                              _c("td", [_vm._v(_vm._s(product.supplier))]),
+                            ])
+                          }),
+                          0
+                        ),
+                      ]
+                    ),
+                  ]
+                ),
               ]),
             ]),
           ]),
