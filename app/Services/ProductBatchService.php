@@ -282,103 +282,84 @@ class ProductBatchService
                 Log::channel('batch_upload')->warning("{$supplier_product_no}");
 
                 $productBasice = $product['productBasice'];
-                $errorContent = [
-                    'rowNum' => $productBasice['rowNum'],
-                    'supplierProductNo' => $supplier_product_no,
-                    'errorMessage' => '',
-                ];
+                $errorMessage = [];
+
                 //「庫存類型」未填寫
                 if (empty($productBasice['stock_type'])) {
-                    $errorContent['errorMessage'] = '「庫存類型」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「庫存類型」未填寫';
                 }
                 //「庫存類型」須為「B」或「T」
                 if (!empty($productBasice['stock_type']) && !in_array($productBasice['stock_type'], ['A', 'B', 'T'])) {
-                    $errorContent['errorMessage'] = '「庫存類型」須為「A」或「B」或「T」';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「庫存類型」須為「A」或「B」或「T」';
                 }
                 //「供應商代碼」未填寫
                 if (empty($productBasice['display_number'])) {
-                    $errorContent['errorMessage'] = '「供應商代碼」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「供應商代碼」未填寫';
                 }
                 //「供應商代碼」錯誤
                 if (!empty($productBasice['display_number'])) {
                     $supplierIsset = $supplier->where('display_number', $productBasice['display_number'])->first();
                     if (!$supplierIsset) {
-                        $errorContent['errorMessage'] = '「供應商代碼」錯誤';
-                        array_push($result, $errorContent);
+                        $errorMessage[] = '「供應商代碼」錯誤';
                     };
                 }
                 //「商品名稱」未填寫
                 if (empty($productBasice['product_name'])) {
-                    $errorContent['errorMessage'] = '「商品名稱」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「商品名稱」未填寫';
                 }
                 //「商品名稱」不可超過100個字
                 if (!empty($productBasice['product_name']) && mb_strlen($productBasice['product_name']) > 100) {
-                    $errorContent['errorMessage'] = '「商品名稱」不可超過100個字';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「商品名稱」不可超過100個字';
                 }
                 //「品牌」未填寫
                 if (empty($productBasice['brand_name'])) {
-                    $errorContent['errorMessage'] = '「品牌」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「品牌」未填寫';
                 }
                 //「品牌」不存在
                 if (!empty($productBasice['brand_name'])) {
                     $brandIsset = $brands->where('brand_name', $productBasice['brand_name'])->first();
                     if (!$brandIsset) {
-                        $errorContent['errorMessage'] = '「品牌」不存在';
-                        array_push($result, $errorContent);
+                        $errorMessage[] = '「品牌」不存在';
                     }
                 }
                 //「廠商料號」未填寫
                 if (empty($supplier_product_no)) {
-                    $errorContent['errorMessage'] = '「廠商料號」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「廠商料號」未填寫';
                 }
 
                 //「商品類型」未填寫
                 if (empty($productBasice['product_type'])) {
-                    $errorContent['errorMessage'] = '「商品類型」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「商品類型」未填寫';
                 }
                 // 「商品類型」須為「N」或「G」
                 if (!empty($productBasice['product_type']) && !in_array($productBasice['product_type'], ['N', 'G'])) {
-                    $errorContent['errorMessage'] = '「商品類型」須為「N」或「G」';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「商品類型」須為「N」或「G」';
                 }
                 // 「規格」須為「0」、「1」、或「2」
                 if (!empty($productBasice['spec_dimension']) && !in_array($productBasice['spec_dimension'], ['0', '1', '2'])) {
-                    $errorContent['errorMessage'] = '「規格」須為「0」、「1」、或「2」';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「規格」須為「0」、「1」、或「2」';
                 }
                 switch ($productBasice['spec_dimension']) {
                     case '0':
                         //  單規格商品不可填寫「規格一(名稱)」、「規格二(名稱)」
                         if (!empty($productBasice['spec_1']) || !empty($productBasice['spec_2'])) {
-                            $errorContent['errorMessage'] = '單規格商品不可填寫「規格一(名稱)」、「規格二(名稱)」';
-                            array_push($result, $errorContent);
+                            $errorMessage[] = '單規格商品不可填寫「規格一(名稱)」、「規格二(名稱)」';
                         }
                         break;
                     case '1':
                         //一維多規格商品須填寫「規格一(名稱)」
                         if (empty($productBasice['spec_1'])) {
-                            $errorContent['errorMessage'] = '一維多規格商品須填寫「規格一(名稱)」';
-                            array_push($result, $errorContent);
+                            $errorMessage[] = '一維多規格商品須填寫「規格一(名稱)」';
                         }
                         //  一維多規格商品不可填寫「規格二(名稱)」
                         if (!empty($productBasice['spec_2'])) {
-                            $errorContent['errorMessage'] = '一維多規格商品不可填寫「規格二(名稱)」';
-                            array_push($result, $errorContent);
+                            $errorMessage[] = '一維多規格商品不可填寫「規格二(名稱)」';
                         }
                         break;
                     case '2':
                         // 二維多規格商品須填寫「規格一(名稱)」、「規格二(名稱)」
                         if (empty($productBasice['spec_1']) || empty($productBasice['spec_2'])) {
-                            $errorContent['errorMessage'] = '二維多規格商品須填寫「規格一(名稱)」、「規格二(名稱)」';
-                            array_push($result, $errorContent);
+                            $errorMessage[] = '二維多規格商品須填寫「規格一(名稱)」、「規格二(名稱)」';
                         }
                         break;
                     default:
@@ -387,288 +368,241 @@ class ProductBatchService
                 }
                 //「規格一(名稱)」最長只能有4個字
                 if (!empty($productBasice['spec_1']) && mb_strlen($productBasice['spec_1']) > 4) {
-                    $errorContent['errorMessage'] = '「規格一(名稱)」最長只能有4個字';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「規格一(名稱)」最長只能有4個字';
                 }
                 // 「規格二(名稱)」最長只能有4個字
                 if (!empty($productBasice['spec_2']) && mb_strlen($productBasice['spec_2']) > 4) {
-                    $errorContent['errorMessage'] = ' 「規格二(名稱)」最長只能有4個字';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = ' 「規格二(名稱)」最長只能有4個字';
                 }
 
                 // 「單位」未填寫
                 if (empty($productBasice['uom'])) {
-                    $errorContent['errorMessage'] = '「單位」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「單位」未填寫';
                 }
                 //「單位」不可超過10個字
                 if (!empty($productBasice['uom']) && mb_strlen($productBasice['uom']) > 10) {
-                    $errorContent['errorMessage'] = '「單位」不可超過10個字';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「單位」不可超過10個字';
                 }
                 // 「材積_長」未填寫
                 if (empty($productBasice['length'])) {
-                    $errorContent['errorMessage'] = '「材積_長」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「材積_長」未填寫';
                 }
                 //「材積_長」須為正整數
                 if (!empty($productBasice['length']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['length'])) {
-                    $errorContent['errorMessage'] = '「材積_長」須為正整數';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「材積_長」須為正整數';
                 }
                 //「材積_寬」未填寫
                 if (empty($productBasice['width'])) {
-                    $errorContent['errorMessage'] = '「材積_寬」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「材積_寬」未填寫';
                 }
                 //「材積_寬」須為正整數
                 if (!empty($productBasice['width']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['width'])) {
-                    $errorContent['errorMessage'] = '「材積_寬」須為正整數';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「材積_寬」須為正整數';
                 }
                 // 「材積_高」未填寫
                 if (empty($productBasice['height'])) {
-                    $errorContent['errorMessage'] = '「材積_高」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「材積_高」未填寫';
                 }
                 // 「材積_高」須為正整數
                 if (!empty($productBasice['height']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['height'])) {
-                    $errorContent['errorMessage'] = '「材積_高」須為正整數';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「材積_高」須為正整數';
                 }
                 //  「重量」未填寫
                 if (empty($productBasice['weight'])) {
-                    $errorContent['errorMessage'] = '「重量」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「重量」未填寫';
                 }
                 //  「重量」須為正整數
                 if (!empty($productBasice['weight']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['weight'])) {
-                    $errorContent['errorMessage'] = '「重量」須為正整數';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「重量」須為正整數';
                 }
                 //  「市價」未填寫
                 if (empty($productBasice['list_price'])) {
-                    $errorContent['errorMessage'] = ' 「市價」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = ' 「市價」未填寫';
                 }
                 // 「市價」須為正整數
                 if (!empty($productBasice['list_price']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['list_price'])) {
-                    $errorContent['errorMessage'] = '「市價」須為正整數';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「市價」須為正整數';
                 }
                 // 「售價」未填寫
                 if (empty($productBasice['selling_price'])) {
-                    $errorContent['errorMessage'] = '「售價」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「售價」未填寫';
                 }
                 // 「售價」須為正整數
                 if (!empty($productBasice['selling_price']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['selling_price'])) {
-                    $errorContent['errorMessage'] = '「售價」須為正整數';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「售價」須為正整數';
                 }
                 // 「成本」未填寫  「買斷」商品不須填寫
                 if (empty($productBasice['purchase_price']) && in_array($productBasice['stock_type'], ['B', 'T'])) {
-                    $errorContent['errorMessage'] = '「成本」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「成本」未填寫';
                 }
                 // 「成本」須為正整數
                 if (!empty($productBasice['purchase_price']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['purchase_price'])) {
-                    $errorContent['errorMessage'] = '「成本」須為正整數';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「成本」須為正整數';
                 }
                 // 「商品簡述1」不可超過60個字
                 if (!empty($productBasice['product_brief_1']) && mb_strlen($productBasice['product_brief_1']) > 60) {
-                    $errorContent['errorMessage'] = '「商品簡述1」不可超過60個字';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「商品簡述1」不可超過60個字';
                 }
                 // 「商品簡述2」不可超過60個字
                 if (!empty($productBasice['product_brief_2']) && mb_strlen($productBasice['product_brief_2']) > 60) {
-                    $errorContent['errorMessage'] = '「商品簡述2」不可超過60個字';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「商品簡述2」不可超過60個字';
                 }
                 // 「商品簡述3」不可超過60個字
                 if (!empty($productBasice['product_brief_3']) && mb_strlen($productBasice['product_brief_3']) > 60) {
-                    $errorContent['errorMessage'] = '「商品簡述3」不可超過60個字';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「商品簡述3」不可超過60個字';
                 }
 
                 // 「有無保固」須為「Y」或「N」
                 if (!empty($productBasice['is_with_warranty_text']) && !in_array($productBasice['is_with_warranty_text'], ['Y', 'N'])) {
-                    $errorContent['errorMessage'] = '「有無保固」須為「Y」或「N」';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「有無保固」須為「Y」或「N」';
                 }
                 // 「保固天數」須為正整數
                 if ($productBasice['is_with_warranty_text'] == 'Y' && empty($productBasice['warranty_days'])) {
-                    $errorContent['errorMessage'] = '「有無保固」填寫Y時 需填寫「保固天數」';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「有無保固」填寫Y時 需填寫「保固天數」';
                 }
                 // 「保固天數」須為正整數
                 if ($productBasice['is_with_warranty_text'] == 'Y' && !preg_match("/^[1-9][0-9]*$/", $productBasice['warranty_days'])) {
-                    $errorContent['errorMessage'] = '「保固天數」須為正整數';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「保固天數」須為正整數';
                 }
                 // 「保固範圍」不可超過250個字
                 if (!empty($productBasice['warranty_scope']) && mb_strlen($productBasice['warranty_scope']) > 250) {
-                    $errorContent['errorMessage'] = '「保固範圍」不可超過250個字';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「保固範圍」不可超過250個字';
                 }
                 //「促銷小標-生效時間起」格式錯誤
                 if ($productBasice['promotion_start_at'] === false) {
-                    $errorContent['errorMessage'] = '「促銷小標-生效時間起」格式錯誤';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「促銷小標-生效時間起」格式錯誤';
                 }
                 //如果有輸入生效時間起，促銷小標-生效時間訖則為必填
                 if (!empty($productBasice['promotion_start_at']) && empty($productBasice['promotion_end_at'])) {
-                    $errorContent['errorMessage'] = '如果有輸入「促銷小標-生效時間起」，「促銷小標-生效時間訖」為必填';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '如果有輸入「促銷小標-生效時間起」，「促銷小標-生效時間訖」為必填';
                 }
                 //「促銷小標-生效時間訖」格式錯誤
                 if ($productBasice['promotion_start_at'] === false) {
-                    $errorContent['errorMessage'] = ' 「促銷小標-生效時間訖」格式錯誤';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = ' 「促銷小標-生效時間訖」格式錯誤';
                 }
 
                 //「促銷小標-生效時間起」不能大於「促銷小標-生效時間訖」
                 if (!empty($productBasice['promotion_start_at']) && !empty($productBasice['promotion_end_at'])) {
                     if ($productBasice['promotion_start_at']->gt($productBasice['promotion_end_at'])) {
-                        $errorContent['errorMessage'] = '「促銷小標-生效時間起」不能大於「促銷小標-生效時間訖」';
-                        array_push($result, $errorContent);
+                        $errorMessage[] = '「促銷小標-生效時間起」不能大於「促銷小標-生效時間訖」';
                     }
                 }
                 //「效期控管」未填寫
                 if (empty($productBasice['has_expiry_date_text'])) {
-                    $errorContent['errorMessage'] = '「效期控管」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「效期控管」未填寫';
                 }
                 // 「有無保固」須為「Y」或「N」
                 if (!empty($productBasice['has_expiry_date_text']) && !in_array($productBasice['has_expiry_date_text'], ['Y', 'N'])) {
-                    $errorContent['errorMessage'] = '「效期控管」須為「Y」或「N」';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「效期控管」須為「Y」或「N」';
                 }
                 // 「效期控管天數」須為正整數
                 if ($productBasice['has_expiry_date_text'] == 'Y' && !preg_match("/^[1-9][0-9]*$/", $productBasice['expiry_days'])) {
-                    $errorContent['errorMessage'] = '「效期控管天數」須為正整數';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「效期控管天數」須為正整數';
                 }
                 // 「效期控管」為「Y」時「效期控管天數」為必填
                 if ($productBasice['has_expiry_date_text'] == 'Y' && empty($productBasice['expiry_days'])) {
-                    $errorContent['errorMessage'] = '「效期控管」為「Y」時「效期控管天數」為必填';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「效期控管」為「Y」時「效期控管天數」為必填';
                 }
                 // 「允收期(天)」須為正整數
                 if ($productBasice['has_expiry_date_text'] == 'Y' && !preg_match("/^[1-9][0-9]*$/", $productBasice['expiry_receiving_days'])) {
-                    $errorContent['errorMessage'] = '「效期控管天數」須為正整數';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「效期控管天數」須為正整數';
                 }
                 // 「效期控管」為「Y」時「允收期(天)」為必填
                 if ($productBasice['has_expiry_date_text'] == 'Y' && empty($productBasice['expiry_receiving_days'])) {
-                    $errorContent['errorMessage'] = '「效期控管」為「Y」時「允收期(天)」為必填';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「效期控管」為「Y」時「允收期(天)」為必填';
                 }
                 //「商品內容」未填寫
                 if (empty($productBasice['description'])) {
-                    $errorContent['errorMessage'] = '「商品內容」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「商品內容」未填寫';
                 }
                 //「商品規格」未填寫
                 if (empty($productBasice['specification'])) {
-                    $errorContent['errorMessage'] = '「商品規格」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「商品規格」未填寫';
                 }
                 //  指定「POS小分類」代碼
                 if (empty($productBasice['category_number'])) {
-                    $errorContent['errorMessage'] = '「POS小分類」代碼未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「POS小分類」代碼未填寫';
                 }
                 //「POS小分類」代碼不存在
                 if (empty($productBasice['category_id'])) {
-                    $errorContent['errorMessage'] = '「POS小分類」代碼不存在';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「POS小分類」代碼不存在';
                 }
                 //至少填寫一組分類ID，若有多組，請以逗號分隔，例如：36
                 if (empty($productBasice['web_category_hierarchy_ids'])) {
-                    $errorContent['errorMessage'] = '至少填寫一組分類ID，若有多組，請以逗號分隔，例如：36,52';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '至少填寫一組分類ID，若有多組，請以逗號分隔，例如：36,52';
                 }
                 $web_category_hierarchy_id_array = explode(",", $productBasice['web_category_hierarchy_ids']);
                 foreach ($web_category_hierarchy_id_array as $web_category_hierarchy_id) {
-                    if (!$getMaxLevelCategories->where('id',$web_category_hierarchy_id)->first()) {
-                        $errorContent['errorMessage'] = "找不到ID:{$web_category_hierarchy_id}的前台分類";
-                        array_push($result, $errorContent);
+                    if (!$getMaxLevelCategories->where('id', $web_category_hierarchy_id)->first()) {
+                        $errorMessage[] = "找不到ID:{$web_category_hierarchy_id}的前台分類";
                     }
-                    if($getMaxLevelCategories->where('content_type','M')->where('id',$web_category_hierarchy_id)->first()){
-                        $errorContent['errorMessage'] = "前台分類 ID :{$web_category_hierarchy_id}不可為指定賣場";
-                        array_push($result, $errorContent);
+                    if ($getMaxLevelCategories->where('content_type', 'M')->where('id', $web_category_hierarchy_id)->first()) {
+                        $errorMessage[] = "前台分類 ID :{$web_category_hierarchy_id}不可為指定賣場";
                     }
                 }
 
                 //  「最小入庫量」未填寫
                 if (empty($productBasice['min_purchase_qty'])) {
-                    $errorContent['errorMessage'] = '「最小入庫量」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「最小入庫量」未填寫';
                 }
                 //  「最小入庫量」須為正整數
                 if (!empty($productBasice['min_purchase_qty']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['min_purchase_qty'])) {
-                    $errorContent['errorMessage'] = '「最小入庫量」須為正整數';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「最小入庫量」須為正整數';
                 }
                 //「商品通路」未填寫
                 if (empty($productBasice['selling_channel'])) {
-                    $errorContent['errorMessage'] = '「商品通路」未填寫';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「商品通路」未填寫';
                 }
                 // 「商品通路」須為「E」或「S」或「W」
                 if (!empty($productBasice['selling_channel']) && !in_array($productBasice['selling_channel'], ['E', 'S', 'W'])) {
-                    $errorContent['errorMessage'] = '「商品通路」須為「E」或「S」或「W」';
-                    array_push($result, $errorContent);
+                    $errorMessage[] = '「商品通路」須為「E」或「S」或「W」';
                 }
                 foreach ($product['productItems'] as $item) {
                     if (empty($item['supplier_item_no'])) {
-                        $errorContent['errorMessage'] = '「廠商貨號」未填寫';
-                        array_push($result, $errorContent);
+                        $errorMessage[] = '「廠商貨號」未填寫';
                     }
                     //「廠商貨號」不可超過100個字
                     if (!empty($item['supplier_item_no']) && mb_strlen($item['supplier_item_no']) > 100) {
-                        $errorContent['errorMessage'] = '「廠商貨號」不可超過100個字';
-                        array_push($result, $errorContent);
+                        $errorMessage[] = '「廠商貨號」不可超過100個字';
                     }
                     //「國際條碼」不可超過30個字
                     if (!empty($item['ean']) && mb_strlen($item['ean']) > 30) {
-                        $errorContent['errorMessage'] = '「國際條碼」不可超過30個字';
-                        array_push($result, $errorContent);
+                        $errorMessage[] = '「國際條碼」不可超過30個字';
                     }
                     // 「買斷」、「寄售」商品需填寫POS品號 // 商城後台才有的欄位
                     if (empty($item['pos_item_no']) && in_array($productBasice['stock_type'], ['A', 'B'])) {
-                        $errorContent['errorMessage'] = '「買斷」、「寄售」商品需填寫POS品號';
-                        array_push($result, $errorContent);
+                        $errorMessage[] = '「買斷」、「寄售」商品需填寫POS品號';
                     }
                     // POS商品編號已跟現有品項重複
                     if (!empty($item['pos_item_no'])) {
                         if ($productItem->where('pos_item_no', $item['pos_item_no'])->count() > 0) {
-                            $errorContent['errorMessage'] = 'POS商品編號已跟現有品項重複';
-                            array_push($result, $errorContent);
+                            $errorMessage[] = 'POS商品編號已跟現有品項重複';
                         };
                     }
                     // 匯入的POS品號有重複
                     if (!empty($item['pos_item_no'])) {
                         if (in_array($item['pos_item_no'], $pos_item_no_arrays)) {
-                            $errorContent['errorMessage'] = "匯入的POS品號有重複{$item['pos_item_no']}";
-                            array_push($result, $errorContent);
+                            $errorMessage[] = "匯入的POS品號有重複{$item['pos_item_no']}";
                         } else {
                             array_push($pos_item_no_arrays, $item['pos_item_no']);
                         }
                     }
                     // 「安全庫存量」未填寫
                     if (empty($item['safty_qty'])) {
-                        $errorContent['errorMessage'] = '「安全庫存量」未填寫';
-                        array_push($result, $errorContent);
+                        $errorMessage[] = '「安全庫存量」未填寫';
                     }
                     // 「安全庫存量」須為正整數
                     if (!empty($item['safty_qty']) && !preg_match("/^[1-9][0-9]*$/", $item['safty_qty'])) {
-                        $errorContent['errorMessage'] = '「安全庫存量」須為正整數';
-                        array_push($result, $errorContent);
+                        $errorMessage[] = '「安全庫存量」須為正整數';
                     }
 
+                }
+                if (!empty($errorMessage)) {
+                    array_push($result, [
+                        'rowNum' => $productBasice['rowNum'],
+                        'supplierProductNo' => $supplier_product_no,
+                        'errorMessage' => implode(' + ', $errorMessage),
+                    ]);
                 }
             }
 
@@ -698,11 +632,8 @@ class ProductBatchService
                 $spec_1_values = collect([]);
                 $spec_2_values = collect([]);
                 $productBasice = $product['productBasice'];
-                $errorContent = [
-                    'rowNum' => $productBasice['rowNum'],
-                    'supplierProductNo' => $supplier_product_no,
-                    'errorMessage' => '',
-                ];
+                $errorMessage = [];
+
                 foreach ($product['productItems'] as $item) {
                     if ($item['spec_1_value'] !== '') {
                         $spec_1_values->push($item['spec_1_value']);
@@ -719,20 +650,17 @@ class ProductBatchService
                 $itemRealNum = $product['productItems']->count();
 
                 if ($itemRealNum !== $itemCorrectNum) {
-                    $errorContent['errorMessage'] = "需要{$itemRealNum}筆品項，但實際匯入規格只有{$itemCorrectNum}筆品項";
-                    array_push($result, $errorContent);
+                    $errorMessage[] = "需要{$itemRealNum}筆品項，但實際匯入規格只有{$itemCorrectNum}筆品項";
                 }
                 switch ($productBasice['spec_dimension']) {
                     case '0':
                         if ($itemRealNum > 1) {
-                            $errorContent['errorMessage'] = "  單規格商品：同個檔案內，不能有多筆「廠商料號」相同的資料";
-                            array_push($result, $errorContent);
+                            $errorMessage[] = "  單規格商品：同個檔案內，不能有多筆「廠商料號」相同的資料";
                         }
                         break;
                     case '1':
                         if ($spec_1_values->count() !== $spec_1_values->unique()->count()) {
-                            $errorContent['errorMessage'] = "一維多規格商品：同個檔案內，不能有多筆「廠商料號」、「規格一」相同的資料";
-                            array_push($result, $errorContent);
+                            $errorMessage[] = "一維多規格商品：同個檔案內，不能有多筆「廠商料號」、「規格一」相同的資料";
                         }
                         break;
                     case '2':
@@ -743,13 +671,19 @@ class ProductBatchService
                         foreach ($cartesian as $spec) {
                             $find = $product['productItems']->where('spec_1_value', $spec[0])->where('spec_2_value', $spec[1])->all();
                             if (count($find) > 1) {
-                                $errorContent['errorMessage'] = "二維多規格商品：同個檔案內，不能有多筆「廠商料號」、「規格一」、「規格二」相同的資料";
-                                array_push($result, $errorContent);
+                                $errorMessage[] = "二維多規格商品：同個檔案內，不能有多筆「廠商料號」、「規格一」、「規格二」相同的資料";
                             }
                         }
                         break;
                     default:
                         break;
+                }
+                if (!empty($errorMessage)) {
+                    array_push($result, [
+                        'rowNum' => $productBasice['rowNum'],
+                        'supplierProductNo' => $supplier_product_no,
+                        'errorMessage' => implode(' + ', $errorMessage),
+                    ]);
                 }
             }
         } catch (\Exception $e) {
@@ -1088,7 +1022,7 @@ class ProductBatchService
     {
         $result = collect();
         foreach ($verifys as $verifyType => $content) {
-            if(count($content) > 0){
+            if (count($content) > 0) {
                 switch ($verifyType) {
                     case 'verifyProduct':
                         $result->push([
