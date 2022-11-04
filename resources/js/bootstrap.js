@@ -14,7 +14,7 @@ import "jquery-validation/dist/localization/messages_zh_TW";
 import flatpickr from "flatpickr";
 import monthSelectPlugin from "flatpickr/dist/plugins/monthSelect";
 import { MandarinTraditional } from "flatpickr/dist/l10n/zh-tw";
-import Croppie from "Croppie";
+import Croppie from "croppie";
 import moment from "moment";
 import { saveAs } from "file-saver";
 import camelcaseKeys from "camelcase-keys";
