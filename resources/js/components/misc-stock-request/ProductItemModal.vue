@@ -160,7 +160,7 @@
                             </div>
                             <br />
 
-                            <div class="table-responsive overflow-scroll" style="max-height: 50vh;">
+                            <div class="table-responsive" style="max-height: 50vh; overflow-y: auto">
                                 <table
                                     class="table table-striped table-bordered table-hover"
                                     style="width: 100%"
