@@ -535,6 +535,7 @@
                         <td class="text-nowrap">${detail.request_qty}</td>
                         <td class="text-nowrap">${detail.discount}</td>
                         <td class="text-nowrap">${detail.subtotal}</td>
+                        <td class="text-nowrap">${detail.point_discount}</td>
                         <td class="text-nowrap">${detail.record_identity}</td>
                     </tr>`;
                 });

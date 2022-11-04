@@ -52,6 +52,7 @@
                                                                 <th >數量</th>
                                                                 <th >活動折抵</th>
                                                                 <th >小計</th>
+                                                                <th >點數折抵</th>
                                                                 <th >訂單身份</th>
                                                             </tr>
                                                         </thead>
@@ -89,7 +90,7 @@
                                                     <input type="text" class="form-control search-limit-group"
                                                            maxlength="6" min="1" max="999999"
                                                            name="nego_refund_amount" placeholder="※ 填寫500，表示可退款500元">
-                                                    <span class="text-danger">※ 可退款金額：<span data-target="refundable_amount"></span>元</span>
+                                                    <span class="text-danger">※ 可退款金額：<span data-target="refundable_amount"></span>元(協商後點數不會自動還點，由客服另行處理)</span>
                                                 </div>
                                             </div>
                                         </div>

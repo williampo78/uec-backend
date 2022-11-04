@@ -172,7 +172,7 @@ class OrderRefundService
             'returnExaminationDetails:id,return_examination_id,return_request_detail_id,product_item_id,request_qty',
             'returnExaminationDetails.productItem:id,product_id,spec_1_value,spec_2_value,item_no',
             'returnExaminationDetails.productItem.product:id,product_name,supplier_product_no',
-            'returnExaminationDetails.returnRequestDetail:id,selling_price,campaign_discount,cart_p_discount,subtotal,record_identity'
+            'returnExaminationDetails.returnRequestDetail:id,selling_price,campaign_discount,cart_p_discount,subtotal,record_identity,point_discount'
         ])
             ->where('return_request_id', $id)
             ->orderBy('examination_no')
@@ -233,6 +233,7 @@ class OrderRefundService
                     'selling_price'       => number_format($detail->returnRequestDetail->selling_price),
                     'discount'            => number_format($detail->returnRequestDetail->campaign_discount + $detail->returnRequestDetail->cart_p_discount),
                     'subtotal'            => number_format($detail->returnRequestDetail->subtotal),
+                    'point_discount'      => number_format($detail->returnRequestDetail->point_discount),
                     'record_identity'     => config('uec.order_record_identity_options')[$detail->returnRequestDetail->record_identity] ?? '',
                 ];
             });
@@ -331,7 +332,7 @@ class OrderRefundService
                 'nego_refund_amount'       => is_null($returnExamination->nego_refund_amount) ? '' : number_format($returnExamination->nego_refund_amount),
                 //協商內容備註
                 'nego_remark'              => $returnExamination->nego_remark ?? '',
-                'refundable_amount'        => (int)$returnExamination->returnable_amount,
+                'refundable_amount'        => (int)abs($returnExamination->returnable_amount),
                 'details'                  => $details ?? []
             ];
         });
@@ -632,7 +633,7 @@ class OrderRefundService
         }
 
         //退款金額大於可退金額
-        if ($payload['nego_refund_amount'] > $returnExamination->returnable_amount) {
+        if ($payload['nego_refund_amount'] > abs($returnExamination->returnable_amount)) {
             return [
                 'status'  => false,
                 'message' => '發生錯誤，退款金額大於可退款金額'
