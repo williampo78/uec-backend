@@ -59,7 +59,7 @@ class StockService
             ->where("warehouse.delete", "=", "0")
             ->where("warehouse.number", "=", $number)
             ->whereIn("warehouse_stock.product_item_id", $productItemIds)
-            ->where("warehouse_stock.stockQty", '>', 0)
+            ->where("warehouse_stock.stock_qty", '>', 0)
             ->first();
     }
 
