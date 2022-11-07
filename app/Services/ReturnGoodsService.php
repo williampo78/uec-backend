@@ -803,6 +803,22 @@ class ReturnGoodsService
     }
 
     /**
+     * 紀錄參數與回傳資料
+     * @Author: Eric
+     * @DateTime: 2022/11/7 上午 11:25
+     */
+    private function saveLog()
+    {
+        $log = [
+            'ip'       => request()->ip(),
+            'params'   => $this->params,
+            'response' => $this->verifyResult,
+        ];
+
+        Log::channel('refund_params')->info(json_encode($log, JSON_UNESCAPED_UNICODE));
+    }
+
+    /**
      * 處理退款流程
      * @return array
      * @Author: Eric
@@ -810,13 +826,12 @@ class ReturnGoodsService
      */
     public function handle(): array
     {
-        Log::channel('refund_params')->info(sprintf('IP:%s;參數:%s', request()->ip(), json_encode($this->params)));
-
         try {
             //驗證參數
             $this->verifyParameters();
 
             if ($this->verifyResult['status'] === false) {
+                $this->saveLog();
                 return $this->verifyResult;
             }
 
@@ -828,6 +843,7 @@ class ReturnGoodsService
             $this->verify();
 
             if ($this->verifyResult['status'] === false || $this->verifyResult['code'] === 'S201') {
+                $this->saveLog();
                 return $this->verifyResult;
             }
 
@@ -844,12 +860,15 @@ class ReturnGoodsService
             $this->handleRefund();
             DB::commit();
 
-            return [
+            $this->verifyResult = [
                 'status'           => true,
                 'code'             => 'S200',
                 'http_status_code' => 200,
                 'message'          => '更新成功'
             ];
+
+            $this->saveLog();
+            return $this->verifyResult;
 
         } catch (Throwable $e) {
 
