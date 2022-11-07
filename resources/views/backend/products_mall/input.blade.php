@@ -247,6 +247,8 @@
 
                                 </div>
                             </div>
+                            {{-- 認證 --}}
+                            @if(isset($product_attribute_lov['CERTIFICATE']))
                             <div class="row" style="margin-bottom: 16px">
                                 <div class="col-sm-10">
                                     <div class="form-group">
@@ -271,6 +273,9 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
+                            {{-- 成分 --}}
+                            @if(isset($product_attribute_lov['INGREDIENT']))
                             <div class="row" style="margin-bottom: 16px">
                                 <div class="col-sm-10">
                                     <div class="form-group">
@@ -294,6 +299,9 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
+                            {{-- 適用族群 --}}
+                            @if(isset($product_attribute_lov['GROUP']))
                             <div class="row" style="margin-bottom: 16px">
                                 <div class="col-sm-10">
                                     <div class="form-group">
@@ -317,6 +325,8 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
+                            @if(isset($product_attribute_lov['DOSAGE_FORM']))
                             <div class="row" style="margin-bottom: 16px">
                                 <div class="col-sm-10">
                                     <div class="form-group">
@@ -340,6 +350,7 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
                             <div class="row" style="margin-bottom: 16px">
                                 <div class="col-sm-10">
                                     <div class="form-group">
