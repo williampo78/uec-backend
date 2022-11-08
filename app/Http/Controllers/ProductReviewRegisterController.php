@@ -87,6 +87,7 @@ class ProductReviewRegisterController extends Controller
         $result['products'] = $this->productService->showProducts($id);
         $result['product_review_log'] = $this->productService->getProductReviewLog($id);
         $result['itemListCheckStatus'] =$this->productService->itemListCheckStatus($id);
+        $result['checkStockTypeStatus'] =$this->productService->checkStockTypeStatus($id);
 
         return view('backend.product_review_register.input', $result);
     }
