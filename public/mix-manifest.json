@@ -1,10 +1,14 @@
 {
-    "/js/app.js": "/js/app.js",
-    "/js/advertisement.js": "/js/advertisement.js",
-    "/js/promotional_campaign/cart/main.js": "/js/promotional_campaign/cart/main.js",
-    "/js/promotional_campaign/prd/main.js": "/js/promotional_campaign/prd/main.js",
-    "/js/misc-stock-request/main.js": "/js/misc-stock-request/main.js",
-    "/js/promotional_campaign/cart_v2/main.js": "/js/promotional_campaign/cart_v2/main.js?v=2022102401",
-    "/css/app.css": "/css/app.css",
-    "/css/advertisement.css": "/css/advertisement.css"
+    "/js/app.js": "/js/app.js?id=60d0e32055d79dbb46f3e3ec72c7b36d",
+    "/js/advertisement.js": "/js/advertisement.js?id=2e34429dc20b85cf6dbb24caa7bd8633",
+    "/js/external_inventory_daily_report.js": "/js/external_inventory_daily_report.js?id=619a0f514c547fe3b1b7f2389c421cc9",
+    "/js/inventory.js": "/js/inventory.js?id=e5aff572c2f7f66460f46f8c4dd38be1",
+    "/js/order.js": "/js/order.js?id=67d3e6745a95279342afd01472710a9d",
+    "/js/order_payments_report.js": "/js/order_payments_report.js?id=7a54b7c8851aabe60ecc6433e5afa656",
+    "/js/order_refund.js": "/js/order_refund.js?id=dcdadc4eb86b7200089da89c65cf481f",
+    "/js/promotional_campaign/cart/main.js": "/js/promotional_campaign/cart/main.js?id=2b98421bce99f79c9b4ae8ba562d3a9d",
+    "/js/promotional_campaign/prd/main.js": "/js/promotional_campaign/prd/main.js?id=1d4ad9a35cf4b3b0335e1d34faa576c4",
+    "/js/promotional_campaign/cart_v2/main.js": "/js/promotional_campaign/cart_v2/main.js?id=81a9fa5ab966c4b253f9f8a5e35590bd",
+    "/css/app.css": "/css/app.css?id=467402cd6422a4d1b4168e9db8eef45c",
+    "/css/advertisement.css": "/css/advertisement.css?id=22bd1fc2a7711ea2379993a4d2c4ae5b"
 }
