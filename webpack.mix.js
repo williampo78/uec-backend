@@ -33,3 +33,5 @@ mix.copyDirectory(
     "node_modules/jquery-validation/dist/localization/*.min.js",
     "public/jquery-validation/dist/localization"
 );
+
+mix.version();

@@ -715,7 +715,7 @@ export default {
             return axios({
                 method: "POST",
                 url: "/backend/promotional-campaign-cart-v2/product-modal/products",
-                params: data,
+                data: data,
             })
                 .then(function (response) {
                     return response.data;
