@@ -509,7 +509,7 @@ class WebCategoryHierarchyService
         $adSlotCodeString = '';
         $adSlot = AdSlot::whereHas('adSlotContents', function ($query) use($webCategoryHierarchyId) {
             return $query->where('active', '=', 1)
-                        //  ->where('end_at','>',now())
+                         ->where('end_at','>',now())
                          ->where('see_more_action','C')
                          ->where('see_more_cate_hierarchy_id' , $webCategoryHierarchyId)
                          ->orderBy('slot_code','ASC');
