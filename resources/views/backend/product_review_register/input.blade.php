@@ -301,6 +301,11 @@
                 $('.item_error_msg').css("display", "block");
                 alert('商品Item皆為失效狀態，不允許申請上架！');
             }
+            var checkStockTypeStatus = @json($checkStockTypeStatus);
+            if(!checkStockTypeStatus){
+                $('#save_data').attr('disabled', true);
+                alert('寄售與買斷商品須在供應商平台維護價格，才能申請上架！');
+            }
             let startLaunchedAtLastSelectedDates;
 
             let start_launched_at_flatpickr = flatpickr("#start_launched_at_flatpickr", {

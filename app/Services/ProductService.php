@@ -12,6 +12,7 @@ use App\Models\Products;
 use App\Models\ProductSpecInfo;
 use App\Models\PromotionalCampaign;
 use App\Models\PromotionalCampaignProduct;
+use App\Models\PriceLog;
 use App\Models\RelatedProduct;
 use App\Models\WarehouseStock;
 use App\Models\WebCategoryHierarchy;
@@ -1395,6 +1396,24 @@ class ProductService
             return false;
         }
 
+    }
+
+    /**
+     * itemListCheckStatus function
+     *
+     * @param $product_id
+     * @return bool
+     */
+    public function checkStockTypeStatus($product_id)
+    {
+        $purchasePrice = Product::where('id', $product_id)->pluck('purchase_price')->first();
+        $priceLogs = PriceLog::where('product_id', $product_id)->get('id');
+
+        if ($priceLogs->count() > 0 && $purchasePrice) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
