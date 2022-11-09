@@ -2,15 +2,16 @@
 
 namespace App\Services;
 
-use App\Models\WebCategoryHierarchy;
-use App\Models\WebCategoryProduct;
+use ImageUpload;
 use Carbon\Carbon;
+use App\Models\AdSlot;
+use App\Models\WebCategoryProduct;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Models\WebCategoryHierarchy;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use ImageUpload;
 
 class WebCategoryHierarchyService
 {
@@ -490,5 +491,40 @@ class WebCategoryHierarchyService
 
                 return $category;
             });
+    }
+
+    /**
+     * 確認底下是否有包含分類的廣告版位
+     * 
+     * @param integer $webCategoryHierarchyId 分類ID
+     * @return array
+     */
+    public function hasAdSlotContent($webCategoryHierarchyId)
+    {
+        $result = [
+            'status'=>true,
+            'message'=>'',
+        ] ;
+        $adSlotCodes = collect([]) ; 
+        $adSlotCodeString = '';
+        $adSlot = AdSlot::whereHas('adSlotContents', function ($query) use($webCategoryHierarchyId) {
+            return $query->where('active', '=', 1)
+                         ->where('end_at','>',now())
+                         ->where('see_more_action','C')
+                         ->where('see_more_cate_hierarchy_id' , $webCategoryHierarchyId)
+                         ->orderBy('slot_code','ASC');
+        })
+        ->where('active',1)
+        ->get();
+    
+        if($adSlot->count() > 0){
+            foreach($adSlot as $v){
+                $adSlotCodes->push($v->slot_code);
+            }
+            $adSlotCodeString = implode('、',$adSlotCodes->toArray());
+            $result['status'] = false ;
+            $result['message'] = "尚有廣告版位的「看更多」使用此分類，請先修改廣告版位設定才能進行刪除 ({$adSlotCodeString})" ; 
+        }
+        return $result ;
     }
 }

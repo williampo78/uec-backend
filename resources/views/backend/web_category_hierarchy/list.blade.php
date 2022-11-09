@@ -648,7 +648,10 @@
                                         errorMessage += data.message;
                                         alert(errorMessage);
                                         break;
-
+                                    case 'E102':
+                                        errorMessage += data.message;
+                                        alert(errorMessage);
+                                        break;
                                     default:
                                         alert('刪除失敗');
                                         break;

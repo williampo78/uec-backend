@@ -154,6 +154,13 @@ class WebCategoryHierarchyController extends Controller
                 'code' => 'E101',
             ], 400);
         }
+        $hasAdSlotContent = $this->webCategoryHierarchyService->hasAdSlotContent($id); 
+        if(!$hasAdSlotContent['status']){
+            return response()->json([
+                'message' => $hasAdSlotContent['message'],
+                'code' => 'E102',
+            ], 400);
+        }
 
         $deleteResult = $this->webCategoryHierarchyService->deleteCategory($id);
 
