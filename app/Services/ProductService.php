@@ -1406,14 +1406,15 @@ class ProductService
      */
     public function checkStockTypeStatus($product_id)
     {
-        $purchasePrice = Product::where('id', $product_id)->pluck('purchase_price')->first();
-        $priceLogs = PriceLog::where('product_id', $product_id)->get('id');
+        $result = true;
+        $productData = Product::where('id', $product_id)->first(['stock_type','purchase_price']);
 
-        if ($priceLogs->count() > 0 && $purchasePrice) {
-            return true;
-        } else {
-            return false;
+        if ($productData->stock_type == 'B' || $productData->stock_type == 'T') {
+            $priceLogs = PriceLog::where('product_id', $product_id)->get('id');
+            $result = $priceLogs->count() > 0 && $productData->purchase_price;
         }
+
+        return $result;
     }
 
     /**
