@@ -341,6 +341,7 @@ class ReturnGoodsService
                 $orderDetail->subtotal          = 0;
                 $orderDetail->point_discount    = 0;
                 $orderDetail->points            = 0;
+                $orderDetail->cart_p_discount   = 0;
                 //與已退相關的項目，會累計舊order_detail的值
                 //已退數量
                 $orderDetail->returned_qty = $orderDetail->returned_qty + $this->invertSign($targetReturnRequestDetail->passed_qty);
@@ -362,6 +363,15 @@ class ReturnGoodsService
                 }
 
                 $subtotal = $this->invertSign($targetReturnRequestDetail->passed_qty * $sellingPrice);
+                $returnRequestDetailId = $targetReturnRequestDetail->id;
+                //經過協商的項目(return_examinations.nego_reported_at !=null)
+                $negotiatedReturnExamination = $this->returnExamination
+                    ->first(function ($returnExamination) use ($returnRequestDetailId) {
+                        $target = $returnExamination
+                            ->returnExaminationDetails
+                            ->firstWhere('return_request_detail_id', $returnRequestDetailId);
+                        return !empty($returnExamination->nego_reported_at) && !empty($target);
+                    });
 
                 //整理新增return_order_details的資料
                 $this->createReturnOrderDetailData->push([
@@ -376,6 +386,7 @@ class ReturnGoodsService
                     'points'                  => $this->invertSign($targetReturnRequestDetail->points),
                     'point_discount'          => $this->invertSign($targetReturnRequestDetail->point_discount),
                     'refund_amount'           => $subtotal + $this->invertSign($targetReturnRequestDetail->point_discount),
+                    'is_negotiated'           => empty($negotiatedReturnExamination) ? 0 : 1,
                     'created_by'              => $this->getUserId(),
                     'updated_by'              => $this->getUserId(),
                 ]);
