@@ -1291,6 +1291,7 @@ class OrderService
             ->get()->toArray();
         //整理版本內容
         $data = [];
+        $arr_data = [];
         foreach ($orders as $order) {
             $data[$order['order_no']][] = $order;
         }
