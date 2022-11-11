@@ -130,6 +130,12 @@ return [
         'INSTAL_FEE' => '分期付款手續費',
     ],
 
+    // 退貨成功-備註
+    'return_remark_options' => [
+        '0' => '',
+        '1' => '此退貨有經過協商',
+    ],
+
     // 發票用途
     'invoice_usage_options' => [
         'P' => '個人電子發票',

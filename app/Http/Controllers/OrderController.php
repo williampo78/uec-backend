@@ -170,6 +170,7 @@ class OrderController extends Controller
             'cvs_completed_at' => null,
             'is_return' => 0,
             'return_status_code' => null,
+            'is_negotiated' => 0,
             'return_order_details' => null,
         ];
 
@@ -535,6 +536,7 @@ class OrderController extends Controller
                     'subtotal' => null,
                     'point_discount' => $returnOrderDetail->point_discount,
                     'refund_amount' => null,
+                    'remark' => '',
                 ];
 
                 if ($returnOrderDetail->data_type == 'PRD') {
@@ -566,6 +568,11 @@ class OrderController extends Controller
                 $returnOrderDetails['selling_price'] = number_format($returnOrderDetail->selling_price);
                 $returnOrderDetails['subtotal'] = number_format($returnOrderDetail->subtotal);
                 $returnOrderDetails['refund_amount'] = number_format($returnOrderDetail->refund_amount);
+                $returnOrderDetails['remark'] = config('uec.return_remark_options')[$returnOrderDetail->is_negotiated] ?? '';
+
+                if ($returnOrderDetail->is_negotiated == 1 && $payload['is_negotiated'] == 0) {
+                    $payload['is_negotiated'] = 1;
+                }
 
                 $payload['return_order_details'][] = $returnOrderDetails;
             });

@@ -616,6 +616,10 @@
                         // 有退貨，退貨已完成
                         if (order.is_return == 1) {
                             if (order.return_order_details) {
+                                if (order.is_negotiated == 1) {
+                                    $('#is_negotiated').text('※ 退貨單若有經過客服協商，點數不會自動還點，由客服另行處理');
+                                }
+
                                 let count = 1;
                                 order.return_order_details.forEach((return_order_detail) => {
                                     $("#tab-return-success tbody").append(`
@@ -629,6 +633,7 @@
                                             <td>${return_order_detail.subtotal}</td>
                                             <td>${return_order_detail.point_discount}</td>
                                             <td>${return_order_detail.refund_amount}</td>
+                                            <td>${return_order_detail.remark}</td>
                                         </tr>
                                     `);
                                 });

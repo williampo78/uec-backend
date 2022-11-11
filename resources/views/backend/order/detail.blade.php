@@ -336,6 +336,7 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="tab-return-success">
+                        <div id="is_negotiated" style="color: #4c68d6;"></div>
                         <div class="table-responsive">
                             <table class='table table-striped table-bordered table-hover' style='width:100%'>
                                 <thead>
@@ -349,6 +350,7 @@
                                         <th class="text-nowrap">小計</th>
                                         <th class="text-nowrap">歸還點數</th>
                                         <th class="text-nowrap">退款金額</th>
+                                        <th class="text-nowrap">備註</th>
                                     </tr>
                                 </thead>
                                 <tbody>
