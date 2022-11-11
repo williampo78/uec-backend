@@ -610,8 +610,13 @@
                         fax: {
                             maxlength: 25,
                         },
+                        postal_code: {
+                            digits: true,
+                            maxlength: 20,
+                        },
                         cell_phone: {
-                            maxlength: 25,
+                            digits: true,
+                            maxlength: 10,
                         },
                         tax_type: {
                             required: true,
@@ -695,7 +700,8 @@
 
                     $(`.contact-cell-phone`).each(function() {
                         $(this).rules("add", {
-                            maxlength: 25,
+                            digits: true,
+                            maxlength: 10,
                         });
                     });
 
