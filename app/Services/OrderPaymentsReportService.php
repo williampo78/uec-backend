@@ -51,7 +51,7 @@ class OrderPaymentsReportService
      */
     public function getOrderPaymentsReports(array $request = [])
     {
-        $select1 = "op.created_at, op.order_no, op.payment_type, op.payment_method,
+        $select1 = "op.created_at, op.order_no, op.payment_type, op.payment_method, op.number_of_instal,
             (case when op.payment_status = 'PENDING' then '待退款'
                 when op.payment_status = 'COMPLETED' then '退款成功'
                 when op.payment_status = 'FAILED' then '退款失敗'
@@ -61,7 +61,7 @@ class OrderPaymentsReportService
             o.invoice_no, o.invoice_date, op.record_created_reason,
             '國泰世華' as bank_name";
 
-        $select2 = "op.created_at, op.order_no, op.payment_type, op.payment_method,
+        $select2 = "op.created_at, op.order_no, op.payment_type, op.payment_method, op.number_of_instal,
             (case when op.payment_status = 'PENDING' then '待請款'
                 when op.payment_status = 'COMPLETED' then '請款成功'
                 when op.payment_status = 'FAILED' then '請款失敗'
@@ -71,7 +71,7 @@ class OrderPaymentsReportService
             o.invoice_no, o.invoice_date, op.record_created_reason,
             '國泰世華' as bank_name";
 
-        $select3 = "op.created_at, op.order_no, op.payment_type, op.payment_method,
+        $select3 = "op.created_at, op.order_no, op.payment_type, op.payment_method, op.number_of_instal,
             (case when op.payment_status = 'PENDING' then '待退款'
                 when op.payment_status = 'COMPLETED' then '退款成功'
                 when op.payment_status = 'FAILED' then '退款失敗'
@@ -177,7 +177,7 @@ class OrderPaymentsReportService
                 (string) $item->order_no, //訂單編號
                 (string) $item->payment_type, //類型
                 (string) $item->payment_method, //金流方式
-                '', //分期期數
+                $item->number_of_instal, //分期期數
                 (string) $item->status_desc, //狀態
                 $item->amount, //金額
                 (string) $item->invoice_no, //發票號碼

@@ -152,7 +152,7 @@
                                         <td>{{ $orderPaymentsReport->order_no }}</td>
                                         <td>{{ $orderPaymentsReport->payment_type }}</td>
                                         <td>{{ $orderPaymentsReport->payment_method }}</td>
-                                        <td></td>
+                                        <td>{{ $orderPaymentsReport->number_of_instal }}</td>
                                         <td>{{ $orderPaymentsReport->status_desc }}</td>
                                         <td>{{ $orderPaymentsReport->amount }}</td>
                                         <td>{{ $orderPaymentsReport->invoice_no }}</td>
