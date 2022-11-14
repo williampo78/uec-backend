@@ -28,6 +28,7 @@ class SummaryStockController extends Controller
             'item_id_start',
             'item_id_end',
             'product_name',
+            'export',
         ]);
         $data['info'] = ($getData ? $this->summaryStock->getSummaryStock($getData) : []);
         $data['sum'] = ($getData ? $this->summaryStock->getSummarySum($getData) : []);

@@ -36,6 +36,7 @@ class BuyoutProductsReportController extends Controller
             'POS_start_number',
             'POS_end_number',
             'product_name',
+            'export',
         ]);
         $result = [];
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
