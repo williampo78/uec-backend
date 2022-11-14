@@ -1105,7 +1105,7 @@ class PromotionalCampaignService
                 if (isset($campaignProduct->product)) {
                     $tmpCampaignProduct['product_no'] = $campaignProduct->product->product_no;
                     $tmpCampaignProduct['product_name'] = $campaignProduct->product->product_name;
-                    $tmpCampaignProduct['selling_price'] = number_format($campaignProduct->product->selling_price);
+                    $tmpCampaignProduct['selling_price'] = $campaignProduct->product->selling_price;
                     $tmpCampaignProduct['launch_status'] = $campaignProduct->product->launch_status;
                     $tmpCampaignProduct['gross_margin'] = $campaignProduct->product->gross_margin;
                     $tmpCampaignProduct['created_at'] = Carbon::parse($campaignProduct->created_at)->format('Y-m-d H:i:s');
