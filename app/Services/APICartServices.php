@@ -1416,13 +1416,14 @@ class APICartServices
                     $cartDetail[$prdouct_id][$item_id] = $item; //購物車內容
                     $prodQty[$prdouct_id][$item_id] = $item['item_qty'];
 
-                    $product_payment_method[$stock_type][] = collect(explode(',', $item['payment_method'])); //取得主商品交集共同的付款方式
                     if (config('uec.cart_billing_split') == 1) {
                         //定義健康力出貨為(dradvice)，廠商出貨為(supplier)
                         if ($item['stock_type'] == 'T') {    //廠商出貨：轉單[T] 商品
                             $cartStockTypeCount['supplier']++;
+                            $product_payment_method['supplier'][] = collect(explode(',', $item['payment_method'])); //取得主商品交集共同的付款方式
                         } else {    //健康力出貨：買斷[A]、寄售[B] 商品
                             $cartStockTypeCount['dradvice']++;
+                            $product_payment_method['dradvice'][] = collect(explode(',', $item['payment_method'])); //取得主商品交集共同的付款方式
                         }
                     }
                 }
