@@ -1098,6 +1098,7 @@ class PromotionalCampaignService
                     'end_launched_at' => null,
                     'launch_status' => null,
                     'gross_margin' => null,
+                    'created_at'=>null,
                 ];
 
                 // 商品
@@ -1107,6 +1108,7 @@ class PromotionalCampaignService
                     $tmpCampaignProduct['selling_price'] = number_format($campaignProduct->product->selling_price);
                     $tmpCampaignProduct['launch_status'] = $campaignProduct->product->launch_status;
                     $tmpCampaignProduct['gross_margin'] = $campaignProduct->product->gross_margin;
+                    $tmpCampaignProduct['created_at'] = Carbon::parse($campaignProduct->created_at)->format('Y-m-d H:i:s');
 
                     // 上架時間起
                     if (isset($campaignProduct->product->start_launched_at)) {
@@ -1486,38 +1488,6 @@ class PromotionalCampaignService
                     'updated_by' => $user->id,
                 ]);
 
-                $updatedProductIds = [];
-                // 新增或更新單品
-                if (isset($data['products'])) {
-                    $originProductIds = PromotionalCampaignProduct::where('promotional_campaign_id', $id)->pluck('id');
-                    foreach ($data['products'] as $product) {
-                        // 新增
-                        if (!$originProductIds->contains($product['id'])) {
-                            $createdProduct = PromotionalCampaignProduct::create([
-                                'promotional_campaign_id' => $id,
-                                'sort' => 1,
-                                'product_id' => $product['product_id'],
-                                'created_by' => $user->id,
-                                'updated_by' => $user->id,
-                            ]);
-
-                            $updatedProductIds[] = $createdProduct->id;
-                        }
-                        // 更新
-                        else {
-                            PromotionalCampaignProduct::findOrFail($product['id'])->update([
-                                'product_id' => $product['product_id'],
-                                'updated_by' => $user->id,
-                            ]);
-
-                            $updatedProductIds[] = $product['id'];
-                        }
-                    }
-                }
-
-                // 刪除單品
-                PromotionalCampaignProduct::where('promotional_campaign_id', $id)->whereNotIn('id', $updatedProductIds)->delete();
-
                 $updatedGiveawayIds = [];
                 // 新增或更新贈品
                 if (isset($data['giveaways'])) {
@@ -1553,7 +1523,36 @@ class PromotionalCampaignService
                 // 刪除贈品
                 PromotionalCampaignGiveaway::where('promotional_campaign_id', $id)->whereNotIn('id', $updatedGiveawayIds)->delete();
             }
+            $updatedProductIds = [];
+            // 新增或更新單品
+            if (isset($data['products'])) {
+                $originProductIds = PromotionalCampaignProduct::where('promotional_campaign_id', $id)->pluck('id');
+                foreach ($data['products'] as $product) {
+                    // 新增
+                    if (!$originProductIds->contains($product['id'])) {
+                        $createdProduct = PromotionalCampaignProduct::create([
+                            'promotional_campaign_id' => $id,
+                            'sort' => 1,
+                            'product_id' => $product['product_id'],
+                            'created_by' => $user->id,
+                            'updated_by' => $user->id,
+                        ]);
 
+                        $updatedProductIds[] = $createdProduct->id;
+                    }
+                    // 更新
+                    else {
+                        PromotionalCampaignProduct::findOrFail($product['id'])->update([
+                            'product_id' => $product['product_id'],
+                            'updated_by' => $user->id,
+                        ]);
+
+                        $updatedProductIds[] = $product['id'];
+                    }
+                }
+            }
+            // 刪除單品
+            PromotionalCampaignProduct::where('promotional_campaign_id', $id)->whereNotIn('id', $updatedProductIds)->delete();
             DB::commit();
             $result = true;
         } catch (\Exception $e) {
@@ -1838,6 +1837,7 @@ class PromotionalCampaignService
                     $tmpCampaignProduct['selling_price'] = number_format($campaignProduct->product->selling_price);
                     $tmpCampaignProduct['launch_status'] = $campaignProduct->product->launch_status;
                     $tmpCampaignProduct['gross_margin'] = $campaignProduct->product->gross_margin;
+                    $tmpCampaignProduct['created_at'] = Carbon::parse($campaignProduct->created_at)->format('Y-m-d H:i:s');
 
                     // 上架時間起
                     if (isset($campaignProduct->product->start_launched_at)) {
@@ -2501,39 +2501,38 @@ class PromotionalCampaignService
                 // 刪除活動門檻
                 PromotionalCampaignThreshold::where('promotional_campaign_id', $id)->whereNotIn('id', $updatedThresholdIds)->delete();
 
-                $updatedProductIds = [];
-                // 新增或更新活動指定商品
-                if (isset($data['products'])) {
-                    $originProductIds = PromotionalCampaignProduct::where('promotional_campaign_id', $id)->pluck('id');
-                    foreach ($data['products'] as $product) {
-                        // 新增
-                        if (!$originProductIds->contains($product['id'])) {
-                            $createdProduct = PromotionalCampaignProduct::create([
-                                'promotional_campaign_id' => $id,
-                                'sort' => 1,
-                                'product_id' => $product['product_id'],
-                                'created_by' => $user->id,
-                                'updated_by' => $user->id,
-                            ]);
+            }
+            $updatedProductIds = [];
+            // 新增或更新活動指定商品
+            if (isset($data['products'])) {
+                $originProductIds = PromotionalCampaignProduct::where('promotional_campaign_id', $id)->pluck('id');
+                foreach ($data['products'] as $product) {
+                    // 新增
+                    if (!$originProductIds->contains($product['id'])) {
+                        $createdProduct = PromotionalCampaignProduct::create([
+                            'promotional_campaign_id' => $id,
+                            'sort' => 1,
+                            'product_id' => $product['product_id'],
+                            'created_by' => $user->id,
+                            'updated_by' => $user->id,
+                        ]);
 
-                            $updatedProductIds[] = $createdProduct->id;
-                        }
-                        // 更新
-                        else {
-                            PromotionalCampaignProduct::findOrFail($product['id'])->update([
-                                'product_id' => $product['product_id'],
-                                'updated_by' => $user->id,
-                            ]);
+                        $updatedProductIds[] = $createdProduct->id;
+                    }
+                    // 更新
+                    else {
+                        PromotionalCampaignProduct::findOrFail($product['id'])->update([
+                            'product_id' => $product['product_id'],
+                            'updated_by' => $user->id,
+                        ]);
 
-                            $updatedProductIds[] = $product['id'];
-                        }
+                        $updatedProductIds[] = $product['id'];
                     }
                 }
-
-                // 刪除活動指定商品
-                PromotionalCampaignProduct::where('promotional_campaign_id', $id)->whereNotIn('id', $updatedProductIds)->delete();
             }
 
+            // 刪除活動指定商品
+            PromotionalCampaignProduct::where('promotional_campaign_id', $id)->whereNotIn('id', $updatedProductIds)->delete();
             DB::commit();
             $result = true;
         } catch (\Exception $e) {

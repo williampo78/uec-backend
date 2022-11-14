@@ -482,7 +482,7 @@
                                                 </div>
                                             </div>
                                             <div class="tab-pane fade" id="tab-product">
-                                                <div class="row" v-if="!isNowGreaterThanOrEqualToStartAt">
+                                                <div class="row">
                                                     <div class="col-sm-12">
                                                         <button type="button" class="btn btn-warning" @click="addProduct">
                                                             <i class="fa-solid fa-plus"></i> 新增商品
@@ -503,8 +503,8 @@
                                                                 <th class="text-nowrap">上架狀態</th>
                                                                 <th class="text-nowrap">毛利(%)</th>
                                                                 <th class="text-nowrap">前台分類</th>
-                                                                <th class="text-nowrap"
-                                                                    v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
+                                                                <th class="text-nowrap">建立日期</th>
+                                                                <th class="text-nowrap">功能</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
@@ -523,8 +523,9 @@
                                                                 <td>@{{ product.launchStatus }}</td>
                                                                 <td>@{{ product.grossMargin }}</td>
                                                                 <td>@{{ product.webCategoryHierarchy }}</td>
-                                                                <td v-if="!isNowGreaterThanOrEqualToStartAt">
-                                                                    <button type="button" class="btn btn-danger"
+                                                                <td>@{{ product.createdAt }}</td>
+                                                                <td>
+                                                                    <button v-if="product.isNew || !isNowGreaterThanOrEqualToStartAt" type="button" class="btn btn-danger"
                                                                         @click="deleteProduct(index)">
                                                                         <i class="fa-solid fa-trash-can"></i> 刪除
                                                                     </button>
@@ -785,6 +786,7 @@
                                 launchStatus: product.launch_status,
                                 grossMargin: product.gross_margin,
                                 webCategoryHierarchy: product.web_category_hierarchy,
+                                createdAt: product.created_at,
                             });
                         });
                     }
@@ -1336,6 +1338,7 @@
                             launchStatus: product.launchStatus,
                             grossMargin: product.grossMargin,
                             webCategoryHierarchy: product.webCategoryHierarchy,
+                            isNew:true,
                         });
                     });
                 },

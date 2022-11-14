@@ -202,7 +202,7 @@
                                                 <div class="col-sm-1">
                                                     <p>單品清單</p>
                                                 </div>
-                                                <div class="col-sm-2" v-if="!isNowGreaterThanOrEqualToStartAt">
+                                                <div class="col-sm-2">
                                                     <button type="button" class="btn btn-warning btn-sm"
                                                         @click="addProduct">
                                                         <i class="fa-solid fa-plus"></i> 新增單品
@@ -223,8 +223,8 @@
                                                             <th class="text-nowrap">上架日期</th>
                                                             <th class="text-nowrap">上架狀態</th>
                                                             <th class="text-nowrap">毛利(%)</th>
-                                                            <th class="text-nowrap"
-                                                                v-if="!isNowGreaterThanOrEqualToStartAt">功能</th>
+                                                            <th class="text-nowrap">建立日期</th>
+                                                            <th class="text-nowrap">功能</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -241,8 +241,9 @@
                                                             <td>@{{ product.launchedAt }}</td>
                                                             <td>@{{ product.launchStatus }}</td>
                                                             <td>@{{ product.grossMargin }}</td>
-                                                            <td v-if="!isNowGreaterThanOrEqualToStartAt">
-                                                                <button type="button" class="btn btn-danger"
+                                                            <td>@{{product.createdAt}}</td>
+                                                            <td>
+                                                                <button type="button" class="btn btn-danger" v-if="product.isNew || !isNowGreaterThanOrEqualToStartAt"
                                                                     @click="deleteProduct(index)">
                                                                     <i class="fa-solid fa-trash-can"></i> 刪除
                                                                 </button>
@@ -434,6 +435,7 @@
                                     '',
                                 launchStatus: product.launch_status,
                                 grossMargin: product.gross_margin,
+                                createdAt: product.created_at,
                             });
                         });
                     }
@@ -780,6 +782,7 @@
                             launchedAt: product.launchedAt,
                             launchStatus: product.launchStatus,
                             grossMargin: product.grossMargin,
+                            isNew:true,
                         });
                     });
                 },
