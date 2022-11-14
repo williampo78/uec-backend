@@ -159,3 +159,7 @@ Route::group(['prefix' => 'checkout'], function () {
 });
 
 Route::get('captcha', [CaptchaController::class, 'getCapcha']);
+
+Route::get('product/{posItemNo}', [ProductController::class, 'getProductByPosItemNo']);
+
+Route::get('stores', [DradviceController::class, 'store']);

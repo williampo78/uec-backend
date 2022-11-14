@@ -431,6 +431,25 @@ class ProductController extends Controller
             $list = $result;
         }
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $list]);
+    }
+
+    /*
+     * 透過POS商品編號取得商品
+     * @param int $posItemNo
+     */
+    public function getProductByPosItemNo($posItemNo)
+    {
+        $error_code = $this->apiService->getErrorCode();
+        $result = $this->apiProductService->getProductByPosItemNo($posItemNo);
+        if ($result['status'] == '200') {
+            $status = true;
+            $msg = null;
+        } else {
+            $status = false;
+            $msg = $error_code[$result['status']];
+        }
+
+        return response()->json(['status' => $status, 'error_code' => $result['status'], 'error_msg' => $msg, 'result' => $result['result']]);
 
     }
 

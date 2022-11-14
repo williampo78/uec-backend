@@ -9,6 +9,7 @@ class DradviceController extends Controller
 {
 
     private $apiService;
+    private $apiProductService;
 
     public function __construct(APIService $apiService)
     {
@@ -60,4 +61,26 @@ class DradviceController extends Controller
         }
         return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $result['data']]);
     }
+
+    /**
+     * 門市代碼清單
+     */
+    public function store()
+    {
+        $status = false;
+        $err = null;
+        $error_code = $this->apiService->getErrorCode();
+        $response = $this->apiService->getStores();
+        if ($response) {
+            $status= true;
+            $err = '';
+            $response = json_decode($response, true);
+        } else {
+            $response = [];
+            $status = false;
+            $err = '201';
+        }
+        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => $error_code[$err], 'result' => $response]);
+    }
+
 }

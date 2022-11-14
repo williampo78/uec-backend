@@ -2069,4 +2069,26 @@ class APIProductServices
         }
         return $productSpec;
     }
+
+    /*
+     * 用POS商品編號取得商品 
+     */
+    public function getProductByPosItemNo($posItemNo) {
+        try{
+            $result['status'] = 404;
+            $result['result'] = null;
+            $productItem = ProductItem::where('pos_item_no', $posItemNo)->where('status', 1)->first();
+            if(isset($productItem)) {
+                $product = Product::find($productItem->product_id);
+                if (isset($product)) {
+                    $result['status'] = 200;
+                    $result['result'] = $product;                    
+                }
+            }
+        } catch(Exception $e) {
+            $result['status'] = 404;
+            $result['result'] = null;
+        }
+        return $result;    
+    }
 }
