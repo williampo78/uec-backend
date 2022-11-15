@@ -1411,6 +1411,10 @@ class APICartServices
             $prodQty = [];
             $cartStockTypeCount['dradvice'] = 0;
             $cartStockTypeCount['supplier'] = 0;
+            $product_payment_method = [
+                'supplier' => [],
+                'dradvice' => []
+            ];
             foreach ($cartInfo['items'] as $prdouct_id => $items) {
                 foreach ($items as $item_id => $item) {
                     $cartDetail[$prdouct_id][$item_id] = $item; //購物車內容
