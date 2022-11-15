@@ -2570,14 +2570,7 @@ class APICartServices
             }
 
             //取得主商品交集共同的付款方式
-            if ( empty($product_payment_method[$stock_type]) || count($product_payment_method[$stock_type]) <= 0) {
-                $cart['paymentMethod'] = ['TAPPAY_CREDITCARD'];
-            } else {
-                foreach ($product_payment_method[$stock_type] as $collection) {
-                    $payment_method = $collection->intersect($payment_method);
-                }
-                $cart['paymentMethod'] = $payment_method->all();
-            }
+            $cart['paymentMethod'] = $this->getPaymentMethod($product_payment_method[$stock_type]);
 
             return json_encode(array("status" => 200, "result" => $cart));
         }
@@ -2591,6 +2584,24 @@ class APICartServices
         $campaign_thresholds = PromotionalCampaignThreshold::with('promotionalCampaignGiveaways')
             ->orderBy('promotional_campaign_id', 'asc')->orderBy('n_value')->get();
         return $campaign_thresholds;
+    }
+
+    /**
+     * @param array $productPaymentMethod
+     *
+     * @return array
+     */
+    protected function getPaymentMethod(array $productPaymentMethod): array
+    {
+        // paymentMethod 預設值
+        $defaultMethod = ['TAPPAY_CREDITCARD'];
+        $paymentMethod = collect($defaultMethod);
+
+        //取得主商品交集共同的付款方式
+        foreach ($productPaymentMethod ?? [] as $collection) {
+            $paymentMethod = $collection->intersect($paymentMethod);
+        }
+        return $paymentMethod->all() ?? $defaultMethod;
     }
 
 }
