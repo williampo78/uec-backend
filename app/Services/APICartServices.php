@@ -2595,13 +2595,15 @@ class APICartServices
     {
         // paymentMethod 預設值
         $defaultMethod = ['TAPPAY_CREDITCARD'];
-        $paymentMethod = collect($defaultMethod);
+        if ( empty($productPaymentMethod) || count($productPaymentMethod) <= 0) {
+            return $defaultMethod;
+        }
 
-        //取得主商品交集共同的付款方式
-        foreach ($productPaymentMethod ?? [] as $collection) {
+        $paymentMethod = $productPaymentMethod[0];
+        foreach ($productPaymentMethod as $collection) {
             $paymentMethod = $collection->intersect($paymentMethod);
         }
-        return $paymentMethod->all() ?? $defaultMethod;
+        return $paymentMethod->all();
     }
 
 }
