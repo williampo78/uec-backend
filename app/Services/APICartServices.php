@@ -2570,11 +2570,14 @@ class APICartServices
             }
 
             //取得主商品交集共同的付款方式
-            $payment_method = isset($product_payment_method[$stock_type][0]) ? $product_payment_method[$stock_type][0] : ['TAPPAY_CREDITCARD'];
-            foreach ($product_payment_method[$stock_type] as $collection) {
-                $payment_method = $collection->intersect($payment_method);
+            if ( empty($product_payment_method[$stock_type]) || count($product_payment_method[$stock_type]) <= 0) {
+                $cart['paymentMethod'] = ['TAPPAY_CREDITCARD'];
+            } else {
+                foreach ($product_payment_method[$stock_type] as $collection) {
+                    $payment_method = $collection->intersect($payment_method);
+                }
+                $cart['paymentMethod'] = $payment_method->all();
             }
-            $cart['paymentMethod'] = $payment_method->all();
 
             return json_encode(array("status" => 200, "result" => $cart));
         }
