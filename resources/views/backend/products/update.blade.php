@@ -1803,11 +1803,11 @@
                     },
                     spec_1: {
                         required: true,
-                        maxlength: 4,
+                        maxlength: 20,
                     },
                     spec_2: {
                         required: true,
-                        maxlength: 4,
+                        maxlength: 20,
                     },
                     product_brief_2: {
                         maxlength: 60,
