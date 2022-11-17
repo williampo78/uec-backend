@@ -48,7 +48,7 @@
                                                         <i class="fa-solid fa-circle-info"></i> 格式說明
                                                     </span>
                                                 </div>
-                                                <input class="form-control" name="pwd" id="pwd" type="password"
+                                                <input class="form-control" name="pwd" id="pwd" type="text"
                                                     autocomplete="off">
                                             </div>
                                         </div>
