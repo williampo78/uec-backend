@@ -318,6 +318,7 @@ class MemberController extends Controller
                 'cancelled_at' => null,
                 'order_no' => $order->order_no,
                 'payment_method' => config('uec.payment_method_options')[$order->payment_method] ?? null,
+                'number_of_instal' => $order->payment_method == 'TAPPAY_INSTAL' ? $order->number_of_instal : '',
                 'receiver_name' => $order->receiver_name,
                 'receiver_mobile' => $order->receiver_mobile,
                 'receiver_zip_code' => $order->receiver_zip_code,
