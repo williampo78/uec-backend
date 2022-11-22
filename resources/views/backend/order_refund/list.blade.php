@@ -15,9 +15,9 @@
         .detail { display: none; }
         .detail-show { display: table-row; }
         .refund-item { cursor: pointer; }
-        .refund-item .fa-chevron-down { display: none }
-        .refund-item-active .fa-chevron-down { display: inline }
-        .refund-item-active span { display: none }
+        .refund-item button:has(.fa-chevron-up) { display: none }
+        .refund-item-active button:has(.fa-chevron-up) { display: inline }
+        .refund-item-active button:has(.fa-chevron-down) { display: none }
         .maintain-return-outer{ grid-template-columns: 1fr 1fr 1fr; gap: 15px; padding: 0 5px; }
         .maintain-return-title{ display: grid; grid-template-columns: 100px 1fr;  align-items: center; }
     </style>
@@ -741,9 +741,15 @@
                                 ${button}
                             </td>
                             <td class="text-nowrap refund-item">
-                                <span>></span>
-                                <i class="fa-sharp fa-solid fa-chevron-down"></i>
+                                <div class="text-nowrap">
+                                    <button class="btn btn-primary"> 展開
+                                        <span class="fa fa-chevron-down"></span>
+                                    </button>
+                                    <button class="btn btn-primary"> 收合
+                                        <span class="fa fa-chevron-up"></span>
+                                    </button>
                                 ${value.examination_no}
+                                </div>
                             </td>
                             <td class="text-nowrap">${value.status_code}</td>
                             <td class="text-nowrap">${value.supplier_name}</td>
