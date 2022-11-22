@@ -346,7 +346,8 @@ class AuthController extends Controller
                     $token = Auth::guard('api')->fromUser($tmp);
                     Member::where('id', $tmp['id'])->update(['api_token' => $token]);
                 } else {
-                    $member = Member::create($result['data']['id']);
+                    $basic['member_id'] = $result['data']['id'];
+                    $member = Member::create($basic);
                     $token = Auth::guard('api')->fromUser($member);
                     Member::where('member_id', '=', $result['data']['id'])->update(['api_token' => $token]);
                 }
