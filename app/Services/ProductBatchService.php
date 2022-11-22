@@ -2,23 +2,24 @@
 
 namespace App\Services;
 
-use App\Jobs\ProductImportJob;
-use App\Models\BatchUploadLog;
 use App\Models\Brand;
 use App\Models\Product;
-use App\Models\ProductItem;
 use App\Models\Supplier;
-use App\Models\TertiaryCategory;
-use App\Models\WebCategoryProduct;
+use App\Models\ProductItem;
+use Illuminate\Support\Str;
+use App\Jobs\ProductImportJob;
+use App\Models\BatchUploadLog;
 use App\Services\BrandsService;
+use App\Models\TertiaryCategory;
+use App\Models\SupplierStockType;
 use App\Services\SupplierService;
+use App\Models\WebCategoryProduct;
 use App\Services\UniversalService;
-use App\Services\WebCategoryHierarchyService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
+use Illuminate\Support\Facades\Storage;
+use App\Services\WebCategoryHierarchyService;
 
 class ProductBatchService
 {
@@ -223,6 +224,7 @@ class ProductBatchService
                     'min_purchase_qty' => $productBasice['min_purchase_qty'] ?? '',
                     'web_category_hierarchy_ids' => $productBasice['web_category_hierarchy_ids'] ?? '',
                     'selling_channel' => $productBasice['selling_channel'] ?? '',
+                    'payment_method'=>'TAPPAY_CREDITCARD,TAPPAY_LINEPAY,TAPPAY_JKOPAY',//付款方式給予預設值
                     'agent_id' => 1,
                     'created_by' => -1,
                     'updated_by' => -1,
@@ -277,13 +279,14 @@ class ProductBatchService
             $brands = $this->brandsService->getBrands();
             $productItem = ProductItem::get();
             $getMaxLevelCategories = $this->webCategoryHierarchyService->getMaxLevelCategories();
-
+            $getSupplierStockType = SupplierStockType::get();
             foreach ($products as $supplier_product_no => $product) {
                 Log::channel('batch_upload')->warning("{$supplier_product_no}");
 
                 $productBasice = $product['productBasice'];
                 $errorMessage = [];
-
+                $stockType = $productBasice['stock_type'] ?? ''; //庫存類型
+                $productType = $productBasice['product_type'] ?? ''; //商品類型
                 //「庫存類型」未填寫
                 if (empty($productBasice['stock_type'])) {
                     $errorMessage[] = '「庫存類型」未填寫';
@@ -297,10 +300,15 @@ class ProductBatchService
                     $errorMessage[] = '「供應商代碼」未填寫';
                 }
                 //「供應商代碼」錯誤
+                $supplierIsset = $supplier->where('display_number', $productBasice['display_number'])->first();
                 if (!empty($productBasice['display_number'])) {
-                    $supplierIsset = $supplier->where('display_number', $productBasice['display_number'])->first();
                     if (!$supplierIsset) {
                         $errorMessage[] = '「供應商代碼」錯誤';
+                    };
+                }
+                if(!empty($productBasice['stock_type']) && isset($supplierIsset->id) && $getSupplierStockType->where('supplier_id',$supplierIsset->id)->where('stock_type',$productBasice['stock_type'])->count() == 0 ){
+                    if (!$supplierIsset) {
+                        $errorMessage[] = "「庫存類型」不允許指定{$productBasice['stock_type']}";
                     };
                 }
                 //「商品名稱」未填寫
@@ -367,12 +375,12 @@ class ProductBatchService
                         break;
                 }
                 //「規格一(名稱)」最長只能有4個字
-                if (!empty($productBasice['spec_1']) && mb_strlen($productBasice['spec_1']) > 4) {
-                    $errorMessage[] = '「規格一(名稱)」最長只能有4個字';
+                if (!empty($productBasice['spec_1']) && mb_strlen($productBasice['spec_1']) > 20) {
+                    $errorMessage[] = '「規格一(名稱)」最長只能有20個字';
                 }
                 // 「規格二(名稱)」最長只能有4個字
-                if (!empty($productBasice['spec_2']) && mb_strlen($productBasice['spec_2']) > 4) {
-                    $errorMessage[] = ' 「規格二(名稱)」最長只能有4個字';
+                if (!empty($productBasice['spec_2']) && mb_strlen($productBasice['spec_2']) > 20) {
+                    $errorMessage[] = ' 「規格二(名稱)」最長只能有20個字';
                 }
 
                 // 「單位」未填寫
@@ -383,62 +391,67 @@ class ProductBatchService
                 if (!empty($productBasice['uom']) && mb_strlen($productBasice['uom']) > 10) {
                     $errorMessage[] = '「單位」不可超過10個字';
                 }
-                // 「材積_長」未填寫
-                if (empty($productBasice['length'])) {
-                    $errorMessage[] = '「材積_長」未填寫';
-                }
-                //「材積_長」須為正整數
-                if (!empty($productBasice['length']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['length'])) {
-                    $errorMessage[] = '「材積_長」須為正整數';
-                }
-                //「材積_寬」未填寫
-                if (empty($productBasice['width'])) {
-                    $errorMessage[] = '「材積_寬」未填寫';
-                }
-                //「材積_寬」須為正整數
-                if (!empty($productBasice['width']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['width'])) {
-                    $errorMessage[] = '「材積_寬」須為正整數';
-                }
-                // 「材積_高」未填寫
-                if (empty($productBasice['height'])) {
-                    $errorMessage[] = '「材積_高」未填寫';
-                }
-                // 「材積_高」須為正整數
-                if (!empty($productBasice['height']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['height'])) {
-                    $errorMessage[] = '「材積_高」須為正整數';
-                }
-                //  「重量」未填寫
-                if (empty($productBasice['weight'])) {
-                    $errorMessage[] = '「重量」未填寫';
-                }
-                //  「重量」須為正整數
-                if (!empty($productBasice['weight']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['weight'])) {
-                    $errorMessage[] = '「重量」須為正整數';
-                }
                 //  「市價」未填寫
-                if (empty($productBasice['list_price'])) {
+                if ((string)$productBasice['list_price'] == '' ) {
                     $errorMessage[] = ' 「市價」未填寫';
                 }
+                // 「售價」未填寫
+                if ((string)$productBasice['selling_price'] == '') {
+                    $errorMessage[] = '「售價」未填寫';
+                }
+                // 「成本」未填寫  「買斷」商品不須填寫
+                if ((string)$productBasice['purchase_price'] == '' && in_array($productBasice['stock_type'], ['B', 'T'])) {
+                    $errorMessage[] = '「成本」未填寫';
+                }
+                switch ($productType) {
+                    case 'N': //一般品
+                        //「成本」須小於「售價」，且成本與售價2欄為「正整數」(不可小於零)
+                        if (!empty($productBasice['selling_price'])
+                            && !empty($productBasice['purchase_price'])
+                            && $productBasice['purchase_price'] >= $productBasice['selling_price']) {
+                            $errorMessage[] = '「成本」須小於「售價」';
+                        }
+                        // 「售價」須為正整數
+                        if (!empty($productBasice['selling_price']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['selling_price'])) {
+                            $errorMessage[] = '「售價」須為正整數';
+                        }
+                        // 「成本」須為正整數
+                        if (!empty($productBasice['purchase_price']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['purchase_price'])) {
+                            $errorMessage[] = '「成本」須為正整數';
+                        }
+                        # code...
+                        break;
+                    case 'G': //贈品
+                        //「成本」須為0、「售價」須為0
+                        // 「售價」須為正整數
+                        if (!empty($productBasice['selling_price']) && $productBasice['selling_price'] != 0) {
+                            $errorMessage[] = '「成本」須為0';
+                        }
+                        // 「成本」須為正整數
+                        if (!empty($productBasice['purchase_price']) && $productBasice['purchase_price'] != 0) {
+                            $errorMessage[] = '「售價」須為0';
+                        }
+                        break;
+                    case 'A': //加購品
+                        // 「售價」須為正整數
+                        if (!empty($productBasice['selling_price']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['selling_price'])) {
+                            $errorMessage[] = '「售價」須為正整數';
+                        }
+                        // 「成本」須為正整數
+                        if (!empty($productBasice['purchase_price']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['purchase_price'])) {
+                            $errorMessage[] = '「成本」須為正整數';
+                        }
+                        break;
+                    default:
+                        # code...
+                        break;
+                }
+
                 // 「市價」須為正整數
                 if (!empty($productBasice['list_price']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['list_price'])) {
                     $errorMessage[] = '「市價」須為正整數';
                 }
-                // 「售價」未填寫
-                if (empty($productBasice['selling_price'])) {
-                    $errorMessage[] = '「售價」未填寫';
-                }
-                // 「售價」須為正整數
-                if (!empty($productBasice['selling_price']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['selling_price'])) {
-                    $errorMessage[] = '「售價」須為正整數';
-                }
-                // 「成本」未填寫  「買斷」商品不須填寫
-                if (empty($productBasice['purchase_price']) && in_array($productBasice['stock_type'], ['B', 'T'])) {
-                    $errorMessage[] = '「成本」未填寫';
-                }
-                // 「成本」須為正整數
-                if (!empty($productBasice['purchase_price']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['purchase_price'])) {
-                    $errorMessage[] = '「成本」須為正整數';
-                }
+
                 // 「商品簡述1」不可超過60個字
                 if (!empty($productBasice['product_brief_1']) && mb_strlen($productBasice['product_brief_1']) > 60) {
                     $errorMessage[] = '「商品簡述1」不可超過60個字';
@@ -452,18 +465,6 @@ class ProductBatchService
                     $errorMessage[] = '「商品簡述3」不可超過60個字';
                 }
 
-                // 「有無保固」須為「Y」或「N」
-                if (!empty($productBasice['is_with_warranty_text']) && !in_array($productBasice['is_with_warranty_text'], ['Y', 'N'])) {
-                    $errorMessage[] = '「有無保固」須為「Y」或「N」';
-                }
-                // 「保固天數」須為正整數
-                if ($productBasice['is_with_warranty_text'] == 'Y' && empty($productBasice['warranty_days'])) {
-                    $errorMessage[] = '「有無保固」填寫Y時 需填寫「保固天數」';
-                }
-                // 「保固天數」須為正整數
-                if ($productBasice['is_with_warranty_text'] == 'Y' && !preg_match("/^[1-9][0-9]*$/", $productBasice['warranty_days'])) {
-                    $errorMessage[] = '「保固天數」須為正整數';
-                }
                 // 「保固範圍」不可超過250個字
                 if (!empty($productBasice['warranty_scope']) && mb_strlen($productBasice['warranty_scope']) > 250) {
                     $errorMessage[] = '「保固範圍」不可超過250個字';
@@ -540,15 +541,62 @@ class ProductBatchService
                         $errorMessage[] = "前台分類 ID :{$web_category_hierarchy_id}不可為指定賣場";
                     }
                 }
+                if (in_array($stockType, ['A', 'B'])) {
+                    //  「最小入庫量」未填寫
+                    if (empty($productBasice['min_purchase_qty'])) {
+                        $errorMessage[] = '「最小入庫量」未填寫';
+                    }
+                    // 「材積_長」未填寫
+                    if (empty($productBasice['length'])) {
+                        $errorMessage[] = '「材積_長」未填寫';
+                    }
+                    //「材積_寬」未填寫
+                    if (empty($productBasice['width'])) {
+                        $errorMessage[] = '「材積_寬」未填寫';
+                    }
+                    // 「材積_高」未填寫
+                    if (empty($productBasice['height'])) {
+                        $errorMessage[] = '「材積_高」未填寫';
+                    }
+                    //  「重量」未填寫
+                    if (empty($productBasice['weight'])) {
+                        $errorMessage[] = '「重量」未填寫';
+                    }
+                    //  「重量」須為正整數
+                    if (!empty($productBasice['weight']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['weight'])) {
+                        $errorMessage[] = '「重量」須為正整數';
+                    }
 
-                //  「最小入庫量」未填寫
-                if (empty($productBasice['min_purchase_qty'])) {
-                    $errorMessage[] = '「最小入庫量」未填寫';
                 }
                 //  「最小入庫量」須為正整數
                 if (!empty($productBasice['min_purchase_qty']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['min_purchase_qty'])) {
                     $errorMessage[] = '「最小入庫量」須為正整數';
                 }
+                //「材積_長」須為正整數
+                if (!empty($productBasice['length']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['length'])) {
+                    $errorMessage[] = '「材積_長」須為正整數';
+                }
+                //「材積_寬」須為正整數
+                if (!empty($productBasice['width']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['width'])) {
+                    $errorMessage[] = '「材積_寬」須為正整數';
+                }
+                // 「材積_高」須為正整數
+                if (!empty($productBasice['height']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['height'])) {
+                    $errorMessage[] = '「材積_高」須為正整數';
+                }
+                // 「保固天數」須為正整數
+                if (!empty($productBasice['is_with_warranty_text']) && $productBasice['is_with_warranty_text'] == 'Y' && empty($productBasice['warranty_days'])) {
+                    $errorMessage[] = '「有無保固」填寫Y時 需填寫「保固天數」';
+                }
+                // 「保固天數」須為正整數
+                if (!empty($productBasice['is_with_warranty_text']) == 'Y' && !preg_match("/^[1-9][0-9]*$/", $productBasice['warranty_days'])) {
+                    $errorMessage[] = '「保固天數」須為正整數';
+                }
+                // 「有無保固」須為「Y」或「N」
+                if (!empty($productBasice['is_with_warranty_text']) && !in_array($productBasice['is_with_warranty_text'], ['Y', 'N'])) {
+                    $errorMessage[] = '「有無保固」須為「Y」或「N」';
+                }
+
                 //「商品通路」未填寫
                 if (empty($productBasice['selling_channel'])) {
                     $errorMessage[] = '「商品通路」未填寫';
@@ -558,6 +606,16 @@ class ProductBatchService
                     $errorMessage[] = '「商品通路」須為「E」或「S」或「W」';
                 }
                 foreach ($product['productItems'] as $item) {
+                    if (in_array($stockType, ['A', 'B'])) {
+                        // 「安全庫存量」未填寫
+                        if (empty($item['safty_qty'])) {
+                            $errorMessage[] = '「安全庫存量」未填寫';
+                        }
+                    }
+                    // 「安全庫存量」須為正整數
+                    if (!empty($item['safty_qty']) && !preg_match("/^[1-9][0-9]*$/", $item['safty_qty'])) {
+                        $errorMessage[] = '「安全庫存量」須為正整數';
+                    }
                     if (empty($item['supplier_item_no'])) {
                         $errorMessage[] = '「廠商貨號」未填寫';
                     }
@@ -586,14 +644,6 @@ class ProductBatchService
                         } else {
                             array_push($pos_item_no_arrays, $item['pos_item_no']);
                         }
-                    }
-                    // 「安全庫存量」未填寫
-                    if (empty($item['safty_qty'])) {
-                        $errorMessage[] = '「安全庫存量」未填寫';
-                    }
-                    // 「安全庫存量」須為正整數
-                    if (!empty($item['safty_qty']) && !preg_match("/^[1-9][0-9]*$/", $item['safty_qty'])) {
-                        $errorMessage[] = '「安全庫存量」須為正整數';
                     }
 
                 }
@@ -825,10 +875,30 @@ class ProductBatchService
                         # code...
                         break;
                 }
+                // 「最小入庫量」未填寫 int 
+                if($productBasice['min_purchase_qty'] == ''){
+                    $productBasice['min_purchase_qty'] = 0;
+                }
+                if($productBasice['length'] == ''){
+                    $productBasice['length'] = 0;
+                }
+                if($productBasice['width'] == ''){
+                    $productBasice['width'] = 0;
+                }
+                if($productBasice['height'] == ''){
+                    $productBasice['height'] = 0;
+                }
+                if($productBasice['weight'] == ''){
+                    $productBasice['weight'] = 0;
+                }
+                if($productBasice['warranty_days'] == ''){
+                    $productBasice['warranty_days'] = 0;
+                }
+
+
 
                 //寫入新品提報table
                 $productId = Product::create($productBasice->toArray())->id;
-
                 $product_no = $this->universalService->getDocNumber('products', ['stock_type' => $productBasice['stock_type'], 'id' => $productId]);
                 Product::where('id', $productId)->update(['product_no' => $product_no]);
                 //前台分類
@@ -900,7 +970,7 @@ class ProductBatchService
                         'supplier_item_no' => $item['supplier_item_no'],
                         'item_no' => $product_no . str_pad($add_item_no, 4, "0", STR_PAD_LEFT), //新增時直接用key生成id
                         'photo_name' => $photoName,
-                        'safty_qty' => $item['safty_qty'],
+                        'safty_qty' => $item['safty_qty'] == '' ? 0 : $item['safty_qty'] ,
                         'is_additional_purchase' => $item['is_additional_purchase'],
                         'status' => $item['status'],
                         'created_by' => -1,
@@ -910,7 +980,7 @@ class ProductBatchService
                     ];
                     $produceSkuForm['skuListdata'][$key]['id'] = ProductItem::create($skuInsert)->id;
                     $produceSkuForm['skuListdata'][$key]['item_no'] = $product_no . str_pad($add_item_no, 4, "0", STR_PAD_LEFT);
-                    $produceSkuForm['skuListdata'][$key]['safty_qty'] = ltrim($item['safty_qty'], '0');
+                    $produceSkuForm['skuListdata'][$key]['safty_qty'] = $item['safty_qty'] == '' ? 0 : $item['safty_qty'];
                     $add_item_no += 1;
                 }
 
@@ -1001,7 +1071,7 @@ class ProductBatchService
                 "item_no" => "",
                 "pos_item_no" => $item["pos_item_no"],
                 "supplier_item_no" => $item["supplier_item_no"],
-                "safty_qty" => $item["safty_qty"],
+                "safty_qty" => $item['safty_qty'] == '' ? 0 : $item['safty_qty'],
                 "ean" => $item["ean"],
                 "is_additional_purchase" => "1", //是否追加先寫死 1
                 "status" => "1", //狀態寫死 1
