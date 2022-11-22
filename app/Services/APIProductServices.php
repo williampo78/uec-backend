@@ -916,7 +916,8 @@ class APIProductServices
                 "brand" => $brand[0]->brand_name,
                 "promotion_label" => $promotional,
                 "selling_channel" => $product[$id]->selling_channel,
-                "start_selling" => $product[$id]->start_selling_at
+                "start_selling" => $product[$id]->start_selling_at,
+                "cart_type" => $product[$id]->stock_type == 'T' ? 'supplier' : 'dradvice'
             );
             $data['productInfo'] = $product_info;
 
@@ -1597,7 +1598,8 @@ class APIProductServices
                 "selling_price" => intval($product[$id]->selling_price),
                 "list_price" => intval($product[$id]->list_price),
                 "selling_channel" => $product[$id]->selling_channel,
-                "start_selling" => $product[$id]->start_selling_at
+                "start_selling" => $product[$id]->start_selling_at,
+                "cart_type" => $product[$id]->stock_type == 'T' ? 'supplier' : 'dradvice'
             );
             $data['productInfo'] = $product_info;
 
