@@ -264,6 +264,7 @@ class ReturnGoodsService
         $this->newOrder = $this->oldOrder->replicate();
         $totalAmount = $this->createOrderDetailData->sum('subtotal');
         $pointDiscount = $this->createOrderDetailData->sum('point_discount');
+        $paidAmount = $totalAmount + $this->newOrder->cart_campaign_discount + $this->newOrder->cart_p_discount + $pointDiscount + $this->newOrder->shipping_fee;
 
         //與舊單不同的資料
         $createData = [
@@ -276,15 +277,15 @@ class ReturnGoodsService
             //點數折扣
             'point_discount'           => $pointDiscount,
             //實際付款金額
-            'paid_amount'              => $totalAmount + $this->newOrder->cart_campaign_discount + $this->newOrder->cart_p_discount + $pointDiscount + $this->newOrder->shipping_fee,
+            'paid_amount'              => $paidAmount,
             //使用點數
             'points'                   => $this->createOrderDetailData->sum('points'),
             //已退購物車滿額折扣
-            'returned_cart_p_discount' => $this->createOrderDetailData->sum('returned_cart_p_discount'),
+            'returned_cart_p_discount' => 0,
             //已退點數折扣
             'returned_point_discount'  => $this->createOrderDetailData->sum('returned_point_discount'),
             //已退付款金額
-            'returned_paid_amount'     => $this->newOrder->returned_paid_amount + $this->createOrderDetailData->sum('returned_subtotal'),
+            'returned_paid_amount'     => $this->newOrder->returned_paid_amount + $paidAmount - $this->newOrder->paid_amount,
             //已退點數
             'returned_points'          => $this->createOrderDetailData->sum('returned_points'),
             //退款狀態
