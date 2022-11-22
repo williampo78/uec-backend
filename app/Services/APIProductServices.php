@@ -424,8 +424,9 @@ class APIProductServices
         } else if ($order_by == 'attribute') {
             $products = $products->orderBy('brands.id', 'asc');
             $products = $products->orderBy('product_attribute_lov.id', 'asc');
+        } else {
+            $products = $products->orderBy('p.id', 'asc');
         }
-        $products = $products->orderBy('p.id', 'asc');
 
         $products = $products->get();
         $data = [];
