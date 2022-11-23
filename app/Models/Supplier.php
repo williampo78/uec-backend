@@ -84,4 +84,13 @@ class Supplier extends Model
     {
         return $this->hasMany(Product::class, 'supplier_id');
     }
+
+    /**
+     * @return HasMany
+     * @DateTime: 2022/11/22 下午 05:28
+     */
+    public function supplierStockTypes(): HasMany
+    {
+        return $this->hasMany(SupplierStockType::class, 'supplier_id');
+    }
 }

@@ -67,6 +67,10 @@ class SupplierController extends Controller
         $result['supplierContractTerms'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
             'type_code' => 'SUPPLIER_CONTRACT_TERMS',
         ]);
+        //可上架庫存類型
+        $result['stockTypes'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
+            'type_code' => 'STOCK_TYPE',
+        ]);
 
         return view('backend.supplier.create', $result);
     }
@@ -113,6 +117,10 @@ class SupplierController extends Controller
         ]);
         // 供應商
         $result['supplier'] = $this->supplierService->getSupplierById($id);
+        //可上架庫存類型
+        $result['stockTypes'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
+            'type_code' => 'STOCK_TYPE',
+        ]);
 
         return view('backend.supplier.show', $result);
     }
@@ -137,6 +145,10 @@ class SupplierController extends Controller
         ]);
         // 供應商
         $result['supplier'] = $this->supplierService->getSupplierById($id);
+        //可上架庫存類型
+        $result['stockTypes'] = $this->lookupValuesVService->getLookupValuesVsForBackend([
+            'type_code' => 'STOCK_TYPE',
+        ]);
 
         return view('backend.supplier.edit', $result);
     }

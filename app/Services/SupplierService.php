@@ -6,6 +6,7 @@ use App\Models\Contact;
 use App\Models\Supplier;
 use App\Models\SupplierContract;
 use App\Models\SupplierContractTerm;
+use App\Models\SupplierStockType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -15,6 +16,14 @@ use Illuminate\Support\Facades\Log;
 
 class SupplierService
 {
+    private $lookupValuesVService;
+
+    public function __construct(
+        LookupValuesVService $lookupValuesVService
+    ) {
+        $this->lookupValuesVService = $lookupValuesVService;
+    }
+
     /**
      * 取得所有供應商
      *
@@ -118,6 +127,17 @@ class SupplierService
                         'updated_by' => $user->id,
                     ]);
                 }
+            }
+
+            //新增可上架庫存類型
+            foreach ($data['stock_type'] as $stockType) {
+                $createdSupplier
+                    ->supplierStockTypes()
+                    ->create([
+                        'stock_type' => $stockType,
+                        'created_by' => $user->id,
+                        'updated_by' => $user->id,
+                    ]);
             }
 
             DB::commit();
@@ -296,6 +316,34 @@ class SupplierService
             // 刪除供應商合約條款明細
             SupplierContractTerm::where('supplier_contract_id', $supplierContractId)->whereNotIn('id', $updatedSupplierContractTermIds)->delete();
 
+            //取得可上架庫存類型
+            $stockTypes = $this->lookupValuesVService->getLookupValuesVsForBackend([
+                'type_code' => 'STOCK_TYPE',
+            ])->pluck('code');
+            //會被刪除的上架庫存類型
+            $deleteStockTypes = [];
+
+            foreach ($stockTypes as $stockType) {
+                //新增
+                if (in_array($stockType, $data['stock_type'], true)) {
+                    SupplierStockType::firstOrCreate([
+                        'supplier_id' => $id,
+                        'stock_type'  => $stockType
+                    ], [
+                        'supplier_id' => $id,
+                        'stock_type'  => $stockType,
+                        'created_by'  => $user->id,
+                        'updated_by'  => $user->id
+                    ]);
+                } else {
+                    $deleteStockTypes[] = $stockType;
+                }
+            }
+            //刪除上架庫存類型
+            SupplierStockType::where('supplier_id', $id)
+                ->whereIn('stock_type', $deleteStockTypes)
+                ->delete();
+
             DB::commit();
             $result = true;
         } catch (\Exception $e) {
@@ -354,6 +402,7 @@ class SupplierService
             'contacts',
             'supplierContract',
             'supplierContract.supplierContractTerms',
+            'supplierStockTypes'
         ])->where('agent_id', $user->agent_id)->find($id);
 
         return $supplier;

@@ -140,6 +140,19 @@
                                             </select2>
                                         </div>
                                     </div>
+                                    <div class="col-sm-8">
+                                        <div class="form-group">
+                                            <label class="control-label" for="">可上架庫存類型
+                                                <span style="color: red;">*</span>
+                                            </label>
+                                            <div class="checkbox">
+                                                <label v-for="(stockType, index) in stockTypes" :key="index">
+                                                    <input type="checkbox" :value="stockType.code" name="stock_type[]" v-model="form.stockType">
+                                                    @{{ stockType.description }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="row">
@@ -450,6 +463,7 @@
                         billingCycle: "",
                         terms: [],
                     },
+                    stockType: @json($supplier->supplierStockTypes->pluck('stock_type'))
                 },
                 supplierTypes: [],
                 paymentTerms: [],
@@ -496,6 +510,7 @@
                     },
                 ],
                 supplierContractTerms: [],
+                stockTypes: @json($stockTypes)
             },
             created() {
                 let supplierTypes = @json($supplierTypes);
@@ -715,11 +730,17 @@
                         remark: {
                             maxlength: 150,
                         },
+                        'stock_type[]': {
+                            required: true,
+                        },
                     },
                     messages: {
                         display_number: {
                             remote: '供應商編號已存在',
-                        }
+                        },
+                        'stock_type[]': {
+                            required: '尚未勾選〔可上架庫存類型〕',
+                        },
                     },
                     errorClass: "help-block",
                     errorElement: "span",
