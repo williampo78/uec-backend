@@ -52,6 +52,9 @@
                                                 <option value="B"
                                                     {{ request()->input('stock_type') == 'B' ? 'selected' : '' }}>寄售[B]
                                                 </option>
+                                                <option value="T"
+                                                    {{ request()->input('stock_type') == 'T' ? 'selected' : '' }}>轉單[T]
+                                                </option>
                                             </select>
                                         </div>
                                     </div>

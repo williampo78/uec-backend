@@ -95,6 +95,9 @@ class InventoryService
                 case 'B':
                     $stock_type_chinese = '寄售[B]';
                     break;
+                case 'T':
+                    $stock_type_chinese = '轉單[T]';
+                    break;
                 default:
                     $stock_type_chinese = '';
             }
