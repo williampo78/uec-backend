@@ -1258,7 +1258,7 @@ class OrderService
      */
     public function getShipmentByOrderNoAndSeq(string $orderNo, string $seq)
     {
-        $data = Order::select('shipments.shipment_no', 'shipments.status_code')
+        $data = Order::select('shipments.shipment_no', 'shipments.status_code', 'shipments.shipped_at', 'shipments.delivered_at')
             ->join('order_details', 'order_details.order_id', 'orders.id')
             ->join('shipments', 'shipments.order_no', 'orders.order_no')
             ->join("shipment_details", function ($join) {

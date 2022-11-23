@@ -40,7 +40,8 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
     /**
      * 需合併儲存格的欄位
      */
-    private const MERGE_CELL_COLUMNS = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
+    // private const MERGE_CELL_COLUMNS = ['B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T'];
+    private const MERGE_CELL_COLUMNS = [];
 
     public function __construct($orders)
     {

@@ -158,6 +158,8 @@
                                         <th class="text-nowrap">已退點數折抵</th>
                                         <th class="text-nowrap">出貨單號</th>
                                         <th class="text-nowrap">出貨單狀態</th>
+                                        <th class="text-nowrap">出貨時間</th>
+                                        <th class="text-nowrap">(宅配)配達時間</th>
                                     </tr>
                                 </thead>
                                 <tbody>

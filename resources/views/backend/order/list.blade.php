@@ -441,6 +441,8 @@
                                         <th class="text-nowrap">已退點數折抵</th>
                                         <th class="text-nowrap">出貨單號</th>
                                         <th class="text-nowrap">出貨單狀態</th>
+                                        <th class="text-nowrap">出貨時間</th>
+                                        <th class="text-nowrap">(宅配)配達時間</th>
                                     </tr>
                                     `);
 
@@ -468,6 +470,8 @@
                                         <td>${order_detail.returned_point_discount}</td>
                                         <td>${order_detail.shipment_no}</td>
                                         <td>${order_detail.status_code}</td>
+                                        <td>${order_detail.shipped_at}</td>
+                                        <td>${order_detail.delivered_at}</td>
                                     </tr>
                                 `);
                                 } else {
@@ -496,6 +500,8 @@
                                         <td>${order_detail.returned_point_discount}</td>
                                         <td>${order_detail.shipment_no}</td>
                                         <td>${order_detail.status_code}</td>
+                                        <td>${order_detail.shipped_at}</td>
+                                        <td>${order_detail.delivered_at}</td>
                                     </tr>
                                 `);
                                 }

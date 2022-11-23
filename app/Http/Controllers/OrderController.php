@@ -262,6 +262,8 @@ class OrderController extends Controller
                     'returned_point_discount' => null,
                     'shipment_no' => '',
                     'status_code' => '',
+                    'shipped_at' => '',
+                    'delivered_at' => '',
                 ];
 
                 // 單位售價 (商品主檔維護的售價)
@@ -309,14 +311,16 @@ class OrderController extends Controller
 
                 $shipmentData = $this->orderService->getShipmentByOrderNoAndSeq($payload['order_no'], $orderDetail->seq);
 
-                // 出貨單號
-                if (!empty($shipmentData)) {
-                    $orderDetails['shipment_no'] = $shipmentData->shipment_no;
-                }
 
-                // 出貨單狀態
                 if (!empty($shipmentData)) {
+                    // 出貨單號
+                    $orderDetails['shipment_no'] = $shipmentData->shipment_no;
+                    // 出貨單狀態
                     $orderDetails['status_code'] = config('uec.shipment_status_code_options')[$shipmentData->status_code];
+                    // 出貨時間
+                    $orderDetails['shipped_at'] = $shipmentData->shipped_at ?? '';
+                    // (宅配)配達時間
+                    $orderDetails['delivered_at'] = $shipmentData->delivered_at ?? '';
                 }
 
                 $payload['order_details'][] = $orderDetails;
