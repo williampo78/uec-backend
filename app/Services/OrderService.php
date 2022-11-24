@@ -535,6 +535,8 @@ class OrderService
 
         }
         $tmp_group = "";
+        //用於排除被使用過的贈品資料
+        $recordOrderCampaignDiscountIds = [];
         foreach ($order_details as $key => $val) {
             $findProductPRD_M = OrderCampaignDiscount::where('order_detail_id', '=', $val['id'])
                 ->where('order_id', $orders['results']['order_id'])
@@ -588,7 +590,7 @@ class OrderService
                     if (!isset($order_details[$key]['discount_content'][$PRD->group_seq])) {
                         $qty = optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty - optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->returned_qty;
 
-                        if ($tmp_group != $PRD->order_detail_id) {
+                        if (!in_array($PRD->id, $recordOrderCampaignDiscountIds)) {
                             $order_details[$key]['discount_content'][$PRD->group_seq] = [
                                 'display' => true,
                                 'campaignName' => $PRD->promotionalCampaign->campaign_name,
@@ -616,17 +618,21 @@ class OrderService
                                 'campaignProdList' => [],
                             ];
                         }
+                        $recordOrderCampaignDiscountIds[] = $PRD->id;
                     } else {
-                        $qty = optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty - optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->returned_qty;
-                        $order_details[$key]['discount_content'][$PRD->group_seq]['campaignProdList'][] = [
-                            'id' => $PRD->order_detail_id,
-                            'productId' => $PRD->product->id,
-                            'productName' => $PRD->product->product_name,
-                            'productPhoto' => $photo_name,
-                            'qty' => $qty,
-                            'spec_1_value' => optional($PRD->productItem)->spec_1_value,
-                            'spec_2_value' => optional($PRD->productItem)->spec_2_value
-                        ];
+                        if (!in_array($PRD->id, $recordOrderCampaignDiscountIds)) {
+                            $qty = optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->qty - optional($OrderDetails->where('id', $PRD->order_detail_id)->first())->returned_qty;
+                            $order_details[$key]['discount_content'][$PRD->group_seq]['campaignProdList'][] = [
+                                'id'           => $PRD->order_detail_id,
+                                'productId'    => $PRD->product->id,
+                                'productName'  => $PRD->product->product_name,
+                                'productPhoto' => $photo_name,
+                                'qty'          => $qty,
+                                'spec_1_value' => optional($PRD->productItem)->spec_1_value,
+                                'spec_2_value' => optional($PRD->productItem)->spec_2_value
+                            ];
+                        }
+                        $recordOrderCampaignDiscountIds[] = $PRD->id;
                     }
 
                 }
