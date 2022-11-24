@@ -307,9 +307,7 @@ class ProductBatchService
                     };
                 }
                 if(!empty($productBasice['stock_type']) && isset($supplierIsset->id) && $getSupplierStockType->where('supplier_id',$supplierIsset->id)->where('stock_type',$productBasice['stock_type'])->count() == 0 ){
-                    if (!$supplierIsset) {
-                        $errorMessage[] = "「庫存類型」不允許指定{$productBasice['stock_type']}";
-                    };
+                    $errorMessage[] = "「庫存類型」不允許指定{$productBasice['stock_type']}";
                 }
                 //「商品名稱」未填寫
                 if (empty($productBasice['product_name'])) {
@@ -615,9 +613,6 @@ class ProductBatchService
                     // 「安全庫存量」須為正整數
                     if (!empty($item['safty_qty']) && !preg_match("/^[1-9][0-9]*$/", $item['safty_qty'])) {
                         $errorMessage[] = '「安全庫存量」須為正整數';
-                    }
-                    if (empty($item['supplier_item_no'])) {
-                        $errorMessage[] = '「廠商貨號」未填寫';
                     }
                     //「廠商貨號」不可超過100個字
                     if (!empty($item['supplier_item_no']) && mb_strlen($item['supplier_item_no']) > 100) {
