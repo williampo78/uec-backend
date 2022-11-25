@@ -7,7 +7,8 @@ return [
      *   指定為3時，中分類清單顯示﹝展小類﹞的按鈕
      */
     'web_category_hierarchy_levels' => env('UEC_CATEGORY_LEVEL', '2'),
-
+    'batch_upload_path'=>env('BATCH_UPLOAD_PATH','uploads/batch/'),
+    'batch_upload_log_path'=>env('BATCH_UPLOAD_LOG_PATH','log/batchLog/'),
     'config_key' => 'EC_WAREHOUSE_GOODS',
 
     /*

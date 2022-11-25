@@ -51,7 +51,7 @@ class ProductBatchService
         $dateYmdHis = date('YmdHis');
 
         $fileName = "{$dateYmdHis}{$random}.{$originaType}";
-        $filePath = "uploads/batch/{$dateY}/{$random}/{$fileName}";
+        $filePath = env('BATCH_UPLOAD_PATH','uploads/batch/')."{$dateY}/{$random}/{$fileName}";
 
         Storage::put(
             $filePath,

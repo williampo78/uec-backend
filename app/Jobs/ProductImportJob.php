@@ -93,7 +93,7 @@ class ProductImportJob implements ShouldQueue
             if (!empty($verifyProduct) || !empty($verifySkuItem || !empty($verifyPhoto))) {
 
                 $random = Str::random(40);
-                $excelEndPath = "log/batchLog/{$random}.xlsx";
+                $excelEndPath = config('uec.batch_upload_path')."{$random}.xlsx";
 
                 Excel::store(new ErrorImpoerLogExport($productBatchService->exportForm([
                     'verifyProduct' => $verifyProduct,
