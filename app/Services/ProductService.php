@@ -17,6 +17,7 @@ use App\Models\RelatedProduct;
 use App\Models\WarehouseStock;
 use App\Models\WebCategoryHierarchy;
 use App\Models\WebCategoryProduct;
+use App\Models\SupplierStockType;
 use App\Services\UniversalService;
 use Batch;
 use Carbon\Carbon;
@@ -214,18 +215,12 @@ class ProductService
                 'expiry_receiving_days' => $in['expiry_receiving_days'],
                 'product_type' => $in['product_type'],
                 'is_discontinued' => $in['is_discontinued'],
-                'length' => $in['length'],
-                'width' => $in['width'],
-                'height' => $in['height'],
-                'weight' => $in['weight'],
                 'list_price' => $in['list_price'],
                 'selling_price' => $in['selling_price'],
                 'product_brief_1' => $in['product_brief_1'],
                 'product_brief_2' => $in['product_brief_2'],
                 'product_brief_3' => $in['product_brief_3'],
                 'patent_no' => $in['patent_no'],
-                'is_with_warranty' => $in['is_with_warranty'],
-                'warranty_days' => $in['warranty_days'] ?? 0,
                 'warranty_scope' => $in['warranty_scope'],
                 'spec_dimension' => $in['spec_dimension'],
                 'spec_1' => $in['spec_1'] ?? '',
@@ -238,10 +233,34 @@ class ProductService
                 'updated_at' => $now,
                 'agent_id' => $agent_id,
             ];
-            //付款方式
+            // 付款方式
             if (isset($in['payment_method'])) {
                 $payment_method_string = implode(",", $in['payment_method']);
                 $insert['payment_method'] = $payment_method_string;
+            }
+            // 長(cm)
+            if (isset($in['length'])) {
+                $insert['length'] = $in['length'] ?? 0;
+            }
+            // 寬(cm)
+            if (isset($in['width'])) {
+                $insert['width'] = $in['width'] ?? 0;
+            }
+            // 高(cm)
+            if (isset($in['height'])) {
+                $insert['height'] = $in['height'] ?? 0;
+            }
+            // 重量(g)
+            if (isset($in['weight'])) {
+                $insert['weight'] = $in['weight'] ?? 0;
+            }
+            //是否有保固
+            if (isset($in['is_with_warranty'])) {
+                $insert['is_with_warranty'] = $in['is_with_warranty'];
+            }
+            //保固期限(天)
+            if (isset($in['warranty_days'])) {
+                $insert['warranty_days'] = $in['warranty_days'] ?? 0;
             }
             $products_id = Product::create($insert)->id;
             $product_no = $this->universalService->getDocNumber('products', ['stock_type' => $in['stock_type'], 'id' => $products_id]);
@@ -259,7 +278,7 @@ class ProductService
                     'supplier_item_no' => $val['supplier_item_no'],
                     'ean' => $val['ean'],
                     'pos_item_no' => $val['pos_item_no'],
-                    'safty_qty' => $skuList[$key]['safty_qty'],
+                    'safty_qty' => $skuList[$key]['safty_qty'] != '' ? (int)$skuList[$key]['safty_qty'] : 0,
                     'is_additional_purchase' => $val['is_additional_purchase'],
                     'status' => $val['status'],
                     'created_by' => $user_id,
@@ -341,18 +360,12 @@ class ProductService
                 'expiry_receiving_days' => $in['expiry_receiving_days'],
                 'product_type' => $in['product_type'],
                 'is_discontinued' => $in['is_discontinued'],
-                'length' => $in['length'],
-                'width' => $in['width'],
-                'height' => $in['height'],
-                'weight' => $in['weight'],
                 'list_price' => $in['list_price'],
                 'selling_price' => $in['selling_price'],
                 'product_brief_1' => $in['product_brief_1'],
                 'product_brief_2' => $in['product_brief_2'],
                 'product_brief_3' => $in['product_brief_3'],
                 'patent_no' => $in['patent_no'],
-                'is_with_warranty' => $in['is_with_warranty'],
-                'warranty_days' => $in['warranty_days'],
                 'warranty_scope' => $in['warranty_scope'],
                 'spec_1' => $in['spec_1'] ?? null,
                 'spec_2' => $in['spec_2'] ?? null,
@@ -379,6 +392,30 @@ class ProductService
             }
             if (isset($in['brand_id']) && $in['brand_id'] !== '') {
                 $update['brand_id'] = $in['brand_id'];
+            }
+            // 長(cm)
+            if (isset($in['length'])) {
+                $update['length'] = $in['length'] ?? 0;
+            }
+            // 寬(cm)
+            if (isset($in['width'])) {
+                $update['width'] = $in['width'] ?? 0;
+            }
+            // 高(cm)
+            if (isset($in['height'])) {
+                $update['height'] = $in['height'] ?? 0;
+            }
+            // 重量(g)
+            if (isset($in['weight'])) {
+                $update['weight'] = $in['weight'] ?? 0;
+            }
+            //是否有保固
+            if (isset($in['is_with_warranty'])) {
+                $update['is_with_warranty'] = $in['is_with_warranty'];
+            }
+            //保固期限(天)
+            if (isset($in['warranty_days'])) {
+                $update['warranty_days'] = $in['warranty_days'] ?? 0;
             }
             Product::where('id', $products_id)->update($update);
             $logCreateIn = [
@@ -448,7 +485,7 @@ class ProductService
                         'supplier_item_no' => $val['supplier_item_no'],
                         'ean' => $val['ean'],
                         'pos_item_no' => $val['pos_item_no'],
-                        'safty_qty' => $skuList[$key]['safty_qty'],
+                        'safty_qty' => $skuList[$key]['safty_qty'] != '' ? (int)$skuList[$key]['safty_qty'] : 0,
                         'is_additional_purchase' => $val['is_additional_purchase'],
                         'status' => $val['status'],
                         'edi_exported_status' => null,
@@ -469,7 +506,7 @@ class ProductService
                         'supplier_item_no' => $val['supplier_item_no'],
                         'ean' => $val['ean'],
                         'pos_item_no' => $val['pos_item_no'],
-                        'safty_qty' => $skuList[$key]['safty_qty'],
+                        'safty_qty' => $skuList[$key]['safty_qty'] != '' ? (int)$skuList[$key]['safty_qty'] : 0,
                         'is_additional_purchase' => $val['is_additional_purchase'],
                         'status' => $val['status'],
                         'updated_by' => $user_id,
@@ -992,6 +1029,20 @@ class ProductService
             return true;
         }
 
+    }
+
+    /**
+     * 取得供應商的庫存類型
+     *
+     * @param integer $id
+     * @return array
+     */
+    public function getSupplierStockTypeBySupplierId(int $id): array
+    {
+        $supplierStockType = SupplierStockType::where('supplier_id', $id)->get();
+        $stockTypes = $supplierStockType->pluck('stock_type')->all();
+
+        return $stockTypes;
     }
 
     /**

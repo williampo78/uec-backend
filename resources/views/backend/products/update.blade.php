@@ -1670,9 +1670,15 @@
 
                 $(".safty_qty_va").each(function() {
                     $(this).rules("add", {
-                        required: true,
-                        digits: true,
-                        notOnlyZero:true,
+                        required: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
+                        digits: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
+                        notOnlyZero: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
                         messages: {
                             digits: '請輸入正整數'
                         },
@@ -1744,6 +1750,10 @@
                         alert('至少上傳一張圖片')
                         return false;
                     }
+                    if ($("input[name=product_type]:checked").val() == 'G' && $("input[name=selling_price]").val() != 0) {
+                        alert('商品類型為贈品則售價須為0');
+                        return false;
+                    }
                     $('#save_data').prop('disabled', true);
                     form.submit();
                 },
@@ -1766,6 +1776,11 @@
                     selling_channel:{
                         required: true,
                     },
+                    is_with_warranty: {
+                        required: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
+                    },
                     uom: {
                         required: true,
                     },
@@ -1775,16 +1790,28 @@
                     },
                     //長
                     length: {
-                        required: true,
-                        digits: true,
+                        required: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
+                        digits: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
                     },
                     width: {
-                        required: true,
-                        digits: true,
+                        required: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
+                        digits: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
                     },
                     height: {
-                        required: true,
-                        digits: true,
+                        required: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
+                        digits: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
                     },
                     list_price: {
                         required: true,
@@ -1795,8 +1822,12 @@
                         digits: true,
                     }, //重量
                     weight: {
-                        required: true,
-                        digits: true,
+                        required: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
+                        digits: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
                     },
                     product_brief_1: {
                         maxlength: 60,
@@ -1817,13 +1848,13 @@
                     },
                     warranty_days: {
                         required: function() {
-                            return $("input[name=is_with_warranty]:checked").val() == '1';
+                            return $("input[name=is_with_warranty]:checked").val() == '1' && $("input[name=stock_type]:checked").val() != 'T';
                         },
                         digits: function() {
-                            return $("input[name=is_with_warranty]:checked").val() == '1';
+                            return $("input[name=is_with_warranty]:checked").val() == '1' && $("input[name=stock_type]:checked").val() != 'T';
                         },
                         min: function() {
-                            if ($("input[name=is_with_warranty]:checked").val() == '1') {
+                            if ($("input[name=is_with_warranty]:checked").val() == '1' && $("input[name=stock_type]:checked").val() != 'T') {
                                 return 0.01;
                             } else {
                                 return 0;
@@ -1839,7 +1870,7 @@
                     warranty_days: {
                         digits: "只可輸入正整數",
                         min: function() {
-                            if ($("input[name=has_expiry_date]:checked").val() == '1') {
+                            if ($("input[name=has_expiry_date]:checked").val() == '1' && $("input[name=stock_type]:checked").val() != 'T') {
                                 return '只可輸入正整數';
                             }
                         },

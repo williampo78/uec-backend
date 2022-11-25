@@ -246,6 +246,9 @@ class ProductController extends Controller
             case 'checkItemQty':
                 $result = $this->productService->checkItemQty($in['item_id']);
                 break;
+            case 'getSupplierStockType':
+                $result = $this->productService->getSupplierStockTypeBySupplierId($in['supplier_id']);
+                break;
             default:
                 break;
         }

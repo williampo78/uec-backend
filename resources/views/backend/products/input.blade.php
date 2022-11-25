@@ -77,19 +77,19 @@
                                     <div class="col-sm-2">
                                         <label class="control-label">庫存類型</label><span class="text-red">*</span>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-3" id="stock_type_a">
                                         <label class="radio-inline">
                                             <input type="radio" name="stock_type" value="A" checked> 買斷
                                             [A]
                                         </label>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-3" id="stock_type_b">
                                         <label class="radio-inline">
                                             <input type="radio" name="stock_type" value="B"> 寄售
                                             [B]
                                         </label>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-3" id="stock_type_t">
                                         <label class="radio-inline">
                                             <input type="radio" name="stock_type" value="T">
                                             轉單[T]
@@ -1148,7 +1148,6 @@
             }
         }
         $(document).ready(function() {
-
             $('input[type=radio][name=stock_type]').change(function() {
                 if ($(this).val() == 'T') {
                     $('.stock_type_list').hide();
@@ -1156,6 +1155,43 @@
                     $('.stock_type_list').show();
                 }
             });
+
+            $(".supplier_id").change(function() {
+                $('#stock_type_a').hide();
+                $('#stock_type_b').hide();
+                $('#stock_type_t').hide();
+                $('input[name=stock_type]').prop("checked", false);
+
+                let supplier_id = $(this).val();
+
+                axios({
+                    method: "post",
+                    url: "/backend/products/ajax",
+                    params: {
+                        type: 'getSupplierStockType',
+                        supplier_id: supplier_id,
+                    },
+                })
+                .then((response) => {
+                    let supplierTypes = response.data.result;
+
+                    supplierTypes.forEach(function(item) {
+                        if (item == 'A') {
+                            $('#stock_type_a').show();
+                        }
+                        if (item == 'B') {
+                            $('#stock_type_b').show();
+                        }
+                        if (item == 'T') {
+                            $('#stock_type_t').show();
+                        }
+                    });
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+            });
+
             $('#checkbox1').change(function() {
                 if ($(this).is(":checked")) {
                     var returnVal = confirm("Are you sure?");
@@ -1204,9 +1240,15 @@
                 })
                 $(".safty_qty_va").each(function() {
                     $(this).rules("add", {
-                        required: true,
-                        digits: true,
-                        notOnlyZero:true,
+                        required: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
+                        digits: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
+                        notOnlyZero: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
                         messages: {
                             digits: '請輸入正整數'
                         },
@@ -1246,6 +1288,7 @@
                                     },
                                     dataFilter: function(data) {
                                         data = JSON.parse(data)
+                                        //console.log(data);
                                         if (data.result) {
                                             return true;
                                         } else {
@@ -1279,15 +1322,24 @@
                         alert('至少上傳一張圖片')
                         return false;
                     }
+                    if ($("input[name=product_type]:checked").val() == 'G' && $("input[name=selling_price]").val() != 0) {
+                        alert('商品類型為贈品則售價須為0');
+                        return false;
+                    }
                     $('#save_data').prop('disabled', true);
                     form.submit();
                 },
                 rules: {
+                    stock_type:{
+                        required: true,
+                    },
                     selling_channel:{
                         required: true,
                     },
                     is_with_warranty: {
-                        required: true,
+                        required: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
                     },
                     has_expiry_date: {
                         required: true,
@@ -1316,16 +1368,28 @@
                     },
                     //長
                     length: {
-                        required: true,
-                        digits: true,
+                        required: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
+                        digits: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
                     },
                     width: {
-                        required: true,
-                        digits: true,
+                        required: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
+                        digits: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
                     },
                     height: {
-                        required: true,
-                        digits: true,
+                        required: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
+                        digits: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
                     },
                     list_price: {
                         required: true,
@@ -1336,8 +1400,12 @@
                         digits: true,
                     }, //重量
                     weight: {
-                        required: true,
-                        digits: true,
+                        required: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
+                        digits: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T';
+                        },
                     },
                     spec_1: {
                         required: true,
@@ -1373,13 +1441,13 @@
                     },
                     warranty_days: {
                         required: function() {
-                            return $("input[name=is_with_warranty]:checked").val() == '1';
+                            return $("input[name=is_with_warranty]:checked").val() == '1' && $("input[name=stock_type]:checked").val() != 'T';
                         },
                         digits: function() {
-                            return $("input[name=is_with_warranty]:checked").val() == '1';
+                            return $("input[name=is_with_warranty]:checked").val() == '1' && $("input[name=stock_type]:checked").val() != 'T';
                         },
                         min: function() {
-                            if ($("input[name=is_with_warranty]:checked").val() == '1') {
+                            if ($("input[name=is_with_warranty]:checked").val() == '1' && $("input[name=stock_type]:checked").val() != 'T') {
                                 return 0.01;
                             } else {
                                 return 0;
@@ -1396,7 +1464,7 @@
                     warranty_days: {
                         digits: "只可輸入正整數",
                         min: function() {
-                            if ($("input[name=has_expiry_date]:checked").val() == '1') {
+                            if ($("input[name=has_expiry_date]:checked").val() == '1' && $("input[name=stock_type]:checked").val() != 'T') {
                                 return '只可輸入正整數';
                             }
                         },
