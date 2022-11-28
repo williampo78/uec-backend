@@ -553,7 +553,8 @@ class APIProductServices
                             'cart' => $cart,
                             'selling_channel' => $product->selling_channel,
                             'start_selling' => $product->start_selling_at,
-                            'gtm' => isset($gtm[$product->id]) ? $gtm[$product->id] : ""
+                            'gtm' => isset($gtm[$product->id]) ? $gtm[$product->id] : "",
+                            'start_launched_at' => $product->start_launched_at //為了排序而加
                         );
 
                         $product_id = $product->id;
@@ -562,7 +563,19 @@ class APIProductServices
                 }
             }
             $return_data = [];
+
+            $sortColumn = $order_by == 'price' ? 'selling_price' : 'start_launched_at';
+            //重新排序資料
+            if ($sort_flag == 'ASC') {
+                $data = collect($data)
+                    ->sortBy($sortColumn);
+            } else {
+                $data = collect($data)
+                    ->sortByDesc($sortColumn);
+            }
+
             foreach ($data as $key => $product) {
+                unset($product['start_launched_at']);
                 $return_data[] = $product;
             }
             //array_multisort(array_column($data, 'selling_price'), $sort_flag, $data);
@@ -2072,7 +2085,7 @@ class APIProductServices
     }
 
     /*
-     * 用POS商品編號取得商品 
+     * 用POS商品編號取得商品
      */
     public function getProductByPosItemNo($posItemNo) {
         try{
@@ -2083,13 +2096,13 @@ class APIProductServices
                 $product = Product::find($productItem->product_id);
                 if (isset($product)) {
                     $result['status'] = 200;
-                    $result['result'] = $product;                    
+                    $result['result'] = $product;
                 }
             }
         } catch(Exception $e) {
             $result['status'] = 404;
             $result['result'] = null;
         }
-        return $result;    
+        return $result;
     }
 }
