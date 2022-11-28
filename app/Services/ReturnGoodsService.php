@@ -486,8 +486,10 @@ class ReturnGoodsService
                         'created_by'            => $this->getUserId(),
                         'updated_by'            => $this->getUserId(),
                     ]);
-
-                $this->newOrderCampaignDiscounts->push($newOrderCampaignDiscount);
+                //如果是此次作廢的資料，才做紀錄
+                if ($orderCampaignDiscount->is_voided != $isVoided) {
+                    $this->newOrderCampaignDiscounts->push($newOrderCampaignDiscount);
+                }
             });
     }
 
