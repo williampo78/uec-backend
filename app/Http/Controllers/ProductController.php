@@ -189,6 +189,16 @@ class ProductController extends Controller
         $result['product_spec_info'] = $this->productService->getProduct_spec_info($id);
         $result['finallyOrderSupplier'] = $this->orderSupplierService->getFinallyOrderSupplier($id);
 
+        $supplierStockType = $this->productService->getSupplierStockTypeBySupplierId($products->supplier_id);
+        $supplierData = $this->supplierService->getSupplierById($products->supplier_id);
+
+        $result['error_message'] = '';
+        if (!in_array($products->stock_type, $supplierStockType)) {
+            $shortName = $supplierData->short_name;
+            $stockType = config('uec.stock_type_options')[$products->stock_type] ?? null;
+            $result['error_message'] = '供應商《' . $shortName . '》不能維護庫存類型為《' . $stockType . '》商品';
+        }
+
         return view('backend.products.update', $result);
     }
 
@@ -247,7 +257,18 @@ class ProductController extends Controller
                 $result = $this->productService->checkItemQty($in['item_id']);
                 break;
             case 'getSupplierStockType':
-                $result = $this->productService->getSupplierStockTypeBySupplierId($in['supplier_id']);
+                $result['stock_type'] = $this->productService->getSupplierStockTypeBySupplierId($in['supplier_id']);
+                if (!empty($in['stock_type'])) {
+                    $supplierData = $this->supplierService->getSupplierById($in['supplier_id']);
+
+                    $result['error_message'] = '';
+                    if (!in_array($in['stock_type'], $result['stock_type'])) {
+                        $shortName = $supplierData->short_name;
+                        $stockType = config('uec.stock_type_options')[$in['stock_type']] ?? null;
+                        $result['error_message'] = '供應商《' . $shortName . '》不能維護庫存類型為《' . $stockType . '》商品';
+                    }
+                }
+
                 break;
             default:
                 break;

@@ -126,6 +126,38 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 no-pa">
+                                        <label class="control-label">供應商<span class="text-red">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <select class="form-control supplier_id" name="supplier_id"
+                                            {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
+                                            <option value=""></option>
+                                            @foreach ($supplier as $val)
+                                                <option value="{{ $val->id }}"
+                                                    {{ $products->supplier_id == $val->id ? 'selected' : '' }}>
+                                                    {{ $val->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 no-pa">
+                                        <label class="control-label ">商品序號</label><span class="text-red">*</span>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="product_no" value="{{ $products->product_no }}"
+                                            readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">庫存類型</label><span class="text-red">*</span>
                                     </div>
                                     <div class="col-sm-3">
@@ -150,38 +182,6 @@
                                                 {{ $products->stock_type == 'T' ? 'checked' : 'disabled' }}>
                                             轉單[T]
                                         </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <div class="col-sm-2 no-pa">
-                                        <label class="control-label ">商品序號</label><span class="text-red">*</span>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" name="product_no" value="{{ $products->product_no }}"
-                                            readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <div class="col-sm-2 no-pa">
-                                        <label class="control-label">供應商<span class="text-red">*</span></label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <select class="form-control supplier_id" name="supplier_id"
-                                            {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
-                                            <option value=""></option>
-                                            @foreach ($supplier as $val)
-                                                <option value="{{ $val->id }}"
-                                                    {{ $products->supplier_id == $val->id ? 'selected' : '' }}>
-                                                    {{ $val->name }}</option>
-                                            @endforeach
-                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -518,7 +518,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 no-pa">
-                                        <label class="control-label">材積(公分) <span class="text-red">*</span></label>
+                                        <label class="control-label">材積(公分) <span class="text-red red-star">*</span></label>
                                     </div>
                                     <div class="col-sm-1 no-pa">
                                         <label class="control-label">長</label>
@@ -549,7 +549,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 no-pa">
-                                        <label class="control-label">重量(公克)<span class="text-red">*</span></label>
+                                        <label class="control-label">重量(公克)<span class="text-red red-star">*</span></label>
                                     </div>
                                     <div class="col-sm-3">
                                         <input class="form-control" name="weight" type="number" min="0"
@@ -769,7 +769,7 @@
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <div class="col-sm-1 no-pa">
-                                        <label class="control-label">保固期限<span class="text-red">*</span></label>
+                                        <label class="control-label">保固期限<span class="text-red red-star">*</span></label>
                                     </div>
                                     <div class="col-sm-1">
                                         <label class="radio-inline">
@@ -1054,7 +1054,7 @@
                                                 <th class="text-nowrap">POS品號<span
                                                         class="stock_type_list text-red">*</span>
                                                 </th>
-                                                <th class="text-nowrap">安全庫存量<span class="text-red">*</span></th>
+                                                <th class="text-nowrap">安全庫存量<span class="text-red red-star">*</span></th>
                                                 <th class="text-nowrap">是否追加<span class="text-red">*</span></th>
                                                 <th class="text-nowrap">狀態<span class="text-red">*</span></th>
                                             </tr>
@@ -1622,6 +1622,46 @@
             }
         }
         $(document).ready(function() {
+            let stockType = '{{ $products->stock_type }}';
+            if (stockType == 'T') {
+                $('.red-star').hide();
+            } else {
+                $('.red-star').show();
+            }
+
+            let errorMessage = '{{ $error_message }}';
+            if (errorMessage != '') {
+                $('#save_data').prop('disabled', true);
+                alert(errorMessage);
+            } else {
+                $(".supplier_id").change(function() {
+                    $('#save_data').prop('disabled', false);
+                    let supplier_id = $(this).val();
+
+                    axios({
+                        method: "post",
+                        url: "/backend/products/ajax",
+                        params: {
+                            type: 'getSupplierStockType',
+                            supplier_id: supplier_id,
+                            stock_type: stockType,
+                        },
+                    })
+                    .then((response) => {
+                        let result = response.data.result;
+
+                        if (result.error_message != '') {
+                            $('#save_data').prop('disabled', true);
+                            alert(result.error_message);
+                        } else {
+                            $('#save_data').prop('disabled', false);
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+                });
+            }
 
             $('input[type=radio][name=stock_type]').change(function() {
                 if ($(this).val() == 'T') {

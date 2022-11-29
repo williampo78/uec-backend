@@ -73,6 +73,33 @@
 
                         <div class="row ">
                             <div class="col-sm-6">
+                                <div class=" form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">供應商<span class="text-red">*</span></label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <select class="form-control supplier_id" name="supplier_id">
+                                            <option value=""></option>
+                                            @foreach ($supplier as $val)
+                                                <option value="{{ $val->id }}">{{ $val->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label ">商品序號</label><span class="text-red">*</span>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="product_no" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2">
                                         <label class="control-label">庫存類型</label><span class="text-red">*</span>
@@ -94,33 +121,6 @@
                                             <input type="radio" name="stock_type" value="T">
                                             轉單[T]
                                         </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <div class="col-sm-2 ">
-                                        <label class="control-label ">商品序號</label><span class="text-red">*</span>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" name="product_no" readonly>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class=" form-group">
-                                    <div class="col-sm-2 ">
-                                        <label class="control-label">供應商<span class="text-red">*</span></label>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <select class="form-control supplier_id" name="supplier_id">
-                                            <option value=""></option>
-                                            @foreach ($supplier as $val)
-                                                <option value="{{ $val->id }}">{{ $val->name }}</option>
-                                            @endforeach
-                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -194,9 +194,9 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-sm-12">
+                            <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-1">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">商品通路<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-3">
@@ -219,9 +219,9 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-sm-12">
+                            <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-1 ">
+                                    <div class="col-sm-2 ">
                                         <label class="control-label">配送溫層<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-2">
@@ -238,9 +238,9 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-sm-12">
+                            <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-1 ">
+                                    <div class="col-sm-2 ">
                                         <label class="control-label">存放溫層<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-2">
@@ -396,7 +396,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 " style="padding-right: 0">
-                                        <label class="control-label">材積(公分) <span class="text-red">*</span></label>
+                                        <label class="control-label">材積(公分) <span class="text-red red-star">*</span></label>
                                     </div>
                                     <div class="col-sm-1">
                                         <label class="control-label">長</label>
@@ -424,7 +424,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
-                                        <label class="control-label">重量(公克)<span class="text-red">*</span></label>
+                                        <label class="control-label">重量(公克)<span class="text-red red-star">*</span></label>
                                     </div>
                                     <div class="col-sm-3">
                                         <input class="form-control" name="weight" type="number" min="0"
@@ -638,7 +638,7 @@
                                 <div class="form-group">
 
                                     <div class="col-sm-1 ">
-                                        <label class="control-label">保固期限<span class="text-red">*</span></label>
+                                        <label class="control-label">保固期限<span class="text-red red-star">*</span></label>
                                     </div>
                                     <div class="col-sm-1">
                                         <label class="radio-inline">
@@ -1151,8 +1151,10 @@
             $('input[type=radio][name=stock_type]').change(function() {
                 if ($(this).val() == 'T') {
                     $('.stock_type_list').hide();
+                    $('.red-star').hide();
                 } else {
                     $('.stock_type_list').show();
+                    $('.red-star').show();
                 }
             });
 
@@ -1173,7 +1175,8 @@
                     },
                 })
                 .then((response) => {
-                    let supplierTypes = response.data.result;
+                    console.log(response);
+                    let supplierTypes = response.data.result.stock_type;
 
                     supplierTypes.forEach(function(item) {
                         if (item == 'A') {

@@ -159,7 +159,7 @@
                             <th style="width: 10%">廠商貨號</th>
                             <th style="width: 10%">國際條碼</th>
                             <th style="width: 10%">POS品號<span class="stock_type_list text-red">*</span></th>
-                            <th style="width: 10%">安全庫存量<span class="text-red">*</span></th>
+                            <th style="width: 10%">安全庫存量<span class="text-red red-star">*</span></th>
                             <th style="width: 10%">是否追加<span class="text-red">*</span></th>
                             <th style="width: 10%">狀態<span class="text-red">*</span></th>
                         </tr>
