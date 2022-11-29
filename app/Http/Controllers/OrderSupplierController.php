@@ -23,24 +23,25 @@ class OrderSupplierController extends Controller
     private $universalService;
     private $orderSupplierService;
     private $requisitionsPurchaseService;
-
+    private $supplierService ; 
     public function __construct(UniversalService $universalService,
         OrderSupplierService $orderSupplierService,
         RequisitionsPurchaseService $requisitionsPurchaseService,
-        BrandsService $brandsService
+        BrandsService $brandsService,
+        SupplierService $supplierService
     ) {
         $this->universalService = $universalService;
         $this->orderSupplierService = $orderSupplierService;
         $this->requisitionsPurchaseService = $requisitionsPurchaseService;
         $this->brandsService = $brandsService;
+        $this->supplierService = $supplierService ; 
     }
     public function index(Request $request)
     {
         $getData = $request->all();
 
         $data = [];
-        $supplier = new SupplierService();
-        $data['supplier'] = $this->universalService->idtokey($supplier->getSuppliers());
+        $data['supplier'] = $this->universalService->idtokey($this->supplierService->getSuppliers());
         $data['order_supplier'] = ($getData) ? $this->orderSupplierService->getOrderSupplier($getData) : [];
         $data['status_code'] = $this->universalService->getStatusCode();
         if (!isset($getData['select_start_date']) || !isset($getData['select_end_date'])) {
@@ -61,8 +62,7 @@ class OrderSupplierController extends Controller
      */
     public function create()
     {
-        $supplier = new SupplierService();
-        $data['supplier'] = $supplier->getSuppliers();
+        $data['supplier'] = $this->supplierService->getSuppliers();
         $data['requisitions_purchase'] = $this->requisitionsPurchaseService->getRequisitionsPurchaseList();
         foreach ($data['requisitions_purchase'] as $key => $val) {
             $data['requisitions_purchase'][$key]->text = $val->number;
@@ -107,7 +107,7 @@ class OrderSupplierController extends Controller
     public function edit($id)
     {
         $supplier = new SupplierService();
-        $result['supplier'] = $supplier->getSuppliers();
+        $result['supplier'] = $this->supplierService->getSuppliers();
         $result['order_supplier'] = $this->orderSupplierService->getOrderSupplierById($id);
         $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
         $result['order_supplier_detail'] = $this->orderSupplierService->getOrderSupplierDetail($id)->transform(function ($obj, $key) use ($brands) {

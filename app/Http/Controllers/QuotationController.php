@@ -109,8 +109,7 @@ class QuotationController extends Controller
      */
     public function edit($id)
     {
-        $supplier = new SupplierService();
-        $result['supplier'] = $supplier->getSuppliers();
+        $result['supplier'] = $this->supplierService->getSuppliers();
         $result['quotation'] = $this->quotationService->getQuotationById($id);
         $result['quotation_details'] = $this->quotationService->getQuotationDetail($id);
         $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();

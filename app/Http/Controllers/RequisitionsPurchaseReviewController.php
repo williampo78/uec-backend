@@ -18,20 +18,22 @@ class RequisitionsPurchaseReviewController extends Controller
     private $review_service;
     private $universal_service;
     private $brandsService;
+    private $supplierService ; 
 
     public function __construct(
         RequisitionsPurchaseService $requisitionsPurchaseService,
         QuotationService $quotationService,
         ReviewService $reviewService,
         UniversalService $universalService,
-        BrandsService $brandsService
+        BrandsService $brandsService,
+        SupplierService $supplierService
     ) {
         $this->requisition_purchase_service = $requisitionsPurchaseService;
         $this->quotation_service = $quotationService;
         $this->review_service = $reviewService;
         $this->universal_service = $universalService;
         $this->brandsService = $brandsService;
-
+        $this->supplierService = $supplierService ; 
     }
 
     /**
@@ -43,8 +45,7 @@ class RequisitionsPurchaseReviewController extends Controller
     {
         $data = [];
         $data['user_name'] = Auth::user()->user_name;
-        $supplier = new SupplierService();
-        $data['supplier'] = $this->universal_service->idtokey($supplier->getSuppliers());
+        $data['supplier'] = $this->universal_service->idtokey($this->supplierService->getSuppliers());
         $data['status_code'] = $this->universal_service->getStatusCode();
         $data['requisition_purchase'] = $this->requisition_purchase_service->getRequisitionsPurchaseReview();
 
@@ -93,8 +94,7 @@ class RequisitionsPurchaseReviewController extends Controller
     {
         $data = [];
         $data['id'] = $id;
-        $supplier = new SupplierService();
-        $data['supplier'] = $this->universal_service->idtokey($supplier->getSuppliers());
+        $data['supplier'] = $this->universal_service->idtokey($this->supplierService->getSuppliers());
         $data['status_code'] = $this->quotation_service->getStatusCode();
         $data['requisitions_purchase'] = $this->requisition_purchase_service->getRequisitionPurchaseById($id);
         $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();

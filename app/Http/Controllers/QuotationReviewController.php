@@ -14,15 +14,18 @@ class QuotationReviewController extends Controller
     private $universalService;
     private $quotationService;
     private $reviewService;
+    private $supplierService ; 
 
     public function __construct(
         QuotationService $quotationService,
         UniversalService $universalService,
-        ReviewService $reviewService
+        ReviewService $reviewService,
+        SupplierService $supplierService
     ) {
         $this->quotationService = $quotationService;
         $this->universalService = $universalService;
         $this->reviewService = $reviewService;
+        $this->supplierService = $supplierService ; 
     }
 
     /**
@@ -33,8 +36,7 @@ class QuotationReviewController extends Controller
     public function index()
     {
         $data['user_name'] = Auth::user()->user_name;
-        $supplier = new SupplierService();
-        $data['supplier'] = $this->universalService->idtokey($supplier->getSuppliers());
+        $data['supplier'] = $this->universalService->idtokey($this->supplierService->getSuppliers());
         $data['status_code'] = $this->quotationService->getStatusCode();
         $data['quotation'] = $this->quotationService->getQuotationReview();
         return view('backend.quotation_review.list', compact('data'));
@@ -80,8 +82,7 @@ class QuotationReviewController extends Controller
     public function edit($id)
     {
         $data['id'] = $id;
-        $supplier = new SupplierService();
-        $data['supplier'] = $this->universalService->idtokey($supplier->getSuppliers());
+        $data['supplier'] = $this->universalService->idtokey($this->supplierService->getSuppliers());
         $data['status_code'] = $this->quotationService->getStatusCode();
         $data['taxList'] = config('uec.tax_option');
         $data['quotation'] = $this->quotationService->getQuotationById($id);
