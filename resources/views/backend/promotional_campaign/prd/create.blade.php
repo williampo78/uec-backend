@@ -581,7 +581,7 @@
                             },
                             compareDiscountAndSellingPrice: {
                                 param: function() {
-                                    return self.form.products;
+                                    return self.form;
                                 },
                                 depends: function(element) {
                                     return ['PRD02', 'PRD04'].includes(self.form.campaignType);

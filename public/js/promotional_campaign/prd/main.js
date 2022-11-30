@@ -2718,30 +2718,76 @@ __webpack_require__.r(__webpack_exports__);
 
 Vue.component("prd-campaign-product-modal", _components_PrdCampaignProductModal_vue__WEBPACK_IMPORTED_MODULE_0__["default"]); // 比較商品售價與折扣
 
-jQuery.validator.addMethod("compareDiscountAndSellingPrice", function (value, element, products) {
+jQuery.validator.addMethod("compareDiscountAndSellingPrice", function (value, element, form) {
   var productNo = '';
   var errorCount = 0;
-  products.forEach(function (product) {
-    if (Number(product.sellingPrice) <= Number(value)) {
-      if (errorCount >= 10) {
-        productNo += '...';
-        return;
-      }
+  var products = form.products; //產品類型
 
-      if (errorCount > 0 && errorCount < 10) {
-        productNo += ', ';
-      }
+  var campaignType = form.campaignType; //活動類型
 
-      productNo += product.productNo;
-      errorCount++;
+  var N = form.nValue; //滿額活動
+
+  if (campaignType == 'PRD02') {
+    // (單品)第N件(含)以上，折X元 
+    if (N = 1) {
+      products.forEach(function (product) {
+        //N = 1：X 須小於 商品售價  
+        if (Number(product.sellingPrice) <= Number(value)) {
+          if (errorCount >= 10) {
+            productNo += '...';
+            return;
+          }
+
+          if (errorCount > 0 && errorCount < 10) {
+            productNo += ', ';
+          }
+
+          productNo += product.productNo;
+          errorCount++;
+        }
+      });
+    } else if (N > 1) {
+      products.forEach(function (product) {
+        //N > 1：X 須小於等於  商品售價  
+        if (Number(product.sellingPrice) < Number(value)) {
+          if (errorCount >= 10) {
+            productNo += '...';
+            return;
+          }
+
+          if (errorCount > 0 && errorCount < 10) {
+            productNo += ', ';
+          }
+
+          productNo += product.productNo;
+          errorCount++;
+        }
+      });
     }
-  });
+  } else if (campaignType == 'PRD04') {
+    // (單品)滿N件，每件折X元
+    products.forEach(function (product) {
+      if (Number(product.sellingPrice) <= Number(value)) {
+        if (errorCount >= 10) {
+          productNo += '...';
+          return;
+        }
+
+        if (errorCount > 0 && errorCount < 10) {
+          productNo += ', ';
+        }
+
+        productNo += product.productNo;
+        errorCount++;
+      }
+    });
+  }
 
   if (!errorCount) {
     return true;
   }
 
-  $.validator.messages.compareDiscountAndSellingPrice = "\u4E0D\u53EF\u5927\u65BC\u7B49\u65BC\u5546\u54C1\u552E\u50F9 (".concat(productNo, ")");
+  $.validator.messages.compareDiscountAndSellingPrice = "\u9808\u5C0F\u65BC\u5546\u54C1\u552E\u50F9 (".concat(productNo, ")");
   return false;
 }, $.validator.messages.compareDiscountAndSellingPrice);
 })();
