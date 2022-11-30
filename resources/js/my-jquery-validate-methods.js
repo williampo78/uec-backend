@@ -344,6 +344,17 @@ jQuery.validator.addMethod(
     "統一編號必須為8個數字"
 );
 
+// 驗證手機號碼格式
+jQuery.validator.addMethod(
+    "isCellPhoneNumber",
+    function (value, element, params) {
+        let regex = /^[0-9]{10}$/;
+
+        return regex.test(value);
+    },
+    "手機號碼必須為10個數字"
+);
+
 // 驗證英文、數字格式
 jQuery.validator.addMethod(
     "isAlphaNumeric",

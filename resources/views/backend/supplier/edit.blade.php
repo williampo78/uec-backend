@@ -707,6 +707,7 @@
                         },
                         cell_phone: {
                             digits: true,
+                            isCellPhoneNumber: true,
                             maxlength: 10,
                         },
                         tax_type: {
