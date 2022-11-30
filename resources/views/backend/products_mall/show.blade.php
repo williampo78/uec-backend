@@ -245,9 +245,9 @@
                                             <label class="control-label">認證：</label>
                                         </div>
                                         <div class="col-sm-10">
-                                            <div style="width:50%;display:flex; flex-wrap:wrap;gap:10px">
+                                            <div style="width:100%;display:flex; flex-wrap:wrap;gap:10px">
                                                 @foreach ($product_attribute_lov['CERTIFICATE'] as $key => $obj)
-                                                    <div style="width:48%">
+                                                    <div style="width:24%">
                                                         <label class="radio-inline">
                                                             <input class="CERTIFICATE" type="checkbox"
                                                                 name="CERTIFICATE[]" value="{{ $obj->id }}"
@@ -272,9 +272,9 @@
                                             <label class="control-label">成分：</label>
                                         </div>
                                         <div class="col-sm-10">
-                                            <div style="width:50%;display:flex; flex-wrap:wrap;gap:10px">
+                                            <div style="width:100%;display:flex; flex-wrap:wrap;gap:10px">
                                                 @foreach ($product_attribute_lov['INGREDIENT'] as $key => $obj)
-                                                    <div  style="width:48%">
+                                                    <div  style="width:24%">
                                                         <label class="radio-inline">
                                                             <input class="INGREDIENT" type="checkbox" name="INGREDIENT[]"
                                                                 value="{{ $obj->id }}"
@@ -297,9 +297,9 @@
                                             <label class="control-label">適用族群：</label>
                                         </div>
                                         <div class="col-sm-10">
-                                            <div style="width:50%;display:flex; flex-wrap:wrap;gap:10px">
+                                            <div style="width:100%;display:flex; flex-wrap:wrap;gap:10px">
                                         @foreach ($product_attribute_lov['GROUP'] as $key => $obj)
-                                            <div style="width:48%">
+                                            <div style="width:24%">
                                                 <label class="radio-inline">
                                                     <input class="GROUP" type="checkbox" name="GROUP[]"
                                                         value="{{ $obj->id }}"
@@ -322,9 +322,9 @@
                                             <label class="control-label">劑型：</label>
                                         </div>
                                         <div class="col-sm-10">
-                                            <div style="width:50%;display:flex; flex-wrap:wrap;gap:10px">
+                                            <div style="width:100%;display:flex; flex-wrap:wrap;gap:10px">
                                         @foreach ($product_attribute_lov['DOSAGE_FORM'] as $key => $obj)
-                                            <div style="width:48%">
+                                            <div style="width:24%">
                                                 <label class="radio-inline">
                                                     <input class="DOSAGE_FORM" type="checkbox" name="DOSAGE_FORM[]"
                                                         value="{{ $obj->id }}"
