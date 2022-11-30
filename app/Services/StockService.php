@@ -124,6 +124,10 @@ class StockService
             ->orderBy('product_items.sort')
             ->get();
         foreach ($products as $product) {
+            if (isset($data[$product->product_id])) {
+                $data[$product->product_id]['stock_qty'] += $product->stock_qty;
+                continue;
+            }
             $data[$product->product_id] = $product;
         }
         return $data;
