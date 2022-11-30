@@ -2144,7 +2144,11 @@ var render = function () {
                   _c("div", { staticClass: "col-sm-12" }, [
                     _c("label", { staticClass: "radio-inline" }, [
                       _c("input", {
-                        attrs: { type: "radio", value: "checkValue" },
+                        attrs: {
+                          name: "checkAllProducts",
+                          type: "radio",
+                          value: "checkValue",
+                        },
                         on: { change: _vm.checkAll },
                       }),
                       _vm._v(" 全勾選\n                                "),
@@ -2152,7 +2156,11 @@ var render = function () {
                     _vm._v(" "),
                     _c("label", { staticClass: "radio-inline" }, [
                       _c("input", {
-                        attrs: { type: "radio", value: "checkValue" },
+                        attrs: {
+                          name: "checkAllProducts",
+                          type: "radio",
+                          value: "checkValue",
+                        },
                         on: { change: _vm.cancelAll },
                       }),
                       _vm._v(" 全取消\n                                "),

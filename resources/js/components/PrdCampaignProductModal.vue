@@ -348,10 +348,10 @@
                             <div class="row">
                                 <div class="col-sm-12">
                                     <label class="radio-inline">
-                                        <input type="radio" @change="checkAll" value="checkValue"> 全勾選
+                                        <input name="checkAllProducts" type="radio" @change="checkAll" value="checkValue"> 全勾選
                                     </label>
                                     <label class="radio-inline">
-                                        <input type="radio" @change="cancelAll" value="checkValue"> 全取消
+                                        <input name="checkAllProducts" type="radio" @change="cancelAll" value="checkValue"> 全取消
                                     </label>
                                 </div>
                             </div>
