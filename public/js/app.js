@@ -7945,7 +7945,11 @@ jQuery.validator.addMethod("isInvoiceNumber", function (value, element, params) 
   return regex.test(value);
 }, "必須為前2碼大寫英文、後8碼數字");
 jQuery.validator.addMethod("notOnlyZero", function (value, element, params) {
-  return this.optional(element) || parseInt(value) > 0;
+  if (params) {
+    return this.optional(element) || parseInt(value) > 0;
+  } else {
+    return true;
+  }
 }, "不能為 0");
 
 /***/ }),

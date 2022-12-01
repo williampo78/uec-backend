@@ -653,7 +653,7 @@
                                     </div>
                                     <div class="col-sm-1">
                                         <div class="form-group">
-                                            <input class="form-control" name="warranty_days" value="0">
+                                            <input class="form-control" id="warranty_days" name="warranty_days" value="0">
                                         </div>
                                     </div>
                                 </div>
@@ -1194,7 +1194,21 @@
                     console.log(error);
                 });
             });
-
+            isWithWarranty();
+            $('input[type=radio][name=is_with_warranty]').change(function() {
+                if(this.value == '0'){
+                    $("#warranty_days").val(0);
+                }
+                isWithWarranty() ;
+            });
+            function isWithWarranty(){
+                let isWithWarranty = $("input[name=is_with_warranty]:checked").val();
+                if(isWithWarranty == '1'){
+                    $("#warranty_days").prop("readonly", false);
+                }else if (!isWithWarranty || isWithWarranty == '0'){
+                    $("#warranty_days").prop("readonly", true);
+                }
+            }
             $('#checkbox1').change(function() {
                 if ($(this).is(":checked")) {
                     var returnVal = confirm("Are you sure?");
@@ -1449,11 +1463,11 @@
                         digits: function() {
                             return $("input[name=is_with_warranty]:checked").val() == '1' && $("input[name=stock_type]:checked").val() != 'T';
                         },
-                        min: function() {
-                            if ($("input[name=is_with_warranty]:checked").val() == '1' && $("input[name=stock_type]:checked").val() != 'T') {
-                                return 0.01;
-                            } else {
-                                return 0;
+                        notOnlyZero: function() {
+                            if($("input[name=is_with_warranty]:checked").val() == '1'){
+                                return true ;
+                            }else{
+                                return false ;
                             }
                         },
                     },

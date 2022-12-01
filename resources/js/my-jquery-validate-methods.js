@@ -407,7 +407,11 @@ jQuery.validator.addMethod(
 jQuery.validator.addMethod(
     "notOnlyZero",
     function (value, element, params) {
-        return this.optional(element) || parseInt(value) > 0;
+        if(params){
+            return this.optional(element) || parseInt(value) > 0; 
+        }else{
+            return true ;
+        }        
     },
     "不能為 0"
 );
