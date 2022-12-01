@@ -143,6 +143,7 @@ class AdvertisementService
             'ad_slot_contents.product_assigned_type',
             'ad_slot_contents.id AS slot_content_id',
             'ad_slot_contents.active AS slot_content_active',
+            'ad_slot_contents.remark AS ad_slot_contents_remark',
             'lookup_values_v.description',
         )
             ->join('ad_slots', 'ad_slots.id', '=', 'ad_slot_contents.slot_id')
