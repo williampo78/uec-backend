@@ -799,6 +799,7 @@
                     $(`.contact-cell-phone`).each(function() {
                         $(this).rules("add", {
                             digits: true,
+                            isCellPhoneNumber: true,
                             maxlength: 10,
                         });
                     });
