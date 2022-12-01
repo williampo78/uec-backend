@@ -174,6 +174,7 @@
                                         <th class="text-nowrap">上下架狀態</th>
                                         <th class="text-nowrap">上架時間</th>
                                         <th class="text-nowrap">版位標題</th>
+                                        <th class="text-nowrap">備註</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -222,6 +223,7 @@
                                                     @endisset
                                                 </td>
                                                 <td>{{ $ad_slot_content->slot_title ?? '' }}</td>
+                                                <td>{{ $ad_slot_content->ad_slot_contents_remark ?? ''}}</td>
                                             </tr>
                                         @endforeach
                                     @endisset

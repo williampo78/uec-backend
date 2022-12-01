@@ -341,7 +341,7 @@
 
             // 唯有「當前時間」小於﹝上架開始時間﹞時，﹝上架開始時間﹞、﹝上架結束時間﹞、﹝狀態﹞才都開放修改；否則﹝上架開始時間﹞與﹝狀態﹞都不開放修改
             if (new Date() >= new Date($('#start_at').val())) {
-                $('#start_at, #active_enabled, #active_disabled').prop('disabled', true);
+                $('#start_at').prop('disabled', true);
             }
 
             vm.seeMore.action = content.see_more_action;
