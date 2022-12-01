@@ -11,8 +11,9 @@ jQuery.validator.addMethod(
         let products = form.products; //產品類型
         let campaignType = form.campaignType; //活動類型
         let N = form.nValue; //滿額活動
+        let errorMessage = '';
         if (campaignType == 'PRD02') { // (單品)第N件(含)以上，折X元 
-            if (N = 1) {
+            if (N == 1) {
                 products.forEach((product) => { //N = 1：X 須小於 商品售價  
                     if (Number(product.sellingPrice) <= Number(value)) {
                         if (errorCount >= 10) {
@@ -23,7 +24,7 @@ jQuery.validator.addMethod(
                         if (errorCount > 0 && errorCount < 10) {
                             productNo += ', ';
                         }
-
+                        errorMessage = '須小於商品售價';
                         productNo += product.productNo;
                         errorCount++;
                     }
@@ -40,7 +41,7 @@ jQuery.validator.addMethod(
                         if (errorCount > 0 && errorCount < 10) {
                             productNo += ', ';
                         }
-
+                        errorMessage = '須小於等於商品售價';
                         productNo += product.productNo;
                         errorCount++;
                     }
@@ -59,7 +60,7 @@ jQuery.validator.addMethod(
                     if (errorCount > 0 && errorCount < 10) {
                         productNo += ', ';
                     }
-    
+                    errorMessage = '須小於商品售價';
                     productNo += product.productNo;
                     errorCount++;
                 }
@@ -70,7 +71,7 @@ jQuery.validator.addMethod(
             return true;
         }
 
-        $.validator.messages.compareDiscountAndSellingPrice = `須小於商品售價 (${productNo})`;
+        $.validator.messages.compareDiscountAndSellingPrice = `${errorMessage}(${productNo})`;
 
         return false;
     },

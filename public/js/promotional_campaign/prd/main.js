@@ -2727,9 +2727,11 @@ jQuery.validator.addMethod("compareDiscountAndSellingPrice", function (value, el
 
   var N = form.nValue; //滿額活動
 
+  var errorMessage = '';
+
   if (campaignType == 'PRD02') {
     // (單品)第N件(含)以上，折X元 
-    if (N = 1) {
+    if (N == 1) {
       products.forEach(function (product) {
         //N = 1：X 須小於 商品售價  
         if (Number(product.sellingPrice) <= Number(value)) {
@@ -2742,6 +2744,7 @@ jQuery.validator.addMethod("compareDiscountAndSellingPrice", function (value, el
             productNo += ', ';
           }
 
+          errorMessage = '須小於商品售價';
           productNo += product.productNo;
           errorCount++;
         }
@@ -2759,6 +2762,7 @@ jQuery.validator.addMethod("compareDiscountAndSellingPrice", function (value, el
             productNo += ', ';
           }
 
+          errorMessage = '須小於等於商品售價';
           productNo += product.productNo;
           errorCount++;
         }
@@ -2777,6 +2781,7 @@ jQuery.validator.addMethod("compareDiscountAndSellingPrice", function (value, el
           productNo += ', ';
         }
 
+        errorMessage = '須小於商品售價';
         productNo += product.productNo;
         errorCount++;
       }
@@ -2787,7 +2792,7 @@ jQuery.validator.addMethod("compareDiscountAndSellingPrice", function (value, el
     return true;
   }
 
-  $.validator.messages.compareDiscountAndSellingPrice = "\u9808\u5C0F\u65BC\u5546\u54C1\u552E\u50F9 (".concat(productNo, ")");
+  $.validator.messages.compareDiscountAndSellingPrice = "".concat(errorMessage, "(").concat(productNo, ")");
   return false;
 }, $.validator.messages.compareDiscountAndSellingPrice);
 })();
