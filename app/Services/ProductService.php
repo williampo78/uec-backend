@@ -265,6 +265,28 @@ class ProductService
             $products_id = Product::create($insert)->id;
             $product_no = $this->universalService->getDocNumber('products', ['stock_type' => $in['stock_type'], 'id' => $products_id]);
             Product::where('id', $products_id)->update(['product_no' => $product_no]);
+            // 新增照片
+            $fileList = [];
+            $uploadPath = 'products/' . $products_id;
+            if (isset($file['filedata'])) {
+                foreach ($file['filedata'] as $key => $val) {
+                    $fileList[$key] = ImageUpload::uploadImage($val, $uploadPath, 'product');
+                }
+                foreach ($fileList as $key => $val) {
+                    $insertImg = [
+                        'product_id' => $products_id,
+                        'photo_name' => $val['image'],
+                        'sort' => $key,
+                        'created_by' => $user_id,
+                        'updated_by' => $user_id,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                    ProductPhoto::create($insertImg);
+                }
+            }
+            $changePhoto = ProductPhoto::where('product_id',$products_id)->orderBy('sort','ASC')->first();
+            // 建立Item
             $add_item_no = 1;
             foreach ($skuList as $key => $val) {
                 $skuList[$key]['safty_qty'] = ltrim($val['safty_qty'], '0');
@@ -286,6 +308,9 @@ class ProductService
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
+                if($in['product_type'] == 'G'){
+                    $skuInsert['photo_name'] = $changePhoto->photo_name ;
+                }
                 $skuList[$key]['id'] = ProductItem::create($skuInsert)->id;
                 $skuList[$key]['item_no'] = $product_no . str_pad($add_item_no, 4, "0", STR_PAD_LEFT);
                 $add_item_no += 1;
@@ -299,25 +324,7 @@ class ProductService
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);
-            $fileList = [];
-            $uploadPath = 'products/' . $products_id;
-            if (isset($file['filedata'])) {
-                foreach ($file['filedata'] as $key => $val) {
-                    $fileList[$key] = ImageUpload::uploadImage($val, $uploadPath, 'product');
-                }
-                foreach ($fileList as $key => $val) {
-                    $insertImg = [
-                        'product_id' => $products_id,
-                        'photo_name' => $val['image'],
-                        'sort' => $key,
-                        'created_by' => $user_id,
-                        'updated_by' => $user_id,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ];
-                    ProductPhoto::create($insertImg);
-                }
-            }
+     
             DB::commit();
             $result['status'] = true;
         } catch (\Exception $e) {
@@ -340,6 +347,7 @@ class ProductService
         $specListJson = json_decode($in['SpecListJson'], true);
         $imgJson = json_decode($in['imgJson'], true);
         $readyDeletePhotosJson = json_decode($in['readyDeletePhotosJson'], true);
+        $result = [] ;  
         DB::beginTransaction();
         try {
             $update = [
@@ -456,12 +464,11 @@ class ProductService
                 }
             }
 
-
+            $changePhoto = ProductPhoto::where('product_id',$products_id)->orderBy('sort','ASC')->first();
             if($deletedPhoto->count() > 0){
-                $changePhoto = ProductPhoto::where('product_id',$products_id)->orderBy('sort','ASC')->first();
                 foreach($deletedPhoto as $photoName){
                     if(ProductItem::where('product_id',$products_id)->where('photo_name',$photoName)->count() > 0){
-                        $result['alertMessage'] ='刪除的商品圖片原有item使用，系統已自動將圖片替換成封面圖，請記得到商城資訊頁確認item圖片是否正確';
+                        $result['alertMessage'][] ='刪除的商品圖片原有item使用，系統已自動將圖片替換成封面圖，請記得到商城資訊頁確認item圖片是否正確';
                     }
                     ProductItem::where('product_id',$products_id)->where('photo_name',$photoName)->update([
                         'photo_name'=>$changePhoto->photo_name,
@@ -470,10 +477,11 @@ class ProductService
             }
 
             $add_item_no = ProductItem::where('product_id', $products_id)->count();
-
+            $addPhotoInItemListStatus = false ; //用來判斷需不需要顯示alert message
             foreach ($skuList as $key => $val) {
                 $skuList[$key]['safty_qty'] = ltrim($val['safty_qty'], '0');
                 if ($val['id'] == '') {
+                    $addPhotoInItemListStatus = true ;
                     $add_item_no += 1;
                     $skuInsert = [
                         'agent_id' => $agent_id,
@@ -488,6 +496,7 @@ class ProductService
                         'safty_qty' => $skuList[$key]['safty_qty'] != '' ? (int)$skuList[$key]['safty_qty'] : 0,
                         'is_additional_purchase' => $val['is_additional_purchase'],
                         'status' => $val['status'],
+                        'photo_name'=>$changePhoto->photo_name,
                         'edi_exported_status' => null,
                         'created_by' => $user_id,
                         'updated_by' => $user_id,
@@ -516,6 +525,9 @@ class ProductService
                     ProductItem::where('id', $val['id'])->update($skuUpdate);
                 }
 
+            }
+            if($addPhotoInItemListStatus){
+                $result['alertMessage'][] ='系統先為新增的item圖片指定為封面圖，請記得到商城資訊頁指定正確的item圖片';
             }
             ProductSpecInfo::where('product_id', $products_id)->update([
                 'spec_value_list' => json_encode($specListJson),

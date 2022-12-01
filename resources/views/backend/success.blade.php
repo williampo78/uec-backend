@@ -71,7 +71,9 @@
     @isset($alertMessage)
     <script>
         let alertMessage = @json($alertMessage) ;
-        alert(alertMessage);
+        alertMessage.forEach(function(item){
+            alert(item);
+        });
     </script>
     @endisset
 @endsection
