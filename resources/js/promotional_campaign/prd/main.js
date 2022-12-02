@@ -66,7 +66,6 @@ jQuery.validator.addMethod(
                 }
             });
         }
-
         if (!errorCount) {
             return true;
         }

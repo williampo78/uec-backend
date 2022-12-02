@@ -90,7 +90,7 @@
                                                     <div class="col-sm-5 mb-md-0 mb-4">
                                                         <input type="number" class="form-control"
                                                             name="n_value" v-model="form.nValue" min="1"
-                                                            :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                            :readonly="isNowGreaterThanOrEqualToStartAt">
                                                     </div>
                                                     <div class="col-sm-2" v-if="showXValue">
                                                         <label class="pt-md-2">X (折扣) = <span
@@ -99,7 +99,7 @@
                                                     <div class="col-sm-3" v-if="showXValue">
                                                         <input type="number" class="form-control"
                                                             name="x_value" v-model="form.xValue"
-                                                            :disabled="isNowGreaterThanOrEqualToStartAt">
+                                                            :readonly="isNowGreaterThanOrEqualToStartAt">
                                                     </div>
                                                     <div class="col-sm-2" v-if="showXValue && showXValueHint">
                                                         <p class="form-control-static fs-6">打85折，輸入0.85</p>
@@ -682,7 +682,7 @@
                             },
                             compareDiscountAndSellingPrice: {
                                 param: function() {
-                                    return self.form.products;
+                                    return self.form;
                                 },
                                 depends: function(element) {
                                     return ['PRD02', 'PRD04'].includes(self.form.campaignType);
