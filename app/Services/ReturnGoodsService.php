@@ -693,36 +693,39 @@ class ReturnGoodsService
 
         $amount = $amount + $feeOfInstal;
 
-        //新增請款單
-        $this->newOrder
-            ->orderPayments()
-            ->create([
-                'source_table_name'         => 'return_requests',
-                'source_table_id'           => $this->returnRequest->id,
-                'order_no'                  => $this->orderNo,
-                'payment_type'              => 'PAY',
-                'payment_method'            => $this->newOrder->payment_method,
-                'payment_status'            => 'PENDING',
-                'amount'                    => $amount,
-                'latest_api_status'         => null,
-                'latest_api_date'           => null,
-                'point_discount'            => 0,
-                'points'                    => 0,
-                'point_api_status'          => null,
-                'point_api_date'            => null,
-                'point_api_log'             => null,
-                'record_created_reason'     => 'RETURNED',
-                'number_of_instal'          => $this->newOrder->number_of_instal,
-                'interest_rate_of_instal'   => $this->newOrder->interest_rate_of_instal,
-                'min_consumption_of_instal' => $this->newOrder->min_consumption_of_instal,
-                'fee_of_instal'             => $feeOfInstal,
-                'remark'                    => null,
-                'created_by'                => $this->getUserId(),
-                'updated_by'                => $this->getUserId(),
-                'rec_trade_id'              => null,
-                'wallet_balance'            => null,
-                'wallet_point'              => null
-            ]);
+        // 分期全退時，不須產生新的請款金流單
+        if ($amount > 0) {
+            //新增請款單
+            $this->newOrder
+                ->orderPayments()
+                ->create([
+                    'source_table_name'         => 'return_requests',
+                    'source_table_id'           => $this->returnRequest->id,
+                    'order_no'                  => $this->orderNo,
+                    'payment_type'              => 'PAY',
+                    'payment_method'            => $this->newOrder->payment_method,
+                    'payment_status'            => 'PENDING',
+                    'amount'                    => $amount,
+                    'latest_api_status'         => null,
+                    'latest_api_date'           => null,
+                    'point_discount'            => 0,
+                    'points'                    => 0,
+                    'point_api_status'          => null,
+                    'point_api_date'            => null,
+                    'point_api_log'             => null,
+                    'record_created_reason'     => 'RETURNED',
+                    'number_of_instal'          => $this->newOrder->number_of_instal,
+                    'interest_rate_of_instal'   => $this->newOrder->interest_rate_of_instal,
+                    'min_consumption_of_instal' => $this->newOrder->min_consumption_of_instal,
+                    'fee_of_instal'             => $feeOfInstal,
+                    'remark'                    => null,
+                    'created_by'                => $this->getUserId(),
+                    'updated_by'                => $this->getUserId(),
+                    'rec_trade_id'              => null,
+                    'wallet_balance'            => null,
+                    'wallet_point'              => null
+                ]);
+        }
     }
 
     private function getFee(int $amount, $rate)
