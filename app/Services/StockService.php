@@ -60,7 +60,8 @@ class StockService
             ->where("warehouse.number", "=", $number)
             ->whereIn("warehouse_stock.product_item_id", $productItemIds)
             ->where("warehouse_stock.stock_qty", '>', 0)
-            ->first();
+            ->orderByDesc('stockQty')
+            ->get();
     }
 
     /*
