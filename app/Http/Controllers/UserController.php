@@ -179,6 +179,9 @@ class UserController extends Controller
         $input = $request->input();
         $this->userService->updateProfile($input);
 
-        return view('backend.home');
+        $act = 'upd';
+        $route_name = 'backend_home';
+
+        return view('backend.success', compact('route_name', 'act'));
     }
 }
