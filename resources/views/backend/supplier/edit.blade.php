@@ -707,7 +707,11 @@
                         },
                         cell_phone: {
                             digits: true,
-                            isCellPhoneNumber: true,
+                            isCellPhoneNumber: {
+                                depends: function(element) {
+                                    return $('#cell_phone').val().length > 0;
+                                },
+                            },
                             maxlength: 10,
                         },
                         tax_type: {
@@ -799,7 +803,11 @@
                     $(`.contact-cell-phone`).each(function() {
                         $(this).rules("add", {
                             digits: true,
-                            isCellPhoneNumber: true,
+                            isCellPhoneNumber: {
+                                depends: function(element) {
+                                    return $(this).val().length > 0;
+                                },
+                            },
                             maxlength: 10,
                         });
                     });
