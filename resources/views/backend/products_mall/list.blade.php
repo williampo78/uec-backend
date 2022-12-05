@@ -307,6 +307,7 @@
                                     <th class="text-nowrap">上架狀態</th>
                                     <th class="text-nowrap">上架時間起</th>
                                     <th class="text-nowrap">上架時間訖</th>
+                                    <th class="text-nowrap">開賣時間</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -352,6 +353,7 @@
                                         </td>
                                         <td>{{ $val->start_launched_at }}</td>
                                         <td>{{ $val->end_launched_at }}</td>
+                                        <td>{{ $val->start_selling_at }}</td>
                                     </tr>
                                 @endforeach
                                 {{-- {{$category_products_list}} --}}
