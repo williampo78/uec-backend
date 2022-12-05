@@ -478,7 +478,7 @@ class OrderService
                         $cart['gift'][$obj->group_seq]['campaignUrlCode'] = $obj->promotionalCampaign->url_code;
                         $cart['gift'][$obj->group_seq]['campaignBrief'] = $obj->promotionalCampaign->campaign_brief;
                         $cart['gift'][$obj->group_seq]['thresholdCampaignBrief'] = $obj->promotionalCampaignThreshold ? $obj->promotionalCampaignThreshold->threshold_brief : '';
-                        $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->product->id] = [
+                        $cart['gift'][$obj->group_seq]['campaignProdList'][$obj->order_detail_id] = [
                             'id' => $obj->order_detail_id,
                             'productPhoto' => $productPhoto,
                             'productPhoto' => $photo_name,
