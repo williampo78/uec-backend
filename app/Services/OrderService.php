@@ -192,6 +192,7 @@ class OrderService
                     ->orderBy('seq', 'asc');
             },
             'orderDetails.product',
+            'orderDetails.product.supplier',
             'orderDetails.productItem',
             'orderDetails.shipmentDetail.shipment',
         ])->where('is_latest', 1);

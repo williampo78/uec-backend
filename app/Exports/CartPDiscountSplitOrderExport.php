@@ -11,9 +11,11 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
 //購物車滿額折扣，攤提回單品計算
-class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, WithColumnWidths, WithStyles, WithStrictNullComparison
+class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, WithColumnWidths, WithStyles, WithStrictNullComparison, WithColumnFormatting
 {
     private $orders;
     private $totalRows = 0;
@@ -22,12 +24,12 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
     /**
      * 欄位
      */
-    private const COLUMNS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT'];
+    private const COLUMNS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ'];
 
     /**
      * 欄位寬度
      */
-    private const WIDTHS = [10, 20, 20, 10, 20, 20, 10, 10, 20, 10, 20, 20, 20, 20, 20, 20, 10, 20, 20, 10, 20, 20, 20, 30, 10, 10, 10, 15, 10, 10, 10, 10, 10, 10, 10, 10, 15, 10, 15, 10, 15, 10, 10, 15, 15];
+    private const WIDTHS = [10, 20, 20, 10, 20, 20, 10, 10, 20, 10, 20, 20, 20, 20, 20, 20, 10, 20, 20, 10, 20, 20, 20, 30, 10, 10, 10, 15, 10, 10, 10, 10, 10, 10, 10, 10, 15, 10, 15, 10, 15, 10, 10, 15, 10, 10, 15, 10, 15, 10, 10, 20];
 
     /**
      * 水平對齊方式
@@ -35,7 +37,7 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
      * center: c
      * right: r
      */
-    private const ALIGNMENTS = ['c', 'c', 'c', 'l', 'l', 'c', 'l', 'c', 'c', 'r', 'c', 'c', 'c', 'c', 'c', 'l', 'r', 'c', 'c', 'r', 'c', 'l', 'l', 'l', 'l', 'l', 'l', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'l'];
+    private const ALIGNMENTS = ['c', 'c', 'c', 'l', 'l', 'c', 'l', 'c', 'c', 'r', 'c', 'c', 'c', 'c', 'c', 'l', 'r', 'c', 'c', 'r', 'c', 'l', 'l', 'l', 'l', 'l', 'l', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'c', 'l', 'l', 'l', 'l', 'c'];
 
     /**
      * 需合併儲存格的欄位
@@ -103,6 +105,11 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
                 'cart_p_discount'            => null,
                 'point_discount'             => null,
                 'package_no'                 => null,
+                'display_number'             => null,
+                'supplier_name'              => null,
+                'purchase_price'             => null,
+                'stock_type'                 => null,
+                'cooling_off_due_date'       => null,
             ];
 
             // 取消 / 作廢時間
@@ -135,6 +142,11 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
             // 發票開立時間
             if (isset($order->invoice_date)) {
                 $row['invoice_date'] = Carbon::parse($order->invoice_date)->format('Y-m-d');
+            }
+
+            // 訂單完成時間
+            if (isset($order->cooling_off_due_date)) {
+                $row['cooling_off_due_date'] = Carbon::parse($order->cooling_off_due_date)->format('Y-m-d H:i');
             }
 
             if ($order->orderDetails->isNotEmpty()) {
@@ -177,6 +189,21 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
                     // 託運單號
                     if (isset($orderDetail->shipmentDetail)) {
                         $row['package_no'] = $orderDetail->shipmentDetail->shipment->package_no;//ar
+                    }
+
+                    if (isset($orderDetail->product->supplier)) {
+                        // 供應商編號
+                        $row['display_number'] = $orderDetail->product->supplier->display_number;
+                        // 供應商名稱
+                        $row['supplier_name'] = $orderDetail->product->supplier->name;
+                    }
+
+                    // 商品成本
+                    $row['purchase_price'] = $orderDetail->purchase_price;
+
+                    if (isset($orderDetail->product)) {
+                        // 庫存類型
+                        $row['stock_type'] = config('uec.stock_type_options')[$orderDetail->product->stock_type] ?? null;
                     }
 
                     $mergeCellLastRow = $count + 1;
@@ -250,6 +277,11 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
             '未退購物車滿額折抵',
             '未退點數折抵',
             '託運單號',
+            '供應商編號',
+            '供應商名稱',
+            '商品成本',
+            '庫存類型',
+            '訂單完成時間',
         ];
     }
 
@@ -309,6 +341,16 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
                     'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
                 ],
             ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function columnFormats(): array
+    {
+        return [
+            'AU' => NumberFormat::FORMAT_TEXT, //日期
         ];
     }
 }
