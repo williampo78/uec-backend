@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api;
 
+use App\Helpers\ApiResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Services\APICartServices;
 use App\Services\APIOrderService;
@@ -190,7 +191,7 @@ class CheckoutController extends Controller
                 $carrierNoRegexRule = '';
                 break;
         }
-
+        
         $messages = [
             'string' => '資料型態必須為string',
             'integer' => '資料型態必須為integer',
@@ -254,9 +255,10 @@ class CheckoutController extends Controller
         ], $messages);
 
         if ($v->fails()) {
-            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
+            return ApiResponseHelper::failedValidation($v);
         }
 
+        $errMsg = '';
         $member_id = Auth::guard('api')->user()->member_id;
         $campaign = $this->apiProductServices->getPromotion('product_card');
         $campaign_gift = $this->apiProductServices->getCampaignGift();
@@ -298,7 +300,7 @@ class CheckoutController extends Controller
             if (abs($points) > $response['result']['point']['discountMax']) {
                 $status = false;
                 $err = '905';
-                $data['points'] = "點數折抵超出本次可抵用點數";
+                $errMsg = $data['points'] = "點數折抵超出本次可抵用點數";
             } elseif ($response['result']['totalPrice'] == $request->total_price && (-$response['result']['discount']) == $request->cart_campaign_discount) {
                 //檢核使用點數折抵後，是否要運費
                 if (abs($points) > 0) {
@@ -327,56 +329,61 @@ class CheckoutController extends Controller
                         case 404:
                             $status = false;
                             $err = '904';
-                            $data['message'] = "會員點數扣點異常，無法成立訂單";
+                            $errMsg = $data['message'] = "會員點數扣點異常，無法成立訂單";
                             break;
 
                         case 402:
                             $status = false;
                             $err = '902';
-                            $data['message'] = "第三方支付異常，無法成立訂單，" . $dataOrder['tappay_msg'];
+                            $errMsg = $data['message'] = "第三方支付異常，無法成立訂單，" . $dataOrder['tappay_msg'];
                             break;
 
                         case 403:
                             $status = false;
                             $err = '903';
-                            $data['message'] = "庫存不足，無法成立訂單";
+                            $errMsg = $data['message'] = "庫存不足，無法成立訂單";
                             break;
 
                         case 405:
                             $status = false;
                             $err = '906';
-                            $data['message'] = "出貨單成立失敗";
+                            $errMsg = $data['message'] = "出貨單成立失敗";
                             break;
 
                         default:
                             $status = false;
                             $err = '401';
-                            $data['message'] = "產生訂單時發生異常，無法成立訂單";
+                            $errMsg = $data['message'] = "產生訂單時發生異常，無法成立訂單";
                             break;
                     }
                 } else {
                     $status = false;
                     $err = '401';
-                    $data['shipping_fee'] = "運費有誤";
+                    $errMsg = $data['shipping_fee'] = "運費有誤";
                 }
             } else {
                 $status = false;
                 $err = '401';
                 if ($response['result']['totalPrice'] != $request->total_price) {
-                    $data['total_price'] = "商品總價有誤";
+                    $errMsg = $data['total_price'] = "商品總價有誤";
                 }
 
                 if ($response['result']['discount'] != $request->cart_campaign_discount) {
-                    $data['cart_campaign_discount'] = "滿額折抵有誤";
+                    $errMsg = $data['cart_campaign_discount'] = "滿額折抵有誤";
                 }
 
                 if ($response['result']['shippingFee'] != $request->shipping_fee) {
-                    $data['shipping_fee'] = "運費有誤";
+                    $errMsg = $data['shipping_fee'] = "運費有誤";
                 }
             }
         }
 
-        return response()->json(['status' => $status, 'error_code' => $err, 'error_msg' => ($err == '200' ? null : $error_code[$err]), 'result' => $data]);
+        return ApiResponseHelper::message(
+                                        $status,
+                                        $err,
+                                        ($err == '200' ? null : ($errMsg ?? $error_code[$err])),
+                                        $data
+        );
     }
 
     /*
