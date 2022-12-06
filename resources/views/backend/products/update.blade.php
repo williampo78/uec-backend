@@ -1672,7 +1672,7 @@
             });
             function isWithWarranty(){
                 let isWithWarranty = $("input[name=is_with_warranty]:checked").val();
-                console.log(isWithWarranty) ; 
+                console.log(isWithWarranty) ;
                 if(isWithWarranty == '1'){
                     $("#warranty_days").prop("readonly", false);
                 }else if (!isWithWarranty || isWithWarranty == '0'){
@@ -1843,7 +1843,9 @@
                     },
                     min_purchase_qty: {
                         digits: true,
-                        min: 1,
+                        min: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T' ? 1 : 0;
+                        },
                     },
                     //長
                     length: {
@@ -1921,8 +1923,10 @@
                 },
                 messages: {
                     min_purchase_qty: {
-                        digits: "只可輸入正整數",
-                        min: "只可輸入正整數",
+                        digits: "只可輸入數字",
+                        min: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T' ? "只可輸入正整數" : "只可輸入數字";
+                        },
                     },
                     warranty_days: {
                         digits: "只可輸入正整數",
