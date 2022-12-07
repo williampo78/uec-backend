@@ -1477,9 +1477,11 @@
                 },
                 messages: {
                     min_purchase_qty: {
-                        digits: "只可輸入數字",
+                        digits: function() {
+                            return $("input[name=stock_type]:checked").val() != 'T' ? "只可輸入正整數" : "只可輸入0或正整數";
+                        },
                         min: function() {
-                            return $("input[name=stock_type]:checked").val() != 'T' ? "只可輸入正整數" : "只可輸入數字";
+                            return $("input[name=stock_type]:checked").val() != 'T' ? "只可輸入正整數" : "只可輸入0或正整數";
                         },
                     },
                     warranty_days: {
