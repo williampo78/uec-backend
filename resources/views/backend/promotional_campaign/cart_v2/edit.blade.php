@@ -1281,36 +1281,41 @@
                 // 設定門檻簡述
                 thresholdBrief(threshold) {
                     let thresholdBrief = null;
-
+                    let xValue = threshold.xValue;
+                    let nValue = this.numberComma(threshold.nValue);
                     switch (this.form.campaignType) {
                         case "CART_P01":
                             if (threshold.nValue && threshold.xValue) {
                                 let discount = this.roundDown(Number(threshold.xValue), 2);
                                 discount = discount.toString().substring(2);
-                                thresholdBrief = `指定商品達$${threshold.nValue}，打${discount}折`;
+                                thresholdBrief = `滿${nValue}元打${discount}折`;
                             }
                             break;
 
                         case "CART_P02":
                             if (threshold.nValue && threshold.xValue) {
-                                thresholdBrief = `指定商品達$${threshold.nValue}，折$${threshold.xValue}`;
+                                thresholdBrief = `滿${nValue}元折${threshold.xValue}元`;
                             }
                             break;
 
                         case "CART_P03":
                             if (threshold.nValue) {
-                                thresholdBrief = `指定商品達$${threshold.nValue}送贈`;
+                                thresholdBrief = `滿${nValue}元贈`;
                             }
                             break;
 
                         case "CART_P04":
                             if (threshold.nValue) {
-                                thresholdBrief = `指定商品達${threshold.nValue}件送贈`;
+                                thresholdBrief = `滿${threshold.nValue}件贈`;
                             }
                             break;
                     }
 
                     return thresholdBrief;
+                },
+                numberComma(num) {
+                    let comma = /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g
+                    return num.toString().replace(comma, ',')
                 },
                 // 點擊庫存類型
                 clickStockType(event) {
