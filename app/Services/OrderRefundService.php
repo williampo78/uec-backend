@@ -620,18 +620,29 @@ class OrderRefundService
         //取得檢驗單相關資料
         $returnExamination = ReturnExamination::with([
             'returnExaminationDetails:id,return_examination_id,return_request_detail_id,request_qty',
-            'returnExaminationDetails.returnRequestDetail:id,return_request_id,request_qty,point_discount,points'
+            'returnExaminationDetails.returnRequestDetail:id,return_request_id,request_qty,point_discount,points',
+            'returnRequest:id,ship_from_whs'
         ])
-            ->where('status_code', 'FAILED')
-            ->find($payload['return_examination_id'], ['id', 'return_request_id', 'returnable_point_discount', 'returnable_amount']);
+        ->find($payload['return_examination_id'], ['id', 'return_request_id', 'returnable_point_discount', 'returnable_amount','status_code']);
+        
+        $returnExaminationStatus = false ; // 檢驗單狀態檢查
 
-        if (empty($returnExamination)) {
+        if(!empty($returnExamination)){
+            if($returnExamination->status_code == 'FAILED'){
+                $returnExaminationStatus = true; 
+            }
+            if($returnExamination->returnRequest->ship_from_whs == 'SELF' && $returnExamination->status_code == 'DISPATCHED'){
+                $returnExaminationStatus = true;
+            }
+        }
+
+        if (!$returnExaminationStatus) {
             return [
                 'status'  => false,
                 'message' => '發生錯誤，檢驗單不存在'
             ];
         }
-
+        
         //退款金額大於可退金額
         if ($payload['nego_refund_amount'] > abs($returnExamination->returnable_amount)) {
             return [
