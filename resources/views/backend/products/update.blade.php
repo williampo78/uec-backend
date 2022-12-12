@@ -299,6 +299,17 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 no-pa">
+                                        <label class="control-label">廠商料號</label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="supplier_product_no" value="{{ $products->supplier_product_no }}"
+                                            {{ $products->edit_readonly == '1' ? 'readonly' : '' }}>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-6">

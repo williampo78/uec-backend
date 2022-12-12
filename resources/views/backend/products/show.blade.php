@@ -210,6 +210,14 @@
                                     </label>
                                 </div>
                             </div>
+                            <div class="col-sm-6">
+                                <div class="col-sm-2 no-pa">
+                                    <label class="control-label">廠商料號</label>
+                                </div>
+                                <div class="col-sm-9">
+                                    <input class="form-control" name="model" value=" {{ $products->supplier_product_no }}" disabled>
+                                </div>
+                            </div>
                         </div>
                         <div class="row form-group">
                             <div class="col-sm-6">

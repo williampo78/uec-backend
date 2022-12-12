@@ -205,6 +205,7 @@ class ProductService
                 'category_id' => $in['category_id'],
                 'brand_id' => $in['brand_id'],
                 'model' => $in['model'],
+                'supplier_product_no' => $in['supplier_product_no'],
                 'lgst_method' => $in['lgst_method'],
                 'lgst_temperature' => $in['lgst_temperature'],
                 'storage_temperature' => $in['storage_temperature'],
@@ -324,7 +325,7 @@ class ProductService
                 'created_at' => $now,
                 'updated_at' => $now,
             ]);
-     
+
             DB::commit();
             $result['status'] = true;
         } catch (\Exception $e) {
@@ -347,7 +348,7 @@ class ProductService
         $specListJson = json_decode($in['SpecListJson'], true);
         $imgJson = json_decode($in['imgJson'], true);
         $readyDeletePhotosJson = json_decode($in['readyDeletePhotosJson'], true);
-        $result = [] ;  
+        $result = [] ;
         DB::beginTransaction();
         try {
             $update = [
@@ -358,6 +359,7 @@ class ProductService
                 // 'category_id' => $in['category_id'],
                 // 'brand_id' => $in['brand_id'],
                 'model' => $in['model'],
+                'supplier_product_no' => $in['supplier_product_no'],
                 'lgst_method' => $in['lgst_method'],
                 'lgst_temperature' => $in['lgst_temperature'],
                 'storage_temperature' => $in['storage_temperature'],

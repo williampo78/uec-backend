@@ -217,6 +217,16 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="col-sm-2 ">
+                                        <label class="control-label">廠商料號</label>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" name="supplier_product_no" value="">
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-6">
