@@ -18,6 +18,7 @@ use App\Services\APIWebService;
 use App\Services\BrandsService;
 use App\Services\APICartServices;
 use App\Services\UniversalService;
+use App\Services\SysConfigService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use App\Models\PromotionalCampaign;
@@ -43,7 +44,8 @@ class APIProductServices
         ShippingFeeRulesService $shippingFeeService,
         UniversalService $universalService,
         WebShippingInfoService $webShippingInfoService,
-        ProductAttributeLovService $attributeLovService
+        ProductAttributeLovService $attributeLovService,
+        SysConfigService $sysConfigService
     )
     {
         $this->apiWebCategory = $apiWebCategory;
@@ -54,6 +56,7 @@ class APIProductServices
         $this->universalService = $universalService;
         $this->webShippingInfoService = $webShippingInfoService;
         $this->ProductAttributeLovService = $attributeLovService;
+        $this->sysConfigService = $sysConfigService ; 
     }
 
     public function getCategory($keyword = null)
@@ -990,7 +993,12 @@ class APIProductServices
 
             //產品規格
             $item_spec = [];
-            $ProductSpec = ProductItem::where('product_id', $id)->where('status', 1)->orderBy('sort', 'asc')->get();
+            $warehouseNumber = $this->sysConfigService->getConfigValue('EC_WAREHOUSE_GOODS');
+            $ProductSpec = ProductItem::where('product_id', $id)->with([
+                'warehouses'=> function($q) use($warehouseNumber){
+                    $q->where('number',$warehouseNumber);
+                },
+            ])->where('status', 1)->orderBy('sort', 'asc')->get();
             $item_spec['spec_dimension'] = $product[$id]->spec_dimension; //維度
             $item_spec['spec_title'] = array($product[$id]->spec_1, $product[$id]->spec_2); //規格名稱
             $spec_info = [];
@@ -1003,12 +1011,18 @@ class APIProductServices
                 if ($spec2 != $item['spec_2_value']) {
                     $item_spec['spec_2'][] = $item['spec_2_value'];//規格2
                 }
+                $warehouses = $item->warehouses->first();
+                $stockQty   = 0 ; 
+                if($warehouses){
+                    $stockQty = $warehouses->pivot->stock_qty ?? 0;
+                }
                 $spec_info[] = array(
                     "item_id" => $item['id'],
                     "item_no" => $item['item_no'],
                     "item_photo" => ($item['photo_name'] ? $s3 . $item['photo_name'] : null),
                     "item_spec1" => $item['spec_1_value'],
                     "item_spec2" => $item['spec_2_value'],
+                    "stock_qty"  => $stockQty
                 );
                 $spec1 = $item['spec_1_value'];
                 $spec2 = $item['spec_2_value'];
@@ -1629,7 +1643,12 @@ class APIProductServices
 
             //產品規格
             $item_spec = [];
-            $ProductSpec = ProductItem::where('product_id', $id)->where('status', 1)->orderBy('sort', 'asc')->get();
+            $warehouseNumber = $this->sysConfigService->getConfigValue('EC_WAREHOUSE_GOODS');
+            $ProductSpec = ProductItem::where('product_id', $id)->with([
+                'warehouses'=> function($q) use($warehouseNumber){
+                    $q->where('number',$warehouseNumber);
+                },
+            ])->where('status', 1)->orderBy('sort', 'asc')->get();
             $item_spec['spec_dimension'] = $product[$id]->spec_dimension; //維度
             $item_spec['spec_title'] = array($product[$id]->spec_1, $product[$id]->spec_2); //規格名稱
             $spec_info = [];
@@ -1642,12 +1661,18 @@ class APIProductServices
                 if ($spec2 != $item['spec_2_value']) {
                     $item_spec['spec_2'][] = $item['spec_2_value'];//規格2
                 }
+                $warehouses = $item->warehouses->first();
+                $stockQty   = 0 ; 
+                if($warehouses){
+                    $stockQty = $warehouses->pivot->stock_qty ?? 0;
+                }
                 $spec_info[] = array(
                     "item_id" => $item['id'],
                     "item_no" => $item['item_no'],
                     "item_photo" => ($item['photo_name'] ? $s3 . $item['photo_name'] : null),
                     "item_spec1" => $item['spec_1_value'],
                     "item_spec2" => $item['spec_2_value'],
+                    "stock_qty"  => $stockQty
                 );
                 $spec1 = $item['spec_1_value'];
                 $spec2 = $item['spec_2_value'];
