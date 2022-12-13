@@ -220,6 +220,8 @@
                     },
                     user_email: {
                         required: true,
+                        email: true,
+                        maxlength: 50,
                     },
                     supplier_id: {
                         required: {
