@@ -42,7 +42,7 @@
 
     <script src="{{ mix('js/app.js') }}"></script>
     <script src="{{ asset('asset/js/template/dist/js/sb-admin-2.js') }}"></script>
-    <script src="{{ asset('asset/js/build/ckeditor.js?v=20221129001') }}"></script>
+    <script src="{{ asset('asset/js/build/ckeditor.js?v=2022121401') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.js') }}"></script>
     <script src="{{ asset('asset/js/bootstrap-colorpicker.min.js') }}"></script>
     <script src="{{ asset('asset/js/sweetalert.min.js') }}"></script>
