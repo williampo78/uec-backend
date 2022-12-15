@@ -230,6 +230,7 @@ class ProductBatchService
                     'updated_by' => -1,
                 ]);
                 $productItems = [];
+                $itemPhotos = [] ;
                 foreach ($product as $item) {
                     $spec_values = '';
                     $spec_values .= $item['spec_1_value'];
@@ -247,11 +248,14 @@ class ProductBatchService
                     ]));
                 }
 
+                if($item['photo_name'] !== ''){
+                    array_push($itemPhotos , $item['photo_name']) ;
+                }
                 $result[$supplier_product_no] = collect([
                     'productBasice' => collect($productBasice),
                     'productItems' => collect($productItems),
+                    'itemPhotos'  => collect($itemPhotos),
                 ]);
-
             }
 
             return collect($result);
@@ -771,7 +775,7 @@ class ProductBatchService
      *
      *  @return Array
      */
-    public function verifyPhoto($endPath, $productPhoto)
+    public function verifyPhoto($endPath, $productPhoto, $products)
     {
         $result = [];
         foreach ($productPhoto as $val) {
@@ -821,6 +825,25 @@ class ProductBatchService
                         ]);
                     }
                 }
+            }
+            //檢查item 選取的照片
+            if(isset($products[$val['supplier_product_no']])){
+                foreach($products[$val['supplier_product_no']]['itemPhotos'] as $itemPhoto){
+                    if(!in_array( $itemPhoto, $val['photos'])){
+                        array_push($result, [
+                            'supplierProductNo' => $val['supplier_product_no'],
+                            'imageName' => $itemPhoto,
+                            'errorMessage' => "匯入的zip檔案找不到該item圖示",
+                        ]);
+                    }
+                }
+                
+            }else{
+                array_push($result, [
+                    'supplierProductNo' => $val['supplier_product_no'],
+                    'imageName' => $photo,
+                    'errorMessage' => "上傳的品項找不到商品料號：${$val['supplier_product_no']}",
+                ]);
             }
         }
 
