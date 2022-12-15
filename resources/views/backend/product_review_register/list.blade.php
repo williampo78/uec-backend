@@ -236,10 +236,10 @@
                                         <th style="width: auto">毛利(%)</th>
                                         <th style="width: auto">商品類型</th>
                                         <th style="width: auto">建檔日期</th>
-                                        <th style="width: auto">開賣時間</th>
                                         <th style="width: auto">上架狀態</th>
-                                        <th style="width: auto">上架時間起</th>
-                                        <th style="width: auto">上架時間訖</th>
+                                        <th style="width: auto">上架時間</th>
+                                        <th style="width: auto">下架時間</th>
+                                        <th style="width: auto">開賣時間</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -287,13 +287,13 @@
                                                 {{ $val->created_at }}
                                             </td>
                                             <td>
-                                                {{$val->start_selling_at}}
-                                            </td>
-                                            <td>
                                                 {{ $val->launched_status }}
                                             </td>
                                             <td>{{ $val->start_launched_at }}</td>
                                             <td>{{ $val->end_launched_at }}</td>
+                                            <td>
+                                                {{$val->start_selling_at}}
+                                            </td>
                                         </tr>
                                     @endforeach
                                     {{-- {{$category_products_list}} --}}
