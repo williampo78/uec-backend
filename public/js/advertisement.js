@@ -686,7 +686,10 @@ window.addImageBlock = function () {
     $("#image-block table > tbody [name=\"image_block_image_name[".concat(image_block_row_no, "]\"]")).siblings(".img_image_block_image_name, .btn-delete-image-block-image-name").hide();
   }
 
-  $("#image-block-row-no").val(parseInt(image_block_row_no) + 1);
+  if (image_block_row_no >= $("#image-block-row-no").val()) {
+    $("#image-block-row-no").val(parseInt(image_block_row_no) + 1);
+  }
+
   _validate__WEBPACK_IMPORTED_MODULE_0__.validateImageBlock(image_block_row_no);
 };
 

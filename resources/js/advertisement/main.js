@@ -692,8 +692,9 @@ window.addImageBlock = (product_category_select_options = "", datas = {}) => {
             .hide();
     }
 
-    $("#image-block-row-no").val(parseInt(image_block_row_no) + 1);
-
+    if(image_block_row_no >= $("#image-block-row-no").val()){
+        $("#image-block-row-no").val(parseInt(image_block_row_no) + 1);
+      }
     validate.validateImageBlock(image_block_row_no);
 };
 
