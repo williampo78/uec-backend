@@ -84,9 +84,9 @@ class ProductImportJob implements ShouldQueue
                 return false;
             }
             $products = $productBatchService->productForm($products);
-            $verifyProduct = $productBatchService->verifyProduct($products); //檢查基本商品
+            $verifyProduct = $productBatchService->verifyProduct($products,$productPhoto); //檢查基本商品
             $verifySkuItem = $productBatchService->verifySkuItem($products); //進階檢查規格
-            $verifyPhoto = $productBatchService->verifyPhoto($endPath, $productPhoto ,$products); //檢查照片
+            $verifyPhoto = $productBatchService->verifyPhoto($endPath, $productPhoto); //檢查照片
             Storage::deleteDirectory($endPath);
 
             // //驗證未過
