@@ -52,8 +52,8 @@
                     <thead>
                         <tr>
                             <th>商品編號</th>
-                            <th>商品名稱</th>
                             <th>POS品號</th>
+                            <th>商品名稱</th>
                             <th>進貨成本</th>
                             <th>最小採購量</th>
                             <th>請購單號</th>

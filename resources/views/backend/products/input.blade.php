@@ -194,7 +194,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-sm-6">
+                            <div class="col-sm-12">
                                 <div class="form-group">
                                     <div class="col-sm-2 no-pa">
                                         <label class="control-label">商品通路<span class="text-red">*</span></label>
@@ -217,7 +217,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-sm-6">
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
                                         <label class="control-label">廠商料號</label>

@@ -210,6 +210,8 @@
                                     </label>
                                 </div>
                             </div>
+                        </div>
+                        <div class="row form-group">
                             <div class="col-sm-6">
                                 <div class="col-sm-2 no-pa">
                                     <label class="control-label">廠商料號</label>
