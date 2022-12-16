@@ -334,8 +334,8 @@
                                         <th class="text-nowrap">商品類型</th>
                                         <th class="text-nowrap">建檔日期</th>
                                         <th class="text-nowrap">上架狀態</th>
-                                        <th class="text-nowrap">上架時間起</th>
-                                        <th class="text-nowrap">上架時間訖</th>
+                                        <th class="text-nowrap">上架時間</th>
+                                        <th class="text-nowrap">下架時間</th>
                                         <th class="text-nowrap">開賣時間</th>
                                     </tr>
                                 </thead>
