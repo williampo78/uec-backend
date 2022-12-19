@@ -2727,47 +2727,31 @@ jQuery.validator.addMethod("compareDiscountAndSellingPrice", function (value, el
 
   var N = form.nValue; //滿額活動
 
+  var X = form.xValue; //滿額活動
+
   var errorMessage = '';
 
   if (campaignType == 'PRD02') {
     // (單品)第N件(含)以上，折X元 
-    if (N == 1) {
-      products.forEach(function (product) {
-        //N = 1：X 須小於 商品售價  
-        if (Number(product.sellingPrice) <= Number(value)) {
-          if (errorCount >= 10) {
-            productNo += '...';
-            return;
-          }
+    products.forEach(function (product) {
+      // (  ( 商品售價 * (N-1) ) +  ( 商品售價 - X)   )  須大於 0
+      console.log(Number(product.sellingPrice) * (Number(N) - 1) + (Number(product.sellingPrice) - Number(X)));
 
-          if (errorCount > 0 && errorCount < 10) {
-            productNo += ', ';
-          }
-
-          errorMessage = '須小於商品售價';
-          productNo += product.productNo;
-          errorCount++;
+      if (Number(product.sellingPrice) * (Number(N) - 1) + (Number(product.sellingPrice) - Number(X)) <= 0) {
+        if (errorCount >= 10) {
+          productNo += '...';
+          return;
         }
-      });
-    } else if (N > 1) {
-      products.forEach(function (product) {
-        //N > 1：X 須小於等於  商品售價  
-        if (Number(product.sellingPrice) < Number(value)) {
-          if (errorCount >= 10) {
-            productNo += '...';
-            return;
-          }
 
-          if (errorCount > 0 && errorCount < 10) {
-            productNo += ', ';
-          }
-
-          errorMessage = '須小於等於商品售價';
-          productNo += product.productNo;
-          errorCount++;
+        if (errorCount > 0 && errorCount < 10) {
+          productNo += ', ';
         }
-      });
-    }
+
+        errorMessage = '折後金額須為正數';
+        productNo += product.productNo;
+        errorCount++;
+      }
+    });
   } else if (campaignType == 'PRD04') {
     // (單品)滿N件，每件折X元
     products.forEach(function (product) {
