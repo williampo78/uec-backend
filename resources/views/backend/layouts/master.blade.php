@@ -2,7 +2,7 @@
 <html lang="zh-tw">
 
 <head>
-    <title>@yield('title')</title>
+    <title>{{ env('TITLE_PREFIX', '') }}@yield('title')</title>
 
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
