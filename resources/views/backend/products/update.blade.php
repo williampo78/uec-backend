@@ -340,6 +340,12 @@
                                     <div class="col-sm-2 ">
                                         <label class="control-label">存放溫層<span class="text-red">*</span></label>
                                     </div>
+                                    @if ($products['stock_type'] == 'B' or $products['stock_type'] == 'A')
+                                    <div class="col-sm-2">
+                                        <input class="form-control" value="{{ $products['StorageTemperatureName'] }}" readonly>
+                                    </div>
+                                    <input type="hidden" id="storage_temperature" name="storage_temperature" value="{{ $products['storage_temperature'] }}">
+                                    @else
                                     <div class="col-sm-2">
                                         <label class="radio-inline">
                                             <input type="radio" name="storage_temperature" value="NORMAL"
@@ -361,6 +367,7 @@
                                             冷藏
                                         </label>
                                     </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
