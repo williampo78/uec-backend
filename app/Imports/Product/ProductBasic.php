@@ -77,7 +77,9 @@ class ProductBasic implements ToCollection, WithMapping, WithStartRow, WithColum
             'specification', //商品規格(html編輯器)
             'category_number',//  指定「POS小分類」代碼
             'web_category_hierarchy_ids',//  前台分類
-            'selling_channel'
+            'selling_channel',
+            'lgst_temperature', //配送溫層
+            'storage_temperature', //存放溫層
         ]);
         $datekey = [];
         $index = 0;
@@ -129,7 +131,7 @@ class ProductBasic implements ToCollection, WithMapping, WithStartRow, WithColum
      */
     public function endColumn(): string
     {
-        return 'AS';
+        return 'AU';
     }
 
 }
