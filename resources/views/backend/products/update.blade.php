@@ -269,7 +269,7 @@
                                     <div class="col-sm-2 no-pa">
                                         <label class="control-label">商品通路<span class="text-red">*</span></label>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-2">
                                         <label class="radio-inline">
                                             <input type="radio" name="selling_channel" value="EC"
                                                 {{ $products->selling_channel == 'EC' ? 'checked' : '' }}
@@ -277,7 +277,7 @@
                                             網路獨賣
                                         </label>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-2">
                                         <label class="radio-inline">
 
                                             <input type="radio" name="selling_channel" value="WHOLE"
@@ -287,7 +287,7 @@
                                         </label>
 
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-2">
                                         <label class="radio-inline">
 
                                             <input type="radio" name="selling_channel" value="STORE"
@@ -314,7 +314,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">配送溫層<span class="text-red">*</span></label>
                                     </div>
                                     <div class="col-sm-2">
@@ -337,7 +337,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 ">
+                                    <div class="col-sm-2 no-pa">
                                         <label class="control-label">存放溫層<span class="text-red">*</span></label>
                                     </div>
                                     @if ($products['stock_type'] == 'B' or $products['stock_type'] == 'A')
