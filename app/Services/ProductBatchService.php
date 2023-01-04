@@ -644,11 +644,18 @@ class ProductBatchService
                             array_push($pos_item_no_arrays, $item['pos_item_no']);
                         }
                     }
+                    $checkProductPhoto = false ;//photos頁籤查無相同「廠商料號」
                     foreach($productPhoto as $photo){
                         //有指定照片再去檢查
                         if($photo['supplier_product_no'] == $supplier_product_no && !empty($item['photo_name']) && !in_array($item['photo_name'],$photo['photos'])){ 
                             $errorMessage[] = '「Item圖示」不存在';
                         }
+                        if($photo['supplier_product_no'] == $supplier_product_no){
+                            $checkProductPhoto = true ;
+                        }
+                    }
+                    if(!$checkProductPhoto){
+                        $errorMessage[] = 'photos頁籤查無相同「廠商料號」';
                     }
                 }
                 if (!empty($errorMessage)) {
