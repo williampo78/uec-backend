@@ -111,4 +111,14 @@ class Product extends Model
     public function brand(){
         return $this->belongsTo(Brand::class,'brand_id');
     }
+
+    /**
+     * 存放溫層名稱
+     *
+     * @return string|null
+     */
+    public function getStorageTemperatureNameAttribute(): ?string
+    {
+        return config('uec.options.storage_temperatures')[$this->storage_temperature] ?? null;
+    }
 }

@@ -215,7 +215,8 @@ class ProductBatchService
                     'tax_type' => 'TAXABLE',
                     'supplier_product_no' => $supplier_product_no,
                     'brand_id' => $brandsData->id ?? '',
-                    'lgst_temperature' => 'NORMAL', //常溫
+                    'lgst_temperature' => $productBasice['lgst_temperature'] ?? 'N', //配送溫層
+                    'storage_temperature' => $productBasice['storage_temperature'] ?? 'N', //存放溫層
                     'lgst_method' => 'HOME', //配送方式 : 宅配
                     'delivery_type' => 'IN_STOCK',
                     'display_number' => $productBasice['display_number'] ?? '',
@@ -228,6 +229,7 @@ class ProductBatchService
                     'agent_id' => 1,
                     'created_by' => -1,
                     'updated_by' => -1,
+
                 ]);
                 $productItems = [];
                 $itemPhotos = [] ;
@@ -607,6 +609,36 @@ class ProductBatchService
                 if (!empty($productBasice['selling_channel']) && !in_array($productBasice['selling_channel'], ['E', 'S', 'W'])) {
                     $errorMessage[] = '「商品通路」須為「E」或「S」或「W」';
                 }
+
+                // 「配送溫層」須為「N」或「C」
+                if (!empty($productBasice['lgst_temperature']) && !in_array($productBasice['lgst_temperature'], ['N', 'C'])) {
+                    $errorMessage[] = '「配送溫層」須為「N」或「C」';
+                }
+                switch($productBasice['lgst_temperature']){
+                    case 'C':
+                        $productBasice['lgst_temperature'] = 'CHILLED';
+                        break;
+                    default:
+                        $productBasice['lgst_temperature'] = 'NORMAL';
+                        break;
+                }
+
+                // 「存放溫層」須為「N」或「A」或「C」
+                if (!empty($productBasice['storage_temperature']) && !in_array($productBasice['storage_temperature'], ['N', 'A', 'C'])) {
+                    $errorMessage[] = '「存放溫層」須為「N」或「A」或「C」';
+                }
+                switch($productBasice['storage_temperature']){
+                    case 'A':
+                        $productBasice['storage_temperature'] = 'AIR';
+                        break;
+                    case 'C':
+                        $productBasice['storage_temperature'] = 'CHILLED';
+                        break;
+                    default:
+                        $productBasice['storage_temperature'] = 'NORMAL';
+                        break;
+                }
+                
                 foreach ($product['productItems'] as $item) {
                     if (in_array($stockType, ['A', 'B'])) {
                         // 「安全庫存量」未填寫

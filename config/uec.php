@@ -311,6 +311,13 @@ return [
             'APPROVE' => '核准',
             'REJECT' => '駁回',
         ],
+
+        // 存放溫層
+        'storage_temperatures' => [
+            'NORMAL' => '常溫',
+            'AIR' => '空調',
+            'CHILLED' => '冷藏',
+        ],
     ],
 
     //購物車滿額折扣，攤提回單品計算

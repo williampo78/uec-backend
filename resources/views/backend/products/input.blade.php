@@ -194,23 +194,23 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-sm-12">
+                            <div class="col-sm-6">
                                 <div class="form-group">
-                                    <div class="col-sm-2 no-pa">
+                                    <div class="col-sm-2">
                                         <label class="control-label">商品通路<span class="text-red">*</span></label>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-2">
                                         <label class="radio-inline">
                                             <input type="radio" name="selling_channel" value="EC"> 網路獨賣
                                         </label>
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-2">
                                         <label class="radio-inline">
                                             <input type="radio" name="selling_channel" value="WHOLE"> 全通路
                                         </label>
 
                                     </div>
-                                    <div class="col-sm-3">
+                                    <div class="col-sm-2">
                                         <label class="radio-inline">
                                             <input type="radio" name="selling_channel" value="STORE"> 門市限定
                                         </label>
@@ -219,7 +219,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-sm-12">
+                            <div class="col-sm-6">
                                 <div class="form-group">
                                     <div class="col-sm-2 ">
                                         <label class="control-label">廠商料號</label>
