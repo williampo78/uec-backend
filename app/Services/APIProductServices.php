@@ -87,7 +87,6 @@ class APIProductServices
                     $query->where('prod.product_name', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('prod.product_no', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('prod.keywords', 'like', '%' . $keyword . '%')
-                        ->orWhere('prod.supplier_name', 'like', '%' . $keyword . '%')
                         ->orWhere('prod.brand_name', 'like', '%' . $keyword . '%')
                         ->orWhere('cate.category_name', 'like', '%' . $keyword . '%')
                         ->orWhere('cate1.category_name', 'like', '%' . $keyword . '%')
@@ -119,7 +118,6 @@ class APIProductServices
                     $query->where('prod.product_name', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('prod.product_no', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('prod.keywords', 'like', '%' . $keyword . '%')
-                        ->orWhere('prod.supplier_name', 'like', '%' . $keyword . '%')
                         ->orWhere('prod.brand_name', 'like', '%' . $keyword . '%')
                         ->orWhere('cate.category_name', 'like', '%' . $keyword . '%')
                         ->orWhere('cate1.category_name', 'like', '%' . $keyword . '%');
@@ -369,7 +367,6 @@ class APIProductServices
                     $query->where('p.product_name', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('p.product_no', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('p.keywords', 'like', '%' . $keyword . '%')
-                        ->orWhere('p.supplier_name', 'like', '%' . $keyword . '%')
                         ->orWhere('p.brand_name', 'like', '%' . $keyword . '%')
                         ->orWhere('cate1.category_name', 'like', '%' . $keyword . '%')
                         ->orWhere('cate2.category_name', 'like', '%' . $keyword . '%')
@@ -380,7 +377,6 @@ class APIProductServices
                     $query->where('p.product_name', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('p.product_no', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('p.keywords', 'like', '%' . $keyword . '%')
-                        ->orWhere('p.supplier_name', 'like', '%' . $keyword . '%')
                         ->orWhere('p.brand_name', 'like', '%' . $keyword . '%')
                         ->orWhere('cate1.category_name', 'like', '%' . $keyword . '%')
                         ->orWhere('cate2.category_name', 'like', '%' . $keyword . '%');
@@ -695,7 +691,6 @@ class APIProductServices
                     $query->where('p.product_name', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('p.product_no', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('p.keywords', 'like', '%' . $keyword . '%')
-                        ->orWhere('p.supplier_name', 'like', '%' . $keyword . '%')
                         ->orWhere('p.brand_name', 'like', '%' . $keyword . '%')
                         ->orWhere('cate1.category_name', 'like', '%' . $keyword . '%')
                         ->orWhere('cate2.category_name', 'like', '%' . $keyword . '%')
@@ -706,7 +701,6 @@ class APIProductServices
                     $query->where('p.product_name', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('p.product_no', 'LIKE', '%' . $keyword . '%')
                         ->orWhere('p.keywords', 'like', '%' . $keyword . '%')
-                        ->orWhere('p.supplier_name', 'like', '%' . $keyword . '%')
                         ->orWhere('p.brand_name', 'like', '%' . $keyword . '%')
                         ->orWhere('cate1.category_name', 'like', '%' . $keyword . '%')
                         ->orWhere('cate2.category_name', 'like', '%' . $keyword . '%');
