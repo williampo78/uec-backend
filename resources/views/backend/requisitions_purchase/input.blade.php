@@ -3,10 +3,6 @@
 @section('content')
     <style>
         .rounding_msg{
-            display: block;
-            width: 100%;
-            padding: 5px 0px;
-            font-size: 12px;
             color: blue;
         }
     </style>
@@ -113,28 +109,25 @@
                                             readonly>
                                     </div>
                                 </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-4">
                                     <div class="form-group" id="div_exchange_rate">
-                                        <label>原幣稅額 <span class="text-red">*</span></label>
+                                        <label>原幣稅額 <span class="text-red">*</span>
+                                            <span class="rounding_msg">四捨五入至整數位</span>
+                                        </label>
                                         <input class="form-control" name="original_total_tax_price"
                                             id="original_total_tax_price"
                                             v-model="requisitions_purchase.original_total_tax_price" readonly>
                                     </div>
                                 </div>
-                                <div class="col-sm-1">
-                                    <label></label>
-                                    <span class="rounding_msg">四捨五入至整數位</span>
-                                </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-4">
                                     <div class="form-group" id="div_exchange_rate">
-                                        <label>原幣總金額 <span class="text-red">*</span></label>
+                                        <label>原幣總金額 
+                                            <span class="text-red">*</span>
+                                            <span class="rounding_msg">四捨五入至整數位</span>
+                                        </label>
                                         <input class="form-control" name="original_total_price" id="original_total_price"
                                             v-model="requisitions_purchase.original_total_price" readonly>
                                     </div>
-                                </div>
-                                <div class="col-sm-1">
-                                    <label></label>
-                                    <span class="rounding_msg">四捨五入至整數位</span>
                                 </div>
                             </div>
                             <div class="row">
@@ -149,27 +142,23 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-4">
                                     <div class="form-group" id="div_exchange_rate">
-                                        <label>稅額 <span class="text-red">*</span></label>
+                                        <label>稅額 <span class="text-red">*</span>
+                                            <span class="rounding_msg">四捨五入至整數位</span>
+                                        </label>
                                         <input class="form-control" name="total_tax_price" id="total_tax_price"
                                             v-model="requisitions_purchase.total_tax_price" readonly>
                                     </div>
                                 </div>
-                                <div class="col-sm-1">
-                                    <label></label>
-                                    <span class="rounding_msg">四捨五入至整數位</span>
-                                </div>
-                                <div class="col-sm-3">
+                                <div class="col-sm-4">
                                     <div class="form-group" id="div_exchange_rate">
-                                        <label>總金額 <span class="text-red">*</span></label>
+                                        <label>總金額 <span class="text-red">*</span>
+                                            <span class="rounding_msg">四捨五入至整數位</span>
+                                        </label>
                                         <input class="form-control" name="total_price" id="total_price"
                                             v-model="requisitions_purchase.total_price" readonly>
                                     </div>
-                                </div>
-                                <div class="col-sm-1">
-                                    <label></label>
-                                    <span class="rounding_msg">四捨五入至整數位</span>
                                 </div>
                             </div>
                             <div class="row">
