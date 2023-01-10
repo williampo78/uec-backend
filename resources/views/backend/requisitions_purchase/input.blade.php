@@ -1,7 +1,11 @@
 @extends('backend.layouts.master')
 @section('title', isset($requisitionsPurchase) ? '編輯請購單' : '新建請購單')
 @section('content')
-
+    <style>
+        .rounding_msg{
+            color: blue;
+        }
+    </style>
     <div class="row">
         <div class="col-sm-12">
             <div class="panel panel-default">
@@ -107,7 +111,9 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group" id="div_exchange_rate">
-                                        <label>原幣稅額 <span class="text-red">*</span></label>
+                                        <label>原幣稅額 <span class="text-red">*</span>
+                                            <span class="rounding_msg">四捨五入至整數位</span>
+                                        </label>
                                         <input class="form-control" name="original_total_tax_price"
                                             id="original_total_tax_price"
                                             v-model="requisitions_purchase.original_total_tax_price" readonly>
@@ -115,7 +121,10 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group" id="div_exchange_rate">
-                                        <label>原幣總金額 <span class="text-red">*</span></label>
+                                        <label>原幣總金額 
+                                            <span class="text-red">*</span>
+                                            <span class="rounding_msg">四捨五入至整數位</span>
+                                        </label>
                                         <input class="form-control" name="original_total_price" id="original_total_price"
                                             v-model="requisitions_purchase.original_total_price" readonly>
                                     </div>
@@ -135,14 +144,18 @@
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group" id="div_exchange_rate">
-                                        <label>稅額 <span class="text-red">*</span></label>
+                                        <label>稅額 <span class="text-red">*</span>
+                                            <span class="rounding_msg">四捨五入至整數位</span>
+                                        </label>
                                         <input class="form-control" name="total_tax_price" id="total_tax_price"
                                             v-model="requisitions_purchase.total_tax_price" readonly>
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
                                     <div class="form-group" id="div_exchange_rate">
-                                        <label>總金額 <span class="text-red">*</span></label>
+                                        <label>總金額 <span class="text-red">*</span>
+                                            <span class="rounding_msg">四捨五入至整數位</span>
+                                        </label>
                                         <input class="form-control" name="total_price" id="total_price"
                                             v-model="requisitions_purchase.total_price" readonly>
                                     </div>
@@ -201,19 +214,21 @@
                                                         :name="'spec_2_value[' + detailKey + ']'">
                                                 </div>
                                             </div>
-                                            {{--  --}}
+                                            {{-- 贈品 --}}
                                             <div class="col-sm-1">
                                                 <input type="checkbox" class="big-checkbox w-auto"
                                                     v-model="details[detailKey].is_gift" :true-value="1"
-                                                    :false-value="0">
+                                                    :false-value="0"
+                                                    @change="isGiftChange(detailKey)"
+                                                    >
                                             </div>
-
                                             {{-- 單價 --}}
                                             <div class="col-sm-1">
                                                 <div class="form-group">
-                                                    <input class="form-control qty item_price" type="number" readonly
+                                                    <input class="form-control qty item_price" type="number" 
                                                         v-model="details[detailKey].item_price"
-                                                        :name="'item_price[' + detailKey + ']'">
+                                                        :name="'item_price[' + detailKey + ']'"
+                                                        readonly>
                                                 </div>
                                             </div>
                                             {{-- 數量 --}}
@@ -436,7 +451,7 @@
                     $(".item_price").each(function() {
                         $(this).rules("add", {
                             required: true,
-                            digits: true,
+                            min:0,
                             messages: {
                                 required: '選取品項取得單價(若選取後無取得單價表示該品項未過報價審核)'
                             },
@@ -493,6 +508,9 @@
                     m = Math.pow(10, Math.max(r1, r2))
                     n = (r1 >= r2) ? r1 : r2;
                     return ((arg1 * m + arg2 * m) / m).toFixed(n);
+                },
+                isGiftChange(detailKey){
+                    this.details[detailKey].item_price = this.details[detailKey].old_item_price;
                 },
             },
             mounted: function mounted() {
@@ -609,7 +627,7 @@
                                 }
                                 req();
                             } else {
-                                obj.item_price = obj.old_item_price;
+                                // obj.item_price = obj.old_item_price;
                                 obj.quotation_id = obj.old_quotation_id;
                                 obj.quotation_doc_number = obj.old_quotation_doc_number;
                             }
@@ -640,9 +658,8 @@
                             obj.subtotal_price = 0;
                         }
                         sum_price += obj.subtotal_price;
-                        sum_total_tax_price = vm.NumberAdd(sum_total_tax_price, obj.subtotal_tax_price);
-                        sum_original_total_tax_price = vm.NumberAdd(sum_original_total_tax_price, obj
-                            .original_subtotal_tax_price);
+                        sum_total_tax_price = Math.round(vm.NumberAdd(sum_total_tax_price, obj.subtotal_tax_price));
+                        sum_original_total_tax_price = Math.round(vm.NumberAdd(sum_original_total_tax_price, obj.original_subtotal_tax_price));
                     });
                     //表頭計算稅
                     switch (requisitions_purchase.tax) {
@@ -666,8 +683,8 @@
                             requisitions_purchase.total_tax_price = 0; //稅額(本幣)
                             break;
                     }
-                    requisitions_purchase.original_total_price = sum_price; //原幣總金額
-                    requisitions_purchase.total_price = sum_price; //總金額
+                    requisitions_purchase.original_total_price = Math.round(sum_price); //原幣總金額
+                    requisitions_purchase.total_price = Math.round(sum_price); //總金額
                     return details;
                 },
 
