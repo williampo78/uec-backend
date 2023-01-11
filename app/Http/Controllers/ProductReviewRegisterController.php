@@ -10,6 +10,11 @@ use Illuminate\Http\Request;
 
 class ProductReviewRegisterController extends Controller
 {
+    private $productService ; 
+    private $supplierService ; 
+    private $brandsService ; 
+    private $webCategoryHierarchyService ; 
+
     public function __construct(ProductService $productService,
         SupplierService $supplierService,
         BrandsService $brandsService,
@@ -126,12 +131,7 @@ class ProductReviewRegisterController extends Controller
         $msg ="" ;
         switch ($in['type']) {
             case 'offProduct':
-                if($this->productService->checkProductInCampaignIsset($in['product_id'])){
-                    $status = $this->productService->offProduct($in);
-                }else{
-                    $status = false ;
-                    $msg = '商品存在上架中的行銷活動，不允許下架！';
-                };
+                $status = $this->productService->offProduct($in);
                 break;
             case 'checkProductReady':
                 if($in['product_type'] == 'N'){
@@ -139,6 +139,13 @@ class ProductReviewRegisterController extends Controller
                 }else{
                     $status = true ;
                 }
+                break;
+            case 'checkProductInCampaignIsset':
+                if($this->productService->checkProductInCampaignIsset($in['product_id'])){
+                    $status = true ;
+                }else{ // 商品存在上架中的行銷活動！
+                    $status = false ;
+                };
                 break;
             default:
                 break;

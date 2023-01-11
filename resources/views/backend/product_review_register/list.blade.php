@@ -359,27 +359,44 @@
 
             $(document).on("click", ".offProduct", function() {
                 let product = $(this).data('json');
-                let msg = '你確定要將商品編號 : ' + product.product_no + ' 商品名稱 :' + product.product_name + ' 下架嗎?';
+                let msg = '您確定要將《' + product.product_no + '-' + product.product_name+' 》下架嗎？';
                 var check = confirm(msg);
                 if (check) {
-                    axios.post('/backend/product_review_register/ajax', {
-                            _token: $('meta[name="csrf-token"]').attr('content'),
-                            type: 'offProduct',
+                    var req = async () => {
+                        const response = await axios.post('/backend/product_review_register/ajax', {
+                            type: 'checkProductInCampaignIsset',
                             product_id: product.id,
-                        })
-                        .then(function(response) {
-                            if(response.data.status){
-                                alert('下架成功');
-                                history.go(0);
-                            }else{
-                                alert(response.data.msg);
-                            }
-                        })
-                        .catch(function(error) {
-                            console.log(error);
                         });
+                        if (!response.data.status) {
+                            if (confirm('商品存在上架中的行銷活動，您確認要下架商品嗎？')) {
+                                offProduct(product.id);
+                            }
+                        } else {
+                            offProduct(product.id);
+                        }
+                    }
+                    req();
                 }
             })
+
+            function offProduct(product_id) {
+                axios.post('/backend/product_review_register/ajax', {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        type: 'offProduct',
+                        product_id: product_id,
+                    })
+                    .then(function(response) {
+                        if (response.data.status) {
+                            alert('下架成功');
+                            history.go(0);
+                        } else {
+                            alert('下架失敗');
+                        }
+                    })
+                    .catch(function(error) {
+                        console.log(error);
+                    });
+            }
         });
     </script>
 @endsection

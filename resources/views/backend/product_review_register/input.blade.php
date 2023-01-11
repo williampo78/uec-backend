@@ -375,6 +375,19 @@
                             return false;
                         };
                     }
+                    var req = async () => {
+                        const response = await axios.post('/backend/product_review_register/ajax', {
+                            type: 'checkProductInCampaignIsset',
+                            product_id: $('#products_id').val(),
+                        });
+                        if (!response.data.status) {
+                            if (confirm('商品存在上架中的行銷活動，您確認要下架商品嗎？')) {
+                                form.submit()
+                            }
+                        } else {
+                            form.submit() ; 
+                        }
+                    }
                     axios.post('/backend/product_review_register/ajax', {
                             _token: $('meta[name="csrf-token"]').attr('content'),
                             type: 'checkProductReady',
@@ -383,7 +396,7 @@
                         })
                         .then(function(response) {
                             if (response.data.status) {
-                                form.submit();
+                                req();
                             } else {
                                 alert('該商品未完成「商城資料」維護，不允許執行上架送審 (至少須有一組前台分類)');
                                 return false;
