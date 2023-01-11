@@ -3,16 +3,18 @@
 namespace App\Exports;
 
 use Carbon\Carbon;
+use App\Models\SupOrderInfo;
 use Illuminate\Support\Collection;
+use App\Services\LookupValuesVService ;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 
 //購物車滿額折扣，攤提回單品計算
 class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, WithColumnWidths, WithStyles, WithStrictNullComparison, WithColumnFormatting
@@ -20,16 +22,15 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
     private $orders;
     private $totalRows = 0;
     private $mergeCellRows = [];
-
     /**
      * 欄位
      */
-    private const COLUMNS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ'];
+    private const COLUMNS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ', 'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV', 'AW', 'AX', 'AY', 'AZ','BA','BB','BC','BD','BE','BF'];
 
     /**
      * 欄位寬度
      */
-    private const WIDTHS = [10, 20, 20, 10, 20, 20, 10, 10, 20, 10, 20, 20, 20, 20, 20, 20, 10, 20, 20, 10, 20, 20, 20, 30, 10, 10, 10, 15, 10, 10, 10, 10, 10, 10, 10, 10, 15, 10, 15, 10, 15, 10, 10, 15, 10, 10, 15, 10, 15, 10, 10, 20];
+    private const WIDTHS = [10, 20, 20, 10, 20, 20, 10, 10, 20, 10, 20, 20, 20, 20, 20, 20, 10, 20, 20, 10, 20, 20, 20, 30, 10, 10, 10, 15, 10, 10, 10, 10, 10, 10, 10, 10, 15, 10, 15, 10, 15, 10, 10, 15, 10, 10, 15, 10, 15, 10, 10, 20, 20, 20, 20, 20, 20,20];
 
     /**
      * 水平對齊方式
@@ -37,7 +38,7 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
      * center: c
      * right: r
      */
-    private const ALIGNMENTS = ['c', 'c', 'c', 'l', 'l', 'c', 'l', 'c', 'c', 'r', 'c', 'c', 'c', 'c', 'c', 'l', 'r', 'c', 'c', 'r', 'c', 'l', 'l', 'l', 'l', 'l', 'l', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'c', 'l', 'l', 'l', 'l', 'c'];
+    private const ALIGNMENTS = ['c', 'c', 'c', 'l', 'l', 'c', 'l', 'c', 'c', 'r', 'c', 'c', 'c', 'c', 'c', 'l', 'r', 'c', 'c', 'r', 'c', 'l', 'l', 'l', 'l', 'l', 'l', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'c', 'l', 'l', 'l', 'l', 'c', 'l', 'l', 'l', 'l', 'l', 'l'];
 
     /**
      * 需合併儲存格的欄位
@@ -54,7 +55,10 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
     {
         $body = collect();
         $orderRecordIdentityOptions = config('uec.order_record_identity_options');
-
+        $lookupValuesVService =  new LookupValuesVService() ;
+        $supShipProgresses = $lookupValuesVService->getLookupValuesVsForBackend([
+                'type_code' => 'SUP_SHIP_PROGRESS',
+        ]);
         $count = 1;
         foreach ($this->orders as $order) {
             $row = [
@@ -109,7 +113,13 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
                 'supplier_name'              => null,
                 'purchase_price'             => null,
                 'stock_type'                 => null,
+                'sup_reported_at'            => null,
+                'sup_reported_progress_code' => null,
+                'sup_reported_memo'          => null,
+                'shipment_no'                => null,
+                'sup_reported_agreed_date'   => null,
                 'cooling_off_due_date'       => null,
+                'income_date'                => null,
             ];
 
             // 取消 / 作廢時間
@@ -152,7 +162,7 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
             if ($order->orderDetails->isNotEmpty()) {
                 $mergeCellFirstRow = $count + 1;
 
-                $order->orderDetails->each(function ($orderDetail) use (&$row, &$count, &$mergeCellFirstRow, &$body, $orderRecordIdentityOptions) {
+                $order->orderDetails->each(function ($orderDetail) use (&$row, &$count, &$mergeCellFirstRow, &$body, $orderRecordIdentityOptions ,$supShipProgresses ,$order) {
                     $row['count']                      = $count;
                     $row['product_no']                 = optional($orderDetail->product)->product_no;
                     $row['item_no']                    = $orderDetail->item_no;
@@ -186,11 +196,42 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
                     $row['cart_p_discount']            = $orderDetail->cart_p_discount;
                     $row['point_discount']             = $orderDetail->point_discount;
 
-                    // 託運單號
                     if (isset($orderDetail->shipmentDetail)) {
-                        $row['package_no'] = $orderDetail->shipmentDetail->shipment->package_no;//ar
-                    }
+                        $row['package_no'] = $orderDetail->shipmentDetail->shipment->package_no;// 託運單號
 
+                        if(!empty($orderDetail->shipmentDetail->shipment->sup_reported_at)){
+                            $row['sup_reported_at'] = Carbon::parse($orderDetail->shipmentDetail->shipment->sup_reported_at)->format('Y-m-d H:i'); 
+                        }
+
+                        if(!empty($orderDetail->shipmentDetail->shipment->sup_reported_progress_code)){
+                            $progressCodeName = $supShipProgresses->where('code',$orderDetail->shipmentDetail->shipment->sup_reported_progress_code)->first();
+                            if($progressCodeName){
+                                $row['sup_reported_progress_code'] = $progressCodeName->description;
+                            }
+                        }
+
+                        if(!empty($orderDetail->shipmentDetail->shipment->sup_reported_memo)){
+                            $row['sup_reported_memo'] = $orderDetail->shipmentDetail->shipment->sup_reported_memo;
+                        }
+
+                        if(!empty($orderDetail->shipmentDetail->shipment->shipment_no)){
+                            $row['shipment_no'] = $orderDetail->shipmentDetail->shipment->shipment_no;
+                        }
+
+                        if(!empty($orderDetail->shipmentDetail->shipment->sup_reported_agreed_date)){
+                            $row['sup_reported_agreed_date'] = Carbon::parse($orderDetail->shipmentDetail->shipment->sup_reported_agreed_date)->format('Y-m-d H:i');
+                        }
+                        //進帳時間
+                        if (isset($order->ship_from_whs) && $order->ship_from_whs == 'SUP' && !empty($orderDetail->shipmentDetail->shipment->supplier_id)) {
+                            $supOrderInfo = SupOrderInfo::where('order_id',$order->id)->where('supplier_id',$orderDetail->shipmentDetail->shipment->supplier_id)->first();
+                            if($supOrderInfo){
+                                $row['income_date'] = Carbon::parse($supOrderInfo->latest_delivered_at)->format('Y-m-d H:i');
+                            }
+                        }else{
+                            $row['income_date'] = Carbon::parse($order->cooling_off_due_date)->format('Y-m-d H:i');
+                        }
+                    }
+                  
                     if (isset($orderDetail->product->supplier)) {
                         // 供應商編號
                         $row['display_number'] = $orderDetail->product->supplier->display_number;
@@ -281,7 +322,13 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
             '供應商名稱',
             '商品成本',
             '庫存類型',
+            '狀態回壓時間',
+            '出貨配送狀態',
+            '出貨配送訊息',
+            '出貨單號',
+            '約定配送日',
             '訂單完成時間',
+            '對帳單入帳日'
         ];
     }
 
