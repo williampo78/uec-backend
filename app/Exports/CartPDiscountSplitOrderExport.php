@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use Carbon\Carbon;
 use App\Models\SupOrderInfo;
+use App\Models\ShipmentDetail;
 use Illuminate\Support\Collection;
 use App\Services\LookupValuesVService ;
 use Maatwebsite\Excel\Concerns\WithStyles;
@@ -158,11 +159,14 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
             if (isset($order->cooling_off_due_date)) {
                 $row['cooling_off_due_date'] = Carbon::parse($order->cooling_off_due_date)->format('Y-m-d H:i');
             }
-
+            $shipmentIds = [] ;
+            foreach($order->shipments as $shipment ){
+                array_push($shipmentIds,$shipment->id);
+            }
+            $shipmentDetail = ShipmentDetail::with(['shipment'])->whereIn('shipment_id',$shipmentIds)->get() ; 
             if ($order->orderDetails->isNotEmpty()) {
                 $mergeCellFirstRow = $count + 1;
-
-                $order->orderDetails->each(function ($orderDetail) use (&$row, &$count, &$mergeCellFirstRow, &$body, $orderRecordIdentityOptions ,$supShipProgresses ,$order) {
+                $order->orderDetails->each(function ($orderDetail) use (&$row, &$count, &$mergeCellFirstRow, &$body, $orderRecordIdentityOptions ,$supShipProgresses ,$order ,$shipmentDetail) {
                     $row['count']                      = $count;
                     $row['product_no']                 = optional($orderDetail->product)->product_no;
                     $row['item_no']                    = $orderDetail->item_no;
@@ -195,37 +199,44 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
                     $row['subtotal']                   = $orderDetail->subtotal;
                     $row['cart_p_discount']            = $orderDetail->cart_p_discount;
                     $row['point_discount']             = $orderDetail->point_discount;
-
+                    //需要重置
+                    $row['sup_reported_progress_code'] = null ;
+                    $row['sup_reported_at'] = null ;
+                    $row['sup_reported_memo'] = null ;
+                    $row['shipment_no'] = null ;
+                    $row['income_date'] = null ;
+                    $row['sup_reported_agreed_date'] = null ;
+                    $findShipmentDetail = $shipmentDetail->where('order_detail_seq',$orderDetail->seq)->first();
                     if (isset($orderDetail->shipmentDetail)) {
                         $row['package_no'] = $orderDetail->shipmentDetail->shipment->package_no;// 託運單號
 
-                        if(!empty($orderDetail->shipmentDetail->shipment->sup_reported_at)){
-                            $row['sup_reported_at'] = Carbon::parse($orderDetail->shipmentDetail->shipment->sup_reported_at)->format('Y-m-d H:i'); 
+                        if(!empty($findShipmentDetail->shipment->sup_reported_at)){
+                            $row['sup_reported_at'] = Carbon::parse($findShipmentDetail->shipment->sup_reported_at)->format('Y-m-d H:i'); 
                         }
 
-                        if(!empty($orderDetail->shipmentDetail->shipment->sup_reported_progress_code)){
-                            $progressCodeName = $supShipProgresses->where('code',$orderDetail->shipmentDetail->shipment->sup_reported_progress_code)->first();
+                        if(!empty($findShipmentDetail->shipment->sup_reported_progress_code)){
+                            $progressCodeName = $supShipProgresses->where('code',$findShipmentDetail->shipment->sup_reported_progress_code)->first();
                             if($progressCodeName){
-                                $row['sup_reported_progress_code'] = $progressCodeName->description;
+                                $row['sup_reported_progress_code'] = $findShipmentDetail->shipment->sup_reported_progress_code."-".$progressCodeName->description;
                             }
                         }
 
-                        if(!empty($orderDetail->shipmentDetail->shipment->sup_reported_memo)){
-                            $row['sup_reported_memo'] = $orderDetail->shipmentDetail->shipment->sup_reported_memo;
+                        if(!empty($findShipmentDetail->shipment->sup_reported_memo)){
+                            $row['sup_reported_memo'] = $findShipmentDetail->shipment->sup_reported_memo;
                         }
 
-                        if(!empty($orderDetail->shipmentDetail->shipment->shipment_no)){
-                            $row['shipment_no'] = $orderDetail->shipmentDetail->shipment->shipment_no;
+                        if(!empty($findShipmentDetail->shipment->shipment_no)){
+                            $row['shipment_no'] = $findShipmentDetail->shipment->shipment_no;
                         }
 
-                        if(!empty($orderDetail->shipmentDetail->shipment->sup_reported_agreed_date)){
-                            $row['sup_reported_agreed_date'] = Carbon::parse($orderDetail->shipmentDetail->shipment->sup_reported_agreed_date)->format('Y-m-d H:i');
+                        if(!empty($findShipmentDetail->shipment->sup_reported_agreed_date)){
+                            $row['sup_reported_agreed_date'] = Carbon::parse($findShipmentDetail->shipment->sup_reported_agreed_date)->format('Y-m-d H:i');
                         }
                         //進帳時間
-                        if (isset($order->ship_from_whs) && $order->ship_from_whs == 'SUP' && !empty($orderDetail->shipmentDetail->shipment->supplier_id)) {
-                            $supOrderInfo = SupOrderInfo::where('order_id',$order->id)->where('supplier_id',$orderDetail->shipmentDetail->shipment->supplier_id)->first();
+                        if (isset($order->ship_from_whs) && $order->ship_from_whs == 'SUP' && !empty($findShipmentDetail->shipment->supplier_id)) {
+                            $supOrderInfo = SupOrderInfo::where('order_id',$order->id)->where('supplier_id',$findShipmentDetail->shipment->supplier_id)->first();
                             if($supOrderInfo){
-                                $row['income_date'] = Carbon::parse($supOrderInfo->latest_delivered_at)->format('Y-m-d H:i');
+                                $row['income_date'] = Carbon::parse($supOrderInfo->statement_date)->format('Y-m-d H:i');
                             }
                         }else{
                             $row['income_date'] = Carbon::parse($order->cooling_off_due_date)->format('Y-m-d H:i');

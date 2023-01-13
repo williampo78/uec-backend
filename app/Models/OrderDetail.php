@@ -45,6 +45,14 @@ class OrderDetail extends Model
     }
 
     /**
+     * 建立與出貨單明細的關聯
+     */
+    public function shipmentDetailByMany()
+    {
+        return $this->hasMany(ShipmentDetail::class, 'order_detail_id');
+    }
+
+    /**
      * 建立與出貨單明細項次的關聯
      */
     public function shipmentDetailSeq()
