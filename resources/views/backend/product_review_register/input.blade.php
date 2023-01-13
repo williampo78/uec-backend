@@ -381,7 +381,7 @@
                             product_id: $('#products_id').val(),
                         });
                         if (!response.data.status) {
-                            if (confirm('商品存在上架中的行銷活動，您確認要下架商品嗎？')) {
+                            if (confirm('商品存在上架中的行銷活動，您確認要上架商品嗎？')) {
                                 form.submit()
                             }
                         } else {
