@@ -195,6 +195,7 @@ class OrderService
             'orderDetails.product.supplier',
             'orderDetails.productItem',
             'orderDetails.shipmentDetail.shipment',
+            'shipments',
         ])->where('is_latest', 1);
 
         // 訂單開始時間
