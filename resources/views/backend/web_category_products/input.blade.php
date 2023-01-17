@@ -129,10 +129,10 @@
                                     @include('backend.web_category_products.tab_list')
                                     <div class="my-4">
                                         <div class="d-inline-block me-3">
-                                            <a class="btn btn-danger" type="button" href="{{redirect()->back()->getTargetUrl()}}"><i class="fa-solid fa-ban"></i> 取消</a>
+                                            <button type="button" class="btn btn-success" @click="submit" id="btn-save"><i class="fa-solid fa-floppy-disk"></i> 儲存</button>
                                         </div>
                                         <div class="d-inline-block">
-                                                <button type="button" class="btn btn-success " @click="submit" id="btn-save"><i class="fa-solid fa-floppy-disk"></i> 儲存</button>
+                                            <a class="btn btn-danger" type="button" href="{{redirect()->back()->getTargetUrl()}}"><i class="fa-solid fa-ban"></i> 取消</a>
                                         </div>
                                     </div>
                                 </div>
