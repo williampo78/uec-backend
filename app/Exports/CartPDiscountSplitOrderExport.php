@@ -228,18 +228,22 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
                         if(!empty($findShipmentDetail->shipment->shipment_no)){
                             $row['shipment_no'] = $findShipmentDetail->shipment->shipment_no;
                         }
-
+                        //約定配送日
                         if(!empty($findShipmentDetail->shipment->sup_reported_agreed_date)){
-                            $row['sup_reported_agreed_date'] = Carbon::parse($findShipmentDetail->shipment->sup_reported_agreed_date)->format('Y-m-d H:i');
+                            $row['sup_reported_agreed_date'] = Carbon::parse($findShipmentDetail->shipment->sup_reported_agreed_date)->format('Y-m-d');
                         }
                         //進帳時間
                         if (isset($order->ship_from_whs) && $order->ship_from_whs == 'SUP' && !empty($findShipmentDetail->shipment->supplier_id)) {
                             $supOrderInfo = SupOrderInfo::where('order_id',$order->id)->where('supplier_id',$findShipmentDetail->shipment->supplier_id)->first();
                             if($supOrderInfo){
-                                $row['income_date'] = Carbon::parse($supOrderInfo->statement_date)->format('Y-m-d H:i');
+                                $row['income_date'] = Carbon::parse($supOrderInfo->statement_date)->format('Y-m-d');
                             }
                         }else{
-                            $row['income_date'] = Carbon::parse($order->cooling_off_due_date)->format('Y-m-d H:i');
+                            if(!is_null($order->cooling_off_due_date)){
+                                $row['income_date'] = Carbon::parse($order->cooling_off_due_date)->format('Y-m-d');
+                            }else{
+                                $row['income_date'] = null ;
+                            }
                         }
                     }
                   
