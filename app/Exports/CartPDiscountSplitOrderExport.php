@@ -39,7 +39,7 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
      * center: c
      * right: r
      */
-    private const ALIGNMENTS = ['c', 'c', 'c', 'l', 'l', 'c', 'l', 'c', 'c', 'r', 'c', 'c', 'c', 'c', 'c', 'l', 'r', 'c', 'c', 'r', 'c', 'l', 'l', 'l', 'l', 'l', 'l', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'c', 'l', 'l', 'l', 'l', 'c', 'l', 'l', 'l', 'l', 'l', 'l'];
+    private const ALIGNMENTS = ['c', 'c', 'c', 'l', 'l', 'c', 'l', 'c', 'c', 'r', 'c', 'c', 'c', 'c', 'c', 'l', 'r', 'c', 'c', 'r', 'c', 'l', 'l', 'l', 'l', 'l', 'l', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'r', 'c', 'l', 'l', 'l', 'l', 'c', 'l', 'l', 'c', 'l', 'l', 'c'];
 
     /**
      * 需合併儲存格的欄位
@@ -163,7 +163,7 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
             foreach($order->shipments as $shipment ){
                 array_push($shipmentIds,$shipment->id);
             }
-            $shipmentDetail = ShipmentDetail::with(['shipment'])->whereIn('shipment_id',$shipmentIds)->get() ; 
+            $shipmentDetail = ShipmentDetail::with(['shipment'])->whereIn('shipment_id',$shipmentIds)->get() ;
             if ($order->orderDetails->isNotEmpty()) {
                 $mergeCellFirstRow = $count + 1;
                 $order->orderDetails->each(function ($orderDetail) use (&$row, &$count, &$mergeCellFirstRow, &$body, $orderRecordIdentityOptions ,$supShipProgresses ,$order ,$shipmentDetail) {
@@ -206,47 +206,50 @@ class CartPDiscountSplitOrderExport implements FromCollection, WithHeadings, Wit
                     $row['shipment_no'] = null ;
                     $row['income_date'] = null ;
                     $row['sup_reported_agreed_date'] = null ;
-                    $findShipmentDetail = $shipmentDetail->where('order_detail_seq',$orderDetail->seq)->first();
+
                     if (isset($orderDetail->shipmentDetail)) {
                         $row['package_no'] = $orderDetail->shipmentDetail->shipment->package_no;// 託運單號
+                    }
 
-                        if(!empty($findShipmentDetail->shipment->sup_reported_at)){
-                            $row['sup_reported_at'] = Carbon::parse($findShipmentDetail->shipment->sup_reported_at)->format('Y-m-d H:i'); 
-                        }
+                    $findShipmentDetail = $shipmentDetail->where('order_detail_seq',$orderDetail->seq)->first();
 
-                        if(!empty($findShipmentDetail->shipment->sup_reported_progress_code)){
-                            $progressCodeName = $supShipProgresses->where('code',$findShipmentDetail->shipment->sup_reported_progress_code)->first();
-                            if($progressCodeName){
-                                $row['sup_reported_progress_code'] = $findShipmentDetail->shipment->sup_reported_progress_code."-".$progressCodeName->description;
-                            }
-                        }
+                    if(!empty($findShipmentDetail->shipment->sup_reported_at)){
+                        $row['sup_reported_at'] = Carbon::parse($findShipmentDetail->shipment->sup_reported_at)->format('Y-m-d H:i');
+                    }
 
-                        if(!empty($findShipmentDetail->shipment->sup_reported_memo)){
-                            $row['sup_reported_memo'] = $findShipmentDetail->shipment->sup_reported_memo;
-                        }
-
-                        if(!empty($findShipmentDetail->shipment->shipment_no)){
-                            $row['shipment_no'] = $findShipmentDetail->shipment->shipment_no;
-                        }
-                        //約定配送日
-                        if(!empty($findShipmentDetail->shipment->sup_reported_agreed_date)){
-                            $row['sup_reported_agreed_date'] = Carbon::parse($findShipmentDetail->shipment->sup_reported_agreed_date)->format('Y-m-d');
-                        }
-                        //進帳時間
-                        if (isset($order->ship_from_whs) && $order->ship_from_whs == 'SUP' && !empty($findShipmentDetail->shipment->supplier_id)) {
-                            $supOrderInfo = SupOrderInfo::where('order_id',$order->id)->where('supplier_id',$findShipmentDetail->shipment->supplier_id)->first();
-                            if($supOrderInfo){
-                                $row['income_date'] = Carbon::parse($supOrderInfo->statement_date)->format('Y-m-d');
-                            }
-                        }else{
-                            if(!is_null($order->cooling_off_due_date)){
-                                $row['income_date'] = Carbon::parse($order->cooling_off_due_date)->format('Y-m-d');
-                            }else{
-                                $row['income_date'] = null ;
-                            }
+                    if(!empty($findShipmentDetail->shipment->sup_reported_progress_code)){
+                        $progressCodeName = $supShipProgresses->where('code',$findShipmentDetail->shipment->sup_reported_progress_code)->first();
+                        if($progressCodeName){
+                            $row['sup_reported_progress_code'] = $findShipmentDetail->shipment->sup_reported_progress_code."-".$progressCodeName->description;
                         }
                     }
-                  
+
+                    if(!empty($findShipmentDetail->shipment->sup_reported_memo)){
+                        $row['sup_reported_memo'] = $findShipmentDetail->shipment->sup_reported_memo;
+                    }
+
+                    if(!empty($findShipmentDetail->shipment->shipment_no)){
+                        $row['shipment_no'] = $findShipmentDetail->shipment->shipment_no;
+                    }
+                    // 約定配送日
+                    if(!empty($findShipmentDetail->shipment->sup_reported_agreed_date)){
+                        $row['sup_reported_agreed_date'] = Carbon::parse($findShipmentDetail->shipment->sup_reported_agreed_date)->format('Y-m-d');
+                    }
+
+                    // 對帳單入帳日
+                    if (isset($order->ship_from_whs) && $order->ship_from_whs == 'SUP' && !empty($findShipmentDetail->shipment->supplier_id)) {
+                        $supOrderInfo = SupOrderInfo::where('order_no', $order->order_no)->where('supplier_id', $findShipmentDetail->shipment->supplier_id)->first();
+                        if($supOrderInfo){
+                            $row['income_date'] = Carbon::parse($supOrderInfo->statement_date)->format('Y-m-d');
+                        }
+                    }else{
+                        if(!is_null($order->cooling_off_due_date)){
+                            $row['income_date'] = Carbon::parse($order->cooling_off_due_date)->format('Y-m-d');
+                        }else{
+                            $row['income_date'] = null ;
+                        }
+                    }
+
                     if (isset($orderDetail->product->supplier)) {
                         // 供應商編號
                         $row['display_number'] = $orderDetail->product->supplier->display_number;
