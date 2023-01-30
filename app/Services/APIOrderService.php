@@ -1100,6 +1100,7 @@ class APIOrderService
                                                 "returned_points"            => 0,
                                                 "main_product_id"            => $products['productID'],
                                                 "purchase_price"             => $product_with['purchase_price'][$gift['productId']] ?? 0,
+                                                "supplier_id"                => $product_with['supplier_id'][$gift['productId']] ?? null,
                                             ];
                                             $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                                             //寫入折扣資訊
@@ -1201,6 +1202,7 @@ class APIOrderService
                             "returned_points"            => 0,
                             "main_product_id"            => 0,
                             "purchase_price"             => 0,
+                            "supplier_id"                => $gift['supplierId'] ?? null
                         ];
                         $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                         if ($campaign_id_gift != $gift['campaignId']) {
@@ -1405,6 +1407,7 @@ class APIOrderService
                                                     "returned_points" => 0,
                                                     "main_product_id" => $products['productID'],
                                                     "purchase_price" => $product_with['purchase_price'][$gift['productId']] ?? 0,
+                                                    "supplier_id" => $product_with['supplier_id'][$gift['productId']] ?? null,
                                                 ];
                                                 $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                                                 //寫入折扣資訊
@@ -1642,6 +1645,10 @@ class APIOrderService
                     $shipDetail['purchase_price'] = $detail['purchase_price'];
                     $shipDetail['record_identity'] = $detail['record_identity'];
                     $shipDetail_id = ShipmentDetail::insertGetId($shipDetail);
+
+                    // 反正規 將shipment_no 儲存置 order_detail
+                    $detail->shipment_no = $shipData['shipment_no'] ?? null;
+                    $detail->save();
                 }
             } else {//出貨倉，SUP-供應商自出
                 //出貨單單身
@@ -1712,6 +1719,10 @@ class APIOrderService
                         $shipDetail['purchase_price'] = $detail['purchase_price'];
                         $shipDetail['record_identity'] = $detail['record_identity'];
                         ShipmentDetail::insertGetId($shipDetail);
+
+                        // 反正規 將shipment_no 儲存置 order_detail
+                        $detail->shipment_no = $shipData['shipment_no'] ?? null;
+                        $detail->save();
                     }
                 }
 
