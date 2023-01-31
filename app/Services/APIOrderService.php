@@ -1013,6 +1013,7 @@ class APIOrderService
                         "returned_points" => 0,
                         "main_product_id" => $products['productID'],
                         "purchase_price" => $product_with['purchase_price'][$products['productID']] ?? 0,
+                        "supplier_id" => $product_with['supplier_id'][$products['productID']] ?? null,
                     ];
                     $point_discount += round($discount_rate[$seq] * $order['points']);
                     $detail_p_discount += $cart_p_discount_prod[$products['productID']][$item['itemId']];
