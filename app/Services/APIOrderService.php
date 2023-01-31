@@ -7,6 +7,7 @@ use App\Models\OrderCampaignDiscount;
 use App\Models\OrderDetail;
 use App\Models\OrderPayment;
 use App\Models\OrderPaymentSecrets;
+use App\Models\Product;
 use App\Models\ProductItem;
 use App\Models\Shipment;
 use App\Models\ShipmentDetail;
@@ -1172,6 +1173,7 @@ class APIOrderService
                         $seq++;
                         $currentQty = $remainingQty <= $stockInfo['stockQty'] ? $remainingQty : $stockInfo['stockQty'];
 
+                        $productInfo = Product::where('id', $gift['productId'])->first();
                         $details[$seq]   = [
                             "order_id"                   => $newOrder->id,
                             "seq"                        => $seq,
@@ -1202,7 +1204,7 @@ class APIOrderService
                             "returned_points"            => 0,
                             "main_product_id"            => 0,
                             "purchase_price"             => 0,
-                            "supplier_id"                => $gift['supplierId'] ?? null
+                            "supplier_id"                => $productInfo->supplier_id ?? null
                         ];
                         $order_detail_id = OrderDetail::insertGetId($details[$seq]);
                         if ($campaign_id_gift != $gift['campaignId']) {
@@ -1721,8 +1723,7 @@ class APIOrderService
                         ShipmentDetail::insertGetId($shipDetail);
 
                         // 反正規 將shipment_no 儲存置 order_detail
-                        $detail->shipment_no = $shipData['shipment_no'] ?? null;
-                        $detail->save();
+                        OrderDetail::where('id', $detail['id'])->update(['shipment_no' => ($shipData['shipment_no'] ?? null)]);
                     }
                 }
 
