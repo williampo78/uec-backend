@@ -1220,14 +1220,14 @@
                         this.SpecList.spec_1.push({
                             name: '',
                             sort: this.SpecList.spec_1.length,
-                            only_key: Math.random().toString(36).substring(8),
+                            only_key: parseFloat('0.' + crypto.getRandomValues(new Uint32Array(1))[0]).toString(36).substring(8),
                         });
                     } else if (spec_type == '2') {
                         this.SpecList.spec_2.length;
                         this.SpecList.spec_2.push({
                             name: '',
                             sort: this.SpecList.spec_2.length,
-                            only_key: Math.random().toString(36).substring(8),
+                            only_key: parseFloat('0.' + crypto.getRandomValues(new Uint32Array(1))[0]).toString(36).substring(8),
                         });
                     }
                 },
@@ -1372,8 +1372,8 @@
                 },
                 change_spec_dimension(changeVal) {
                     if (this.old_spec_dimension == 0) {
-                        let add_spec_1_only_key = Math.random().toString(36).substring(8);
-                        let add_spec_2_only_key = Math.random().toString(36).substring(8);
+                        let add_spec_1_only_key = parseFloat('0.' + crypto.getRandomValues(new Uint32Array(1))[0]).toString(36).substring(8);
+                        let add_spec_2_only_key = parseFloat('0.' + crypto.getRandomValues(new Uint32Array(1))[0]).toString(36).substring(8);
                         this.old_spec_dimension = changeVal;
                         this.SkuList.forEach((person, i, array) => {
                             this.SkuList[i].spec_1_only_key = add_spec_1_only_key;
@@ -1398,7 +1398,7 @@
                     }
                     if (this.old_spec_dimension == 1) {
                         if (changeVal == 2) {
-                            let add_spec_2_only_key = Math.random().toString(36).substring(8);
+                            let add_spec_2_only_key = parseFloat('0.' + crypto.getRandomValues(new Uint32Array(1))[0]).toString(36).substring(8);
                             this.SkuList.forEach((person, i, array) => {
                                 this.SkuList[i].spec_2_only_key = add_spec_2_only_key;
                             })

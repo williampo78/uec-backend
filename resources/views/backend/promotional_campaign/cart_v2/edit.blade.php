@@ -561,6 +561,7 @@
                                                             <input type="file" name="banner_photo_desktop"
                                                                 :data-image-width="bannerPhotoDesktop.width"
                                                                 :data-image-height="bannerPhotoDesktop.height"
+                                                                accept="image/png, image/jpeg"
                                                                 ref="bannerPhotoDesktop" @change="onDesktopFileChange">
                                                         </div>
                                                     </div>
@@ -587,6 +588,7 @@
                                                             <input type="file" name="banner_photo_mobile"
                                                                 :data-image-width="bannerPhotoMobile.width"
                                                                 :data-image-height="bannerPhotoMobile.height"
+                                                                accept="image/png, image/jpeg"
                                                                 ref="bannerPhotoMobile" @change="onMobileFileChange">
                                                         </div>
                                                     </div>
