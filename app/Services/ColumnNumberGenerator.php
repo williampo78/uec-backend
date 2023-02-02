@@ -117,7 +117,7 @@ class ColumnNumberGenerator
     {
         $range_start = str_pad(1, $count, "0", STR_PAD_LEFT);
         $range_end = str_pad(9, $count, "9", STR_PAD_LEFT);
-        $number = rand($range_start, $range_end);
+        $number = random_int($range_start, $range_end);
         $number = Str::of($number)->padLeft($count, "0");
         return $number;
     }
