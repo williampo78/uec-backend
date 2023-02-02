@@ -85,7 +85,6 @@ class AdvertisementLaunchController extends Controller
         $validatedData = $request->validate([
             'slot_icon_name' => 'mimes:jpeg,png,jpg',
         ]);
-        dd($validatedData);
         if (!$this->advertisementService->addSlotContents($inputData)) {
             return back()->withErrors(['message' => '儲存失敗']);
         }

@@ -113,7 +113,7 @@
                                     <div class="row" v-show="modal.categoryForm.icon.showInputFile">
                                         <div class="col-sm-12">
                                             <input
-                                                type="file"
+                                                type="{{$share_type_file}}"
                                                 name="icon"
                                                 ref="icon"
                                                 :accept="ICON_MIME"

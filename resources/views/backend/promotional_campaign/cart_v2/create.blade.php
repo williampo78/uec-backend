@@ -525,7 +525,7 @@
                                                             width="100%" height="150">
                                                         <div v-show="bannerPhotoDesktop.showInputFile"
                                                             class="form-group">
-                                                            <input type="file" name="banner_photo_desktop"
+                                                            <input type="{{$share_type_file}}" name="banner_photo_desktop"
                                                                 :data-image-width="bannerPhotoDesktop.width"
                                                                 :data-image-height="bannerPhotoDesktop.height"
                                                                 ref="bannerPhotoDesktop"
@@ -552,6 +552,7 @@
                                                         <div v-show="bannerPhotoMobile.showInputFile"
                                                             class="form-group">
                                                             <input type="file" name="banner_photo_mobile"
+                                                                type="{{$share_type_file}}"
                                                                 :data-image-width="bannerPhotoMobile.width"
                                                                 :data-image-height="bannerPhotoMobile.height"
                                                                 ref="bannerPhotoMobile"

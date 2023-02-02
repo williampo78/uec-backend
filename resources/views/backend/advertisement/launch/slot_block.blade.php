@@ -130,7 +130,7 @@
                 <div style="padding-left:0" class="col-sm-9">
                     <div class="row">
                         <div class="col-sm-5">
-                            <input type="file" id="slot_icon_name" name="slot_icon_name" accept="image/png, image/jpeg" disabled />
+                            <input type="{{$share_type_file}}" id="slot_icon_name" name="slot_icon_name" accept="image/png, image/jpeg" disabled />
                         </div>
                         <div class="col-sm-3">
                             <img src="" id="img_slot_icon_name" class="img-responsive" width="100"
