@@ -835,7 +835,7 @@ class OrderService
                     $voided_count++;
                     continue;
                 }
-                if ($return_detail->return_requests_status == 'CLOSED') { //退貨取消，狀態回復出貨狀態
+                if ($return_detail->return_requests_status == 'COMPLETED') { //退貨完成
                     $closed_count++;
                 }
                 $T21 = ($return_detail->created_at) ? Carbon::parse($return_detail->created_at)->format('Y-m-d H:i') : null;//退貨檢驗單 產生時間
@@ -929,7 +929,7 @@ class OrderService
                     }
                 }
             }
-            if (($can_return_order['type'] == 2 && $return_examination_info->count() == $voided_count) || $closed_count >0) { //已取消退貨 (進入挑品頁)
+            if ($can_return_order['type'] == 2 && ($return_examination_info->count() == $voided_count + $closed_count) ) { //退貨皆以結案
                 $shipment_status['can_return_order']['type'] = 3;
                 $shipment_status['can_return_order']['status'] = true;
             } elseif ($exam_count > 0) { //有退貨申請未完成的
