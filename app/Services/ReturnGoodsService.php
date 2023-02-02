@@ -425,6 +425,8 @@ class ReturnGoodsService
                 'returned_points'            => $orderDetail->returned_points,
                 'main_product_id'            => $orderDetail->main_product_id,
                 'purchase_price'             => $orderDetail->purchase_price,
+                'supplier_id'                => $orderDetail->supplier_id,
+                'shipment_no'                => $orderDetail->shipment_no,
             ];
         });
     }
