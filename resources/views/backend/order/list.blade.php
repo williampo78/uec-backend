@@ -740,8 +740,7 @@
                         responseType: 'blob',
                     })
                     .then(function(response) {
-                        const timeStamp = (new Date()).toISOString().replace(/[^0-9]/g, '').slice(0, -3)
-                        saveAs(response.data, "orders_"+timeStamp+".xlsx");
+                        saveAs(response.data, "orders_" + moment().format("YYYYMMDDHHmmss") + ".xlsx");
                     })
                     .catch(function(error) {
                         console.log(error);
