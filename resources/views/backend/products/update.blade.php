@@ -833,9 +833,9 @@
                                         <div class="col-sm-10">
                                             <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
                                             <p class="help-block">圖檔比例須為1:1，至少須為480 * 480</p>
-                                            <input type="file" style="margin-bottom: 15px;" @change="fileSelected"
+                                            <input type="{{$share_type_file}}" style="margin-bottom: 15px;" @change="fileSelected"
                                                 multiple>
-                                            <input style="display: none" type="file" :ref="'images_files'"
+                                            <input style="display: none" type="{{$share_type_file}}" :ref="'images_files'"
                                                 name="filedata[]" multiple>
                                             <div style="display: flex; flex-wrap:wrap; gap:15px">
                                                 <div style="max-width:180px;"v-for="(image, key) in images"
