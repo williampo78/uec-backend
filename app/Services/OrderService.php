@@ -248,6 +248,20 @@ class OrderService
             $orders = $orders->whereRelation('orderCampaignDiscounts.promotionalCampaign', 'campaign_name', 'LIKE', "%{$payload['campaign_name']}%");
         }
 
+        // 訂單類型
+        if (isset($payload['order_ship_from_whs'])) {
+            $orders = $orders->where('ship_from_whs', $payload['order_ship_from_whs']);
+        }
+
+        // 資料範圍
+        if (isset($payload['data_range'])) {
+            if ($payload['data_range'] == 'SHIPPED_AT_NULL') {
+                $orders = $orders->whereRelation('shipments', 'shipped_at', null);
+            } elseif ($payload['data_range'] == 'DELIVERED_AT_NULL') {
+                $orders = $orders->whereRelation('shipments', 'delivered_at', null);
+            }
+        }
+
         return $orders->orderBy('ordered_date', 'desc')
             ->get();
     }
