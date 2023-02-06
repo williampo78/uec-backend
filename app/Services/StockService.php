@@ -134,6 +134,56 @@ class StockService
         return $data;
     }
 
+    /**
+     * @param $warehouseCode
+     * @param $cartItems
+     *
+     * @return array
+     */
+    public function getWithCartProductInStock($warehouseCode, $cartItems)
+    {
+        $now = Carbon::now();
+        $data = [];
+        $products = Product::select(
+            DB::raw('products.id as product_id'),
+            DB::raw('products.product_no'),
+            DB::raw('products.product_name'),
+            DB::raw('(SELECT photo_name FROM product_photos WHERE products.id = product_photos.product_id order by sort limit 0, 1) AS product_photo_name'),
+            DB::raw('product_items.id as product_item_id'),
+            DB::raw('product_items.item_no as product_item_no'),
+            DB::raw('product_items.spec_1_value as product_item_spec1'),
+            DB::raw('product_items.spec_2_value as product_item_spec2'),
+            DB::raw('product_items.photo_name as product_item_photo_name'),
+            DB::raw('warehouse_stock.stock_qty')
+        )
+            ->join('product_items', 'product_items.product_id', '=', 'products.id')
+            ->join('warehouse_stock', 'warehouse_stock.product_item_id', '=', 'product_items.id')
+            ->join('warehouse', 'warehouse.id', '=', 'warehouse_stock.warehouse_id')
+            ->where('warehouse_stock.stock_qty', '>', 0)
+            ->where('warehouse.number', $warehouseCode)
+            ->where('products.approval_status', 'APPROVED')
+            ->where('products.start_launched_at', '<=', $now)
+            ->where('products.end_launched_at', '>=', $now)
+            ->where('product_items.status', 1)
+            ->orderBy('products.id')
+            ->orderBy('product_items.sort')
+            ->get();
+        foreach ($products as $product) {
+            if ( !empty($cartItems[$product->product_id][$product->product_item_id]['item_qty'])) {
+                $product->stock_qty = $product->stock_qty - $cartItems[$product->product_id][$product->product_item_id]['item_qty'];
+                if ($product->stock_qty <= 0) {
+                    continue;
+                }
+            }
+            if (isset($data[$product->product_id])) {
+                $data[$product->product_id]['stock_qty'] += $product->stock_qty;
+                continue;
+            }
+            $data[$product->product_id] = $product;
+        }
+        return $data;
+    }
+
     /*
      * 找出產品的庫存數
      * @params : $number = 倉別
