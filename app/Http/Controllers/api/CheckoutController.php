@@ -267,6 +267,10 @@ class CheckoutController extends Controller
         $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount, null, $stock_type);
         $response = json_decode($response, true);
         //檢查付款方式
+        if (empty($response['result']['paymentMethod']) || empty($response['result']['list'])) {
+            return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => "請確認購物車資料"]);
+        }
+
         $payment_method = in_array($request->payment_method, $response['result']['paymentMethod']);
         if (!$payment_method) {
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => "本購物車無此付款方式"]);
