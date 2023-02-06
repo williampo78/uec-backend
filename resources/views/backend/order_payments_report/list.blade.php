@@ -133,6 +133,7 @@
                                         <th class="text-nowrap">項次</th>
                                         <th class="text-nowrap">日期</th>
                                         <th class="text-nowrap">訂單編號</th>
+                                        <th class="text-nowrap">訂單狀態</th>
                                         <th class="text-nowrap">類型</th>
                                         <th class="text-nowrap">金流方式</th>
                                         <th class="text-nowrap">分期期數</th>
@@ -140,7 +141,7 @@
                                         <th class="text-nowrap">金額</th>
                                         <th class="text-nowrap">發票號碼</th>
                                         <th class="text-nowrap">發票日期</th>
-                                        <th class="text-nowrap">備註</th>
+                                        <th class="text-nowrap">金流單來源</th>
                                         <th class="text-nowrap">收款行</th>
                                     </tr>
                                 </thead>
@@ -150,6 +151,7 @@
                                         <td>{{ $loop->iteration }}</td>
                                         <td>{{ $orderPaymentsReport->created_at }}</td>
                                         <td>{{ $orderPaymentsReport->order_no }}</td>
+                                        <td>{{ $orderPaymentsReport->status_code }}</td>
                                         <td>{{ $orderPaymentsReport->payment_type }}</td>
                                         <td>{{ $orderPaymentsReport->payment_method }}</td>
                                         <td>{{ $orderPaymentsReport->number_of_instal }}</td>

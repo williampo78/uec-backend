@@ -51,7 +51,9 @@ class OrderPaymentsReportService
      */
     public function getOrderPaymentsReports(array $request = [])
     {
-        $select1 = "op.created_at, op.order_no, op.payment_type, op.payment_method, op.number_of_instal,
+        $select1 = "op.created_at, op.order_no,
+            (select o_new.status_code from orders o_new where o_new.order_no = op.order_no and o_new.is_latest = 1) as status_code,
+            op.payment_type, op.payment_method, op.number_of_instal,
             (case when op.payment_status = 'PENDING' then '待退款'
                 when op.payment_status = 'COMPLETED' then '退款成功'
                 when op.payment_status = 'FAILED' then '退款失敗'
@@ -61,7 +63,9 @@ class OrderPaymentsReportService
             o.invoice_no, o.invoice_date, op.record_created_reason,
             '國泰世華' as bank_name";
 
-        $select2 = "op.created_at, op.order_no, op.payment_type, op.payment_method, op.number_of_instal,
+        $select2 = "op.created_at, op.order_no,
+            (select o_new.status_code from orders o_new where o_new.order_no = op.order_no and o_new.is_latest = 1) as status_code,
+            op.payment_type, op.payment_method, op.number_of_instal,
             (case when op.payment_status = 'PENDING' then '待請款'
                 when op.payment_status = 'COMPLETED' then '請款成功'
                 when op.payment_status = 'FAILED' then '請款失敗'
@@ -71,7 +75,9 @@ class OrderPaymentsReportService
             o.invoice_no, o.invoice_date, op.record_created_reason,
             '國泰世華' as bank_name";
 
-        $select3 = "op.created_at, op.order_no, op.payment_type, op.payment_method, op.number_of_instal,
+        $select3 = "op.created_at, op.order_no,
+            (select o_new.status_code from orders o_new where o_new.order_no = op.order_no and o_new.is_latest = 1) as status_code,
+            op.payment_type, op.payment_method, op.number_of_instal,
             (case when op.payment_status = 'PENDING' then '待退款'
                 when op.payment_status = 'COMPLETED' then '退款成功'
                 when op.payment_status = 'FAILED' then '退款失敗'
@@ -131,7 +137,7 @@ class OrderPaymentsReportService
     public function handleOrderPaymentsReports(Collection $orderPaymentReports)
     {
         return $orderPaymentReports->map(function ($orderPaymentReport) {
-
+            $orderPaymentReport->status_code = config('uec.order_status_code_options')[$orderPaymentReport->status_code] ?? null;
             $orderPaymentReport->payment_type = config('uec.payment_type_options')[$orderPaymentReport->payment_type] ?? null;
             $orderPaymentReport->payment_method = config('uec.payment_method_options')[$orderPaymentReport->payment_method] ?? null;
             //資料新增原因
