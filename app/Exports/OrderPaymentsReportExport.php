@@ -28,6 +28,7 @@ class OrderPaymentsReportExport implements FromCollection, WithHeadings, WithCol
             '項次',
             '日期',
             '訂單編號',
+            '訂單狀態',
             '類型',
             '金流方式',
             '分期期數',
@@ -35,7 +36,7 @@ class OrderPaymentsReportExport implements FromCollection, WithHeadings, WithCol
             '金額',
             '發票號碼',
             '發票日期',
-            '備註',
+            '金流單來源',
             '收款行',
         ];
     }
@@ -46,15 +47,16 @@ class OrderPaymentsReportExport implements FromCollection, WithHeadings, WithCol
             'A' => 10,
             'B' => 15,
             'C' => 20,
-            'D' => 10,
-            'E' => 20,
-            'F' => 15,
+            'D' => 15,
+            'E' => 10,
+            'F' => 20,
             'G' => 15,
             'H' => 15,
             'I' => 15,
             'J' => 15,
             'K' => 15,
             'L' => 15,
+            'M' => 15,
         ];
     }
 
@@ -62,9 +64,9 @@ class OrderPaymentsReportExport implements FromCollection, WithHeadings, WithCol
     {
         // 對齊方式
         $alignment_datas = [
-            'left' => ['C', 'D', 'E', 'G', 'K', 'L'],
-            'center' => ['A', 'B', 'I', 'J'],
-            'right' => ['F', 'H'],
+            'left' => ['C', 'D', 'E', 'F', 'H', 'L', 'M'],
+            'center' => ['A', 'B', 'J', 'K'],
+            'right' => ['G', 'I'],
         ];
 
         foreach ($alignment_datas as $method => $columns) {
@@ -93,7 +95,7 @@ class OrderPaymentsReportExport implements FromCollection, WithHeadings, WithCol
         $number_format_datas = [
             [
                 'format' => '#,##0',
-                'columns' => ['H'],
+                'columns' => ['I'],
             ],
         ];
 
@@ -106,7 +108,7 @@ class OrderPaymentsReportExport implements FromCollection, WithHeadings, WithCol
         }
 
         return [
-            'A1:L1' => [
+            'A1:M1' => [
                 'alignment' => [
                     'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
                 ],
@@ -114,7 +116,7 @@ class OrderPaymentsReportExport implements FromCollection, WithHeadings, WithCol
                     'bold' => true,
                 ],
             ],
-            "A1:L{$this->total_rows}" => [
+            "A1:M{$this->total_rows}" => [
                 'alignment' => [
                     'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
                 ],
