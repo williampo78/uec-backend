@@ -695,9 +695,9 @@
                                         <div class="col-sm-10">
                                             <p class="help-block">最多上傳15張，每張size不可超過1MB，副檔名須為JPG、JPEG、PNG</p>
                                             <p class="help-block">圖檔比例須為1:1，至少須為480 * 480</p>
-                                            <input type="file" @change="fileSelected" multiple
+                                            <input type="{{$share_type_file}}" @change="fileSelected" multiple
                                                 accept=".jpg,.jpeg,.png">
-                                            <input style="display: none" type="file" :ref="'images_files'"
+                                            <input style="display: none" type="{{$share_type_file}}" :ref="'images_files'"
                                                 name="filedata[]" multiple>
                                         </div>
                                     </div>
@@ -789,14 +789,14 @@
                         this.SpecList.spec_1.push({
                             name: '',
                             sort: this.SpecList.spec_1.length,
-                            only_key: Math.random().toString(36).substring(8),
+                            only_key: parseFloat('0.' + crypto.getRandomValues(new Uint32Array(1))[0]).toString(36).substring(8),
                         });
                     } else if (spec_type == '2') {
                         this.SpecList.spec_2.length;
                         this.SpecList.spec_2.push({
                             name: '',
                             sort: this.SpecList.spec_2.length,
-                            only_key: Math.random().toString(36).substring(8),
+                            only_key: parseFloat('0.' + crypto.getRandomValues(new Uint32Array(1))[0]).toString(36).substring(8),
                         });
                     }
                 },

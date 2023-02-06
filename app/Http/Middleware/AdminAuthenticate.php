@@ -55,6 +55,7 @@ class AdminAuthenticate
         $otherRoleAuth = $this->roleService->getOtherRoles();
         //權限參數傳入view, 可以直接在各個view取用
         view()->share('share_role_auth', $otherRoleAuth);
+        view()->share('share_type_file','file');
         // 權限參數傳入Request物件
         $request->merge(["share_role_auth" => $otherRoleAuth]);
 

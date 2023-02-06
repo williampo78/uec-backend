@@ -7,6 +7,7 @@ use App\Services\AdvertisementService;
 use App\Services\ProductService;
 use App\Services\WebCategoryHierarchyService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class AdvertisementLaunchController extends Controller
 {
@@ -80,6 +81,10 @@ class AdvertisementLaunchController extends Controller
     public function store(Request $request)
     {
         $inputData = $request->except('_token');
+        // 驗證檔案格式
+        $validatedData = $request->validate([
+            'slot_icon_name' => 'mimes:jpeg,png,jpg',
+        ]);
         if (!$this->advertisementService->addSlotContents($inputData)) {
             return back()->withErrors(['message' => '儲存失敗']);
         }
@@ -246,6 +251,14 @@ class AdvertisementLaunchController extends Controller
     {
         $inputData = $request->except('_token', '_method');
         $inputData['slot_content_id'] = $slot_content_id;
+
+        $validatorFile = Validator::make($request->all(), [
+            'slot_icon_name' => 'mimes:jpeg,png,jpg',
+        ]);
+
+        if ($validatorFile->fails()) {
+            return back()->withErrors(['message' => '檔案格式錯誤']);
+        }
 
         if (!$this->advertisementService->updateSlotContents($inputData)) {
             return back()->withErrors(['message' => '儲存失敗']);

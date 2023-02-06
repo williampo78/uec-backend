@@ -469,10 +469,10 @@
                                             </label>
                                         </div>
                                         <div class="col-sm-3">
-                                            <input type="file" name="google_shop_photo_name" accept="image/*"
+                                            <input type="{{$share_type_file}}" name="google_shop_photo_name" accept="image/png, image/jpeg"
                                                 @change="google_shop"
                                                 {{ $products->edit_readonly == '1' ? 'disabled' : '' }}>
-                                            <input type="hidden" name="google_shop_photo_name_old"
+                                            <input type="hidden" name="google_shop_photo_name_old" accept="image/png, image/jpeg"
                                                 value="{{ $products->google_shop_photo_name }}">
                                         </div>
                                         <div class="col-sm-3">

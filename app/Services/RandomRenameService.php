@@ -8,6 +8,7 @@ use CKSource\CKFinder\Event\CKFinderEvent;
 use CKSource\CKFinder\Plugin\PluginInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Illuminate\Support\Str;
 
 class RandomRenameService implements PluginInterface, EventSubscriberInterface
 {
@@ -31,7 +32,7 @@ class RandomRenameService implements PluginInterface, EventSubscriberInterface
         if ($uploadedFile) {
             $uploadedFileName = $uploadedFile->getClientOriginalName();
             $extension = pathinfo($uploadedFileName, PATHINFO_EXTENSION);
-            $randomName = md5(uniqid(rand()));
+            $randomName = Str::random(35);
             $uploadedFileName = "{$randomName}.{$extension}";
             $setOriginalName = function (UploadedFile $file, $newFileName) {
                 $file->originalName = $newFileName;
