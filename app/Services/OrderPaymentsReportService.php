@@ -164,7 +164,7 @@ class OrderPaymentsReportService
     public function handleExcelData(Collection $collection)
     {
         return $collection->map(function ($item, $index) {
-
+            $item->status_code = config('uec.order_status_code_options')[$item->status_code] ?? null;
             $item->payment_type = config('uec.payment_type_options')[$item->payment_type] ?? null;
             $item->payment_method = config('uec.payment_method_options')[$item->payment_method] ?? null;
             //資料新增原因
@@ -181,6 +181,7 @@ class OrderPaymentsReportService
                 (string) $index + 1, //項次
                 (string) $item->created_at, //日期
                 (string) $item->order_no, //訂單編號
+                (string) $item->status_code, //訂單狀態
                 (string) $item->payment_type, //類型
                 (string) $item->payment_method, //金流方式
                 $item->number_of_instal, //分期期數
