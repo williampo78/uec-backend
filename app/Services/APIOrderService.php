@@ -943,6 +943,7 @@ class APIOrderService
             $prod_info_detail = [];
             $point_discount = 0;
             $detail_p_discount = 0;
+            $hasOrderItems = [];
             foreach ($cart['list'] as $products) {
                 foreach ($products['itemList'] as $item) {
                     //售價*數量-單品折抵(itemDiscount) = 單品折抵後的小計($tmp_subtotal)
@@ -982,6 +983,9 @@ class APIOrderService
                         $discount_rate[$seq] = 0;
                         $point_rate = 1;
                     }
+
+                    $itemId = $item['itemId'];
+                    $hasOrderItems[$itemId] = $item['itemQty'];
                     $details[$seq] = [
                         "order_id" => $newOrder->id,
                         "seq" => $seq,
@@ -1070,6 +1074,11 @@ class APIOrderService
                                                 break;
                                             }
                                             $seq++;
+                                            // 贈品庫存，需扣掉目前已有訂購的 item
+                                            $giftStockInfoId = $stockInfo['id'];
+                                            if ( !empty($hasOrderItems[$giftStockInfoId])) {
+                                                $stockInfo['stockQty'] = $stockInfo['stockQty'] - $hasOrderItems[$giftStockInfoId];
+                                            }
                                             $currentQty = $remainingQty <= $stockInfo['stockQty'] ? $remainingQty : $stockInfo['stockQty'];
 
                                             $details[$seq] = [
@@ -1172,6 +1181,12 @@ class APIOrderService
                             break;
                         }
                         $seq++;
+
+                        // 贈品庫存，需扣掉目前已有訂購的 item
+                        $giftStockInfoId = $stockInfo['id'];
+                        if ( !empty($hasOrderItems[$giftStockInfoId])) {
+                            $stockInfo['stockQty'] = $stockInfo['stockQty'] - $hasOrderItems[$giftStockInfoId];
+                        }
                         $currentQty = $remainingQty <= $stockInfo['stockQty'] ? $remainingQty : $stockInfo['stockQty'];
 
                         $productInfo = Product::where('id', $gift['productId'])->first();
@@ -1378,6 +1393,12 @@ class APIOrderService
                                                     break;
                                                 }
                                                 $seq++;
+
+                                                // 贈品庫存，需扣掉目前已有訂購的 item
+                                                $giftStockInfoId = $stockInfo['id'];
+                                                if ( !empty($hasOrderItems[$giftStockInfoId])) {
+                                                    $stockInfo['stockQty'] = $stockInfo['stockQty'] - $hasOrderItems[$giftStockInfoId];
+                                                }
                                                 $currentQty = $remainingQty <= $stockInfo['stockQty'] ? $remainingQty : $stockInfo['stockQty'];
 
                                                 $details[$seq] = [
