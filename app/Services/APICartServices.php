@@ -1374,7 +1374,7 @@ class APICartServices
         if (count($cartInfo) == 0) {
             return json_encode(array("status" => 404, "result" => $feeInfo));
         } else {
-            $stock_gift_check = $this->stockService->getWithCartProductInStock($warehouseCode, $cartInfo['items'] ?? []);
+            $stock_gift_check = $this->stockService->getProductInStock($warehouseCode);
 
             $cartQty = [];
             $cartAmount = [];
