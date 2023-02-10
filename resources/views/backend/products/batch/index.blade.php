@@ -40,7 +40,8 @@
                                                             class="text-red">*</span></label>
                                                 </div>
                                                 <div class="col-sm-4">
-                                                    <input type="{{$share_type_file}}" id="excel" name="excel" accept=".xlsx,.xls,.csv"
+                                                    <input type="{{$share_type_file}}" id="excel" name="excel" 
+                                                        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                                                         data-msg-accept="只支援Excel檔案格式">
                                                 </div>
                                             </div>
@@ -56,7 +57,8 @@
                                                 </div>
                                                 <div class="col-sm-4">
                                                     <input type="{{$share_type_file}}" id="image_zip" name="image_zip"
-                                                        accept=".zip" data-msg-accept="只支援.zip檔案格式">
+                                                    accept="zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed"
+                                                    data-msg-accept="只支援.zip檔案格式">
                                                 </div>
                                             </div>
                                         </div>
