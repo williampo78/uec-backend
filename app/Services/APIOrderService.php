@@ -117,6 +117,7 @@ class APIOrderService
             }
         }
         DB::beginTransaction();
+        $this->convertUtm($order);
         try {
             //訂單單頭
             $cart_campaign_discount = ($order['cart_campaign_discount'] < 0 ? ($order['cart_campaign_discount'] - ($cart['thresholdAmount'])) : 0);
@@ -170,6 +171,8 @@ class APIOrderService
             $webData['utm_medium'] = isset($order['utm']['medium']) ? $order['utm']['medium'] : null;
             $webData['utm_campaign'] = isset($order['utm']['campaign']) ? $order['utm']['campaign'] : null;
             $webData['utm_sales'] = isset($order['utm']['sales']) ? $order['utm']['sales'] : null;
+            $webData['utm_content'] = isset($order['utm']['content']) ? $order['utm']['content'] : null;
+            $webData['utm_agency'] = isset($order['utm']['agency']) ? $order['utm']['agency'] : null;
             $webData['utm_time'] = isset($order['utm']['time']) ? Carbon::createFromTimestamp($order['utm']['time'])->format('Y-m-d H:i:s') : null;
             $newOrder = Order::create($webData);
             //$newOrder = new Order();
@@ -251,6 +254,8 @@ class APIOrderService
                         "utm_medium" => $utm_info[$item['itemId']]->utm_medium,
                         "utm_campaign" => $utm_info[$item['itemId']]->utm_campaign,
                         "utm_sales" => $utm_info[$item['itemId']]->utm_sales,
+                        "utm_content" => $utm_info[$item['itemId']]->utm_content,
+                        "utm_agency" => $utm_info[$item['itemId']]->utm_agency,
                         "utm_time" => $utm_info[$item['itemId']]->utm_time,
                         "created_by" => $member_id,
                         "updated_by" => $member_id,
@@ -324,6 +329,8 @@ class APIOrderService
                                             "utm_medium" => $utm_info[$item['itemId']]->utm_medium,
                                             "utm_campaign" => $utm_info[$item['itemId']]->utm_campaign,
                                             "utm_sales" => $utm_info[$item['itemId']]->utm_sales,
+                                            "utm_content" => $utm_info[$item['itemId']]->utm_content,
+                                            "utm_agency" => $utm_info[$item['itemId']]->utm_agency,
                                             "utm_time" => $utm_info[$item['itemId']]->utm_time,
                                             "created_by" => $member_id,
                                             "updated_by" => $member_id,
@@ -407,6 +414,8 @@ class APIOrderService
                         "utm_medium" => null,
                         "utm_campaign" => null,
                         "utm_sales" => null,
+                        "utm_content" => null,
+                        "utm_agency" => null,
                         "utm_time" => null,
                         "created_by" => $member_id,
                         "updated_by" => $member_id,
@@ -592,6 +601,8 @@ class APIOrderService
                                                 "utm_medium" => isset($order['utm']['medium']) ? $order['utm']['medium'] : null,
                                                 "utm_campaign" => isset($order['utm']['campaign']) ? $order['utm']['campaign'] : null,
                                                 "utm_sales" => isset($order['utm']['sales']) ? $order['utm']['sales'] : null,
+                                                "utm_content" => isset($order['utm']['content']) ? $order['utm']['content'] : null,
+                                                "utm_agency" => isset($order['utm']['agency']) ? $order['utm']['agency'] : null,
                                                 "utm_time" => isset($order['utm']['time']) ? Carbon::createFromTimestamp($order['utm']['time'])->format('Y-m-d H:i:s') : null,
                                                 "created_by" => $member_id,
                                                 "updated_by" => $member_id,
@@ -769,6 +780,49 @@ class APIOrderService
         $utms = ShoppingCartDetail::where('member_id', '=', $member_id)->where('status_code', '=', 0)->get();
         $utm_info = [];
         foreach ($utms as $utm) {
+            if(isset($utm['utm_source'])) {
+                //四參數，對應欄位的數值轉換
+                switch($utm['utm_source']) {
+                  case 'lineclinic':
+                    $utm['utm_source'] = "clinic";
+                    $utm['utm_agency'] = $utm['utm_medium'];
+                    $utm['utm_medium'] = "line";
+                    $utm['utm_campaign'] = null;
+                    $utm['utm_sales'] = $utm['utm_sales'];
+                    $utm['utm_content'] = $utm['utm_source'];
+                    break;
+                  case 'appointment':
+                    $utm['utm_source'] = "clinic";
+                    $utm['utm_agency'] = $utm['utm_medium'];
+                    $utm['utm_medium'] = "appointment";
+                    $utm['utm_campaign'] = null;
+                    $utm['utm_sales'] = $utm['utm_sales'];
+                    $utm['utm_content'] = $utm['utm_campaign'];
+                    break;
+                  case 'shopdradvice':
+                    $utm['utm_source'] = "pharmacy";
+                    $utm['utm_agency'] = explode('_',$utm['utm_medium'])[0];
+                    $sales = str_contains($utm['utm_medium'],'_') ? explode('_',$utm['utm_medium'])[1] : '';
+                    switch($sales) {
+                      case 'line':
+                        $utm['utm_medium'] = "line";
+                        break;
+                      case 'DM':
+                        $utm['utm_medium'] = "dm";
+                        break;
+                      case 'display':
+                        $utm['utm_medium'] = "box";
+                        break;
+                      default:
+                        $utm['utm_medium'] = "sales";
+                        break;
+                    }
+                    $utm['utm_sales'] = $utm['utm_sales'];
+                    $utm['utm_campaign'] = $utm['utm_campaign'];
+                    $utm['utm_content'] = null;
+                    break;
+                }
+            }
             $utm_info[$utm->product_item_id] = $utm;
         }
 
@@ -849,6 +903,7 @@ class APIOrderService
             }
         }
         DB::beginTransaction();
+        $this->convertUtm($order);
         try {
             //訂單單頭
             $cart_campaign_discount = ($order['cart_campaign_discount'] < 0 ? ($order['cart_campaign_discount'] - ($cart['thresholdAmount'])) : 0);
@@ -903,6 +958,8 @@ class APIOrderService
             $webData['utm_medium'] = isset($order['utm']['medium']) ? $order['utm']['medium'] : null;
             $webData['utm_campaign'] = isset($order['utm']['campaign']) ? $order['utm']['campaign'] : null;
             $webData['utm_sales'] = isset($order['utm']['sales']) ? $order['utm']['sales'] : null;
+            $webData['utm_content'] = isset($order['utm']['content']) ? $order['utm']['content'] : null;
+            $webData['utm_agency'] = isset($order['utm']['agency']) ? $order['utm']['agency'] : null;
             $webData['utm_time'] = isset($order['utm']['time']) ? Carbon::createFromTimestamp($order['utm']['time'])->format('Y-m-d H:i:s') : null;
             $webData['ship_from_whs'] = ($order['stock_type'] == 'supplier' ? 'SUP' : 'SELF');
             $webData['sup_transferred_at'] = ($order['stock_type'] == 'supplier' ? Carbon::parse(Carbon::now())->addMinutes($sup_trans_mins) : null);
@@ -1005,6 +1062,8 @@ class APIOrderService
                         "utm_medium" => $utm_info[$item['itemId']]->utm_medium,
                         "utm_campaign" => $utm_info[$item['itemId']]->utm_campaign,
                         "utm_sales" => $utm_info[$item['itemId']]->utm_sales,
+                        "utm_content" => $utm_info[$item['itemId']]->utm_content,
+                        "utm_agency" => $utm_info[$item['itemId']]->utm_agency,
                         "utm_time" => $utm_info[$item['itemId']]->utm_time,
                         "created_by" => $member_id,
                         "updated_by" => $member_id,
@@ -1099,6 +1158,8 @@ class APIOrderService
                                                 "utm_medium"                 => $utm_info[$item['itemId']]->utm_medium,
                                                 "utm_campaign"               => $utm_info[$item['itemId']]->utm_campaign,
                                                 "utm_sales"                  => $utm_info[$item['itemId']]->utm_sales,
+                                                "utm_content"                => $utm_info[$item['itemId']]->utm_content,
+                                                "utm_agency"                 => $utm_info[$item['itemId']]->utm_agency,
                                                 "utm_time"                   => $utm_info[$item['itemId']]->utm_time,
                                                 "created_by"                 => $member_id,
                                                 "updated_by"                 => $member_id,
@@ -1208,6 +1269,8 @@ class APIOrderService
                             "utm_medium"                 => null,
                             "utm_campaign"               => null,
                             "utm_sales"                  => null,
+                            "utm_content"                => null,
+                            "utm_agency"                 => null,
                             "utm_time"                   => null,
                             "created_by"                 => $member_id,
                             "updated_by"                 => $member_id,
@@ -1419,6 +1482,8 @@ class APIOrderService
                                                     "utm_medium" => isset($order['utm']['medium']) ? $order['utm']['medium'] : null,
                                                     "utm_campaign" => isset($order['utm']['campaign']) ? $order['utm']['campaign'] : null,
                                                     "utm_sales" => isset($order['utm']['sales']) ? $order['utm']['sales'] : null,
+                                                    "utm_content" => isset($order['utm']['content']) ? $order['utm']['content'] : null,
+                                                    "utm_agency" => isset($order['utm']['agency']) ? $order['utm']['agency'] : null,
                                                     "utm_time" => isset($order['utm']['time']) ? Carbon::createFromTimestamp($order['utm']['time'])->format('Y-m-d H:i:s') : null,
                                                     "created_by" => $member_id,
                                                     "updated_by" => $member_id,
@@ -1774,6 +1839,58 @@ class APIOrderService
             return false;
         } else {
             return true;
+        }
+    }
+
+    /*
+     * 轉換UTM參數，新舊相容
+     */
+    public function convertUtm($order)
+    {
+        if(isset($order['utm']) && !isset($order['utm']['content']) && !isset($order['utm']['agency'])) {
+            $tmp=$order['utm'];
+            //四參數，對應欄位的數值轉換
+            switch($order['utm']['source']) {
+              case 'lineclinic':
+                $tmp['source'] = "clinic";
+                $tmp['agency'] = $order['utm']['medium'];
+                $tmp['medium'] = "line";
+                $tmp['campaign'] = null;
+                $tmp['sales'] = $order['utm']['sales'];
+                $tmp['content'] = $order['utm']['source'];
+                break;
+              case 'appointment':
+                $tmp['source'] = "clinic";
+                $tmp['agency'] = $order['utm']['medium'];
+                $tmp['medium'] = "appointment";
+                $tmp['campaign'] = null;
+                $tmp['sales'] = $order['utm']['sales'];
+                $tmp['content'] = $order['utm']['campaign'];
+                break;
+              case 'shopdradvice':
+                $tmp['source'] = "pharmacy";
+                $tmp['agency'] = explode('_',$order['utm']['medium'])[0];
+                $sales = str_contains($order['utm']['medium'],'_') ? explode('_',$order['utm']['medium'])[1] : '';
+                switch($sales) {
+                  case 'line':
+                    $tmp['medium'] = "line";
+                    break;
+                  case 'DM':
+                    $tmp['medium'] = "dm";
+                    break;
+                  case 'display':
+                    $tmp['medium'] = "box";
+                    break;
+                  default:
+                    $tmp['medium'] = "sales";
+                    break;
+                }
+                $tmp['sales'] = $order['utm']['sales'];
+                $tmp['campaign'] = $order['utm']['campaign'];
+                $tmp['content'] = null;
+                break;
+            }
+            $order['utm'] = $tmp;
         }
     }
 }

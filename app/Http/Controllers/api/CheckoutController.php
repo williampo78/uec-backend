@@ -246,6 +246,8 @@ class CheckoutController extends Controller
             'utm.medium' => 'string|nullable|max:100',
             'utm.campaign' => 'string|nullable|max:100',
             'utm.sales' => 'string|nullable|max:100',
+            'utm.content' => 'string|nullable|max:100',
+            'utm.agency' => 'string|nullable|max:100',
             'utm.time' => 'nullable',
             'stock_type' => (config('uec.cart_billing_split') == 1 ? 'required|string|in:dradvice,supplier' : 'nullable'),
             'installment_info.bank_id' => ($request->payment_method === 'TAPPAY_INSTAL' ? 'required|string' : 'nullable'),

@@ -102,6 +102,7 @@ class APICartServices
         try {
             $webData = [];
             if ($act == 'add') {
+                $this->convertUtm($input);
                 $webData['member_id'] = $member_id;
                 $webData['product_id'] = $item[0]['product_id'];
                 $webData['product_item_id'] = $input['item_id'];
@@ -111,6 +112,8 @@ class APICartServices
                 $webData['utm_medium'] = $input['utm_medium'];
                 $webData['utm_campaign'] = $input['utm_campaign'];
                 $webData['utm_sales'] = $input['utm_sales'];
+                $webData['utm_content'] = $input['utm_content'];
+                $webData['utm_agency'] = $input['utm_agency'];
                 $webData['latest_added_at'] = $now;
                 $webData['utm_time'] = Carbon::createFromTimestamp($input['utm_time'])->format('Y-m-d H:i:s');
                 $webData['created_by'] = $member_id;
@@ -1220,6 +1223,8 @@ class APICartServices
                     $input['utm_medium'],
                     $input['utm_campaign'],
                     $input['utm_sales'],
+                    $input['utm_content'],
+                    $input['utm_agency'],
                     Carbon::createFromTimestamp($input['utm_time'])->format('Y-m-d H:i:s'),
                     $now,
                     $member_id,
@@ -1232,7 +1237,7 @@ class APICartServices
         }
         $addColumn = [
             "member_id", "product_id", "product_item_id", "qty", "status_code",
-            "utm_source", "utm_medium", "utm_campaign", "utm_sales", "utm_time", "latest_added_at",
+            "utm_source", "utm_medium", "utm_campaign", "utm_sales", "utm_content", "utm_agency", "utm_time", "latest_added_at",
             "created_by", "updated_by", "created_at", "updated_at",
         ];
         DB::beginTransaction();
@@ -1297,16 +1302,20 @@ class APICartServices
         DB::beginTransaction();
         try {
             $webData = [];
+            $this->convertUtm($input);
+            $webData['utm_source'] = $input['utm_source'];
+            $webData['utm_medium'] = $input['utm_medium'];
+            $webData['utm_campaign'] = $input['utm_campaign'];
+            $webData['utm_sales'] = $input['utm_sales'];
+            $webData['utm_content'] = $input['utm_content'];
+            $webData['utm_agency'] = $input['utm_agency'];
+            
             if ($act == 'add') {
                 $webData['member_id'] = $member_id;
                 $webData['product_id'] = $item[0]['product_id'];
                 $webData['product_item_id'] = $input['item_id'];
                 $webData['status_code'] = $input['status_code'];
                 $webData['qty'] = ($input['item_qty'] > $stock ? $stock : $input['item_qty']);
-                $webData['utm_source'] = $input['utm_source'];
-                $webData['utm_medium'] = $input['utm_medium'];
-                $webData['utm_campaign'] = $input['utm_campaign'];
-                $webData['utm_sales'] = $input['utm_sales'];
                 $webData['utm_time'] = Carbon::createFromTimestamp($input['utm_time'])->format('Y-m-d H:i:s');
                 $webData['latest_added_at'] = $now;
                 $webData['created_by'] = $member_id;
@@ -1328,10 +1337,6 @@ class APICartServices
                 $webData['product_id'] = $item[0]['product_id'];
                 $webData['qty'] = ($qty > $stock ? $stock : $qty);
                 $webData['status_code'] = $input['status_code'];
-                $webData['utm_source'] = $input['utm_source'];
-                $webData['utm_medium'] = $input['utm_medium'];
-                $webData['utm_campaign'] = $input['utm_campaign'];
-                $webData['utm_sales'] = $input['utm_sales'];
                 $webData['utm_time'] = Carbon::createFromTimestamp($input['utm_time'])->format('Y-m-d H:i:s');
                 $webData['latest_added_at'] = $latest_added_at;
                 $webData['updated_by'] = $member_id;
@@ -2607,4 +2612,62 @@ class APICartServices
         return $paymentMethod->all();
     }
 
+	/*
+     * 轉換UTM參數，新舊相容
+     */
+    public function convertUtm($input)
+    {
+        if(!isset($input['utm_content']) && !isset($input['utm_agency'])) {
+            //四參數，對應欄位的數值轉換
+            switch($input['utm_source']){
+              case 'lineclinic':
+                $input['utm_source'] = "clinic";
+                $input['utm_agency'] = $input['utm_medium'];
+                $input['utm_medium'] = "line";
+                $input['utm_campaign'] = null;
+                $input['utm_sales'] = null;
+                $input['utm_content'] = $input['utm_campaign'];
+                break;
+              case 'zsmhltc':
+              case 'tmuhltc':
+                $input['utm_source'] = "homecare";
+                $input['utm_agency'] = $input['utm_medium'];
+                $input['utm_medium'] = "dm";
+                $input['utm_campaign'] = null;
+                $input['utm_sales'] = null;
+                $input['utm_content'] = null;
+                break;
+              case 'appointment':
+                $input['utm_source'] = "clinic";
+                $input['utm_agency'] = $input['utm_medium'];
+                $input['utm_medium'] = "appointment";
+                $input['utm_campaign'] = null;
+                $input['utm_sales'] = null;
+                $input['utm_content'] = $input['utm_campaign'];
+                break;
+              case 'shopdradvice':
+                $input['utm_source'] = "pharmacy";
+                $input['utm_agency'] = explode('_',$input['utm_medium'])[0];
+                $sales = str_contains($input['utm_medium'],'_') ? explode('_',$input['utm_medium'])[1] : '';
+                switch($sales) {
+                  case 'line':
+                    $input['utm_medium'] = "line";
+                    break;
+                  case 'DM':
+                    $input['utm_medium'] = "dm";
+                    break;
+                  case 'display':
+                    $input['utm_medium'] = "box";
+                    break;
+                  default:
+                    $input['utm_medium'] = "sales";
+                    break;
+                }
+                $input['utm_sales'] = $input['utm_sales'];
+                $input['utm_campaign'] = $input['utm_campaign'];
+                $input['utm_content'] = null;
+                break;
+            }
+        }
+    }
 }
