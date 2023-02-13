@@ -124,7 +124,7 @@ class CheckoutController extends Controller
                             $installment = $this->apiProductServices->getInstallmentAmountInterestRatesWithBank($paid_amount);
                             $installment = $this->apiProductServices->handleInstallmentInterestRates($installment, $paid_amount);
                             $installment = isset($installment['details']) ? 1 : 0; //不符合回傳0
-                            $data['paymentMethod'] = $response['result']['paymentMethod'];
+                            $data['paymentMethod'] = array_values($response['result']['paymentMethod']);
                             $del_key = "Del";
                             foreach ($data['paymentMethod'] as $key => $method) {
                                 if ($data['paymentMethod'][$key] == 'TAPPAY_INSTAL' && $installment == 0) $del_key = $key;

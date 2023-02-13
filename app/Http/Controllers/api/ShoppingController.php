@@ -107,6 +107,7 @@ class ShoppingController extends Controller
         $stock_type = ($request->stock_type == "supplier" ? "supplier" : "dradvice");
         $response = $this->apiCartService->getCartData($member_id, $campaign, $campaign_gift, $campaign_discount, $gtm, $stock_type);
         $response = json_decode($response, true);
+        $response['result']['paymentMethod'] = array_values($response['result']['paymentMethod']);
         if ($response['status'] == '200') {
             $status = true;
             $data = $response['result'];
