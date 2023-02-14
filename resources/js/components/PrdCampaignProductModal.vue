@@ -29,18 +29,23 @@
                                             >
                                         </div>
                                         <div class="col-sm-10">
-                                            <select2
+                                            <div v-if="modal.action == 'edit'">
+                                                <input type="hidden" v-model="form.supplierId">
+                                                <input class="form-control"  v-model="form.supplierName" disabled/>
+                                            </div>
+                                            <div v-if="modal.action == 'create'">
+                                                <select2
                                                 class="form-control"
                                                 :options="suppliers"
                                                 v-model="form.supplierId"
                                                 :allow-clear="false"
-                                                :disabled="supplier.isDisabled"
-                                            >
+                                                :disabled="supplier.isDisabled">
                                                 <option
                                                     disabled
                                                     value=""
                                                 ></option>
                                             </select2>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -491,6 +496,9 @@ export default {
                     text: `【${supplier.display_number}】 ${supplier.name}`,
                     id: supplier.id,
                 });
+                if(this.form.supplierId == supplier.id){
+                    this.form.supplierName = supplier.name ;
+                }
             });
         }
 

@@ -531,7 +531,7 @@
                                                                 <td>@{{ product.productNo }}</td>
                                                                 <td>@{{ product.productName }}</td>
                                                                 <td>@{{ product.sellingPrice }}</td>
-                                                                <td>@{{ product.startLaunchedAt }}</td>
+                                                                <td>@{{ product.startSellingAt }}</td>
                                                                 <td>@{{ product.launchStatus }}</td>
                                                                 <td>@{{ product.grossMargin }}</td>
                                                                 <td>@{{ product.webCategoryHierarchy }}</td>
@@ -677,6 +677,7 @@
                     },
                     stockType: "",
                     excludeProductIds: [],
+                    action:'edit',
                 },
                 giveawayModal: {
                     id: "giveaway-modal",
@@ -691,6 +692,7 @@
                     },
                     stockType: "",
                     excludeProductIds: [],
+                    action:'edit',
                 },
                 currentThreshold: {},
                 bannerPhotoDesktop: {
@@ -746,7 +748,6 @@
                     this.form.urlCode = campaign.url_code;
                     this.form.stockType = campaign.stock_type;
                     this.form.supplierId = campaign.supplier_id;
-
                     if (campaign.banner_photo_desktop_url) {
                         this.bannerPhotoDesktop.url = campaign.banner_photo_desktop_url;
                         this.bannerPhotoDesktop.showInputFile = false;
@@ -798,6 +799,7 @@
                                 productName: product.product_name,
                                 sellingPrice: product.selling_price,
                                 startLaunchedAt: product.start_launched_at,
+                                startSellingAt: product.start_selling_at,
                                 launchStatus: product.launch_status,
                                 grossMargin: product.gross_margin,
                                 webCategoryHierarchy: product.web_category_hierarchy,
@@ -1399,6 +1401,7 @@
                             productName: product.productName,
                             sellingPrice: product.sellingPrice,
                             startLaunchedAt: product.startLaunchedAt,
+                            startSellingAt: product.startSellingAt,
                             launchStatus: product.launchStatus,
                             grossMargin: product.grossMargin,
                             webCategoryHierarchy: product.webCategoryHierarchy,

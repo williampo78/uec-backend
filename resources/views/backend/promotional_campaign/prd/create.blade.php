@@ -366,6 +366,7 @@
                     },
                     stockType: "",
                     excludeProductIds: [],
+                    action:"create"
                 },
                 giveawayModal: {
                     id: "giveaway-modal",
@@ -380,6 +381,7 @@
                     },
                     stockType: "",
                     excludeProductIds: [],
+                    action:"create"
                 },
                 showXValue: true,
                 showXValueHint: true,

@@ -2044,6 +2044,7 @@ class PromotionalCampaignService
                 'supplier' => null,
                 'stock_type' => config('uec.stock_type_options')[$product->stock_type] ?? null,
                 'stock_qty' => 0,
+                'start_selling_at'=> $product->start_selling_at,
             ];
 
             // 上架時間起
