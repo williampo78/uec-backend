@@ -470,6 +470,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     modal: {
@@ -545,6 +550,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     text: "\u3010".concat(supplier.display_number, "\u3011 ").concat(supplier.name),
                     id: supplier.id
                   });
+
+                  if (_this.form.supplierId == supplier.id) {
+                    _this.form.supplierName = supplier.name;
+                  }
                 });
               }
 
@@ -1632,36 +1641,94 @@ var render = function () {
                     _c("div", { staticClass: "form-group" }, [
                       _vm._m(1),
                       _vm._v(" "),
-                      _c(
-                        "div",
-                        { staticClass: "col-sm-10" },
-                        [
-                          _c(
-                            "select2",
-                            {
-                              staticClass: "form-control",
-                              attrs: {
-                                options: _vm.suppliers,
-                                "allow-clear": false,
-                                disabled: _vm.supplier.isDisabled,
-                              },
-                              model: {
-                                value: _vm.form.supplierId,
-                                callback: function ($$v) {
-                                  _vm.$set(_vm.form, "supplierId", $$v)
+                      _c("div", { staticClass: "col-sm-10" }, [
+                        _vm.modal.action == "edit"
+                          ? _c("div", [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.form.supplierId,
+                                    expression: "form.supplierId",
+                                  },
+                                ],
+                                attrs: { type: "hidden" },
+                                domProps: { value: _vm.form.supplierId },
+                                on: {
+                                  input: function ($event) {
+                                    if ($event.target.composing) {
+                                      return
+                                    }
+                                    _vm.$set(
+                                      _vm.form,
+                                      "supplierId",
+                                      $event.target.value
+                                    )
+                                  },
                                 },
-                                expression: "form.supplierId",
-                              },
-                            },
-                            [
-                              _c("option", {
-                                attrs: { disabled: "", value: "" },
                               }),
-                            ]
-                          ),
-                        ],
-                        1
-                      ),
+                              _vm._v(" "),
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.form.supplierName,
+                                    expression: "form.supplierName",
+                                  },
+                                ],
+                                staticClass: "form-control",
+                                attrs: { disabled: "" },
+                                domProps: { value: _vm.form.supplierName },
+                                on: {
+                                  input: function ($event) {
+                                    if ($event.target.composing) {
+                                      return
+                                    }
+                                    _vm.$set(
+                                      _vm.form,
+                                      "supplierName",
+                                      $event.target.value
+                                    )
+                                  },
+                                },
+                              }),
+                            ])
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _vm.modal.action == "create"
+                          ? _c(
+                              "div",
+                              [
+                                _c(
+                                  "select2",
+                                  {
+                                    staticClass: "form-control",
+                                    attrs: {
+                                      options: _vm.suppliers,
+                                      "allow-clear": false,
+                                      disabled: _vm.supplier.isDisabled,
+                                    },
+                                    model: {
+                                      value: _vm.form.supplierId,
+                                      callback: function ($$v) {
+                                        _vm.$set(_vm.form, "supplierId", $$v)
+                                      },
+                                      expression: "form.supplierId",
+                                    },
+                                  },
+                                  [
+                                    _c("option", {
+                                      attrs: { disabled: "", value: "" },
+                                    }),
+                                  ]
+                                ),
+                              ],
+                              1
+                            )
+                          : _vm._e(),
+                      ]),
                     ]),
                   ]),
                   _vm._v(" "),

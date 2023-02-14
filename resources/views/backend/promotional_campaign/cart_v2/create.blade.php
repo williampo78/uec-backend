@@ -499,7 +499,7 @@
                                                                 <td>@{{ product.productNo }}</td>
                                                                 <td>@{{ product.productName }}</td>
                                                                 <td>@{{ product.sellingPrice }}</td>
-                                                                <td>@{{ product.startLaunchedAt }}</td>
+                                                                <td>@{{ product.startSellingAt }}</td>
                                                                 <td>@{{ product.launchStatus }}</td>
                                                                 <td>@{{ product.grossMargin }}</td>
                                                                 <td>@{{ product.webCategoryHierarchy }}</td>
@@ -642,6 +642,7 @@
                     },
                     stockType: "",
                     excludeProductIds: [],
+                    action:'create',
                 },
                 giveawayModal: {
                     id: "giveaway-modal",
@@ -656,6 +657,7 @@
                     },
                     stockType: "",
                     excludeProductIds: [],
+                    action:'create',
                 },
                 currentThreshold: {},
                 bannerPhotoDesktop: {
@@ -1277,6 +1279,7 @@
                             productName: product.productName,
                             sellingPrice: product.sellingPrice,
                             startLaunchedAt: product.startLaunchedAt,
+                            startSellingAt: product.startSellingAt,
                             launchStatus: product.launchStatus,
                             grossMargin: product.grossMargin,
                             webCategoryHierarchy: product.webCategoryHierarchy,
