@@ -81,6 +81,7 @@ Route::get('/refresh-captcha', [CaptchaController::class, 'refreshCaptcha'])->na
 Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
     Route::resource('/', AdminController::class, ['names' => ['index' => 'backend_home']]);
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/check-login-status', [AuthController::class, 'checkLoginStatus']);
 
     // 倉庫管理
     Route::resource('/warehouse', WarehouseController::class, ['names' => ['index' => 'warehouse']]);

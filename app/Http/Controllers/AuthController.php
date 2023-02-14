@@ -81,4 +81,15 @@ class AuthController extends Controller
 
         return redirect()->route('login.show');
     }
+
+    /**
+     * 確認登入狀態
+     * 
+     */
+
+    public function checkLoginStatus(){
+        return response()->json([
+            'status' => auth()->check(),
+        ]);
+    }
 }

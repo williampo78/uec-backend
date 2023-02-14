@@ -11,8 +11,7 @@
 
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset('asset/img/favicon.ico') }}" />
     <link rel="stylesheet" href="{{ asset('asset/js/template/dist/css/sb-admin-2.css') }}" />
-    <link rel="stylesheet"
-        href="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('asset/css/fa/css/font-awesome.min.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/sweetalert.css') }}">
     <link rel="stylesheet" href="{{ asset('asset/css/bootstrap-colorpicker.min.css') }}">
@@ -70,6 +69,15 @@
             $('#table_list').DataTable({
                 "order": [],
             });
+            axios.get('/backend/check-login-status')
+                .then(function(response) {
+                    if (!response.data.status && location.pathname !== '/login') {
+                        window.location.reload()
+                    }
+                })
+                .catch(function(error) {
+                    console.log(error);
+                });
         });
     </script>
 
