@@ -78,11 +78,9 @@ Route::any('/ckfinder/connector', [CKFinderController::class, 'requestAction'])-
 Route::get('/refresh-captcha', [CaptchaController::class, 'refreshCaptcha'])->name('captcha.refresh');
 
 // 已登入的user才能造訪
-Route::group(['prefix' => 'backend', 'middleware' => ['admin']], function () {
+Route::group(['prefix' => 'backend', 'middleware' => ['admin','nocache']], function () {
     Route::resource('/', AdminController::class, ['names' => ['index' => 'backend_home']]);
     Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/check-login-status', [AuthController::class, 'checkLoginStatus']);
-
     // 倉庫管理
     Route::resource('/warehouse', WarehouseController::class, ['names' => ['index' => 'warehouse']]);
 

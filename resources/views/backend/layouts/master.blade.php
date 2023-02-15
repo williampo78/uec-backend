@@ -69,15 +69,6 @@
             $('#table_list').DataTable({
                 "order": [],
             });
-            axios.get('/backend/check-login-status')
-                .then(function(response) {
-                    if (!response.data.status && location.pathname !== '/login') {
-                        window.location.reload()
-                    }
-                })
-                .catch(function(error) {
-                    console.log(error);
-                });
         });
     </script>
 

@@ -70,5 +70,6 @@ class Kernel extends HttpKernel
         'jwt.auth' => 'Tymon\JWTAuth\Middleware\GetUserFromToken',
         'jwt.refresh' => 'Tymon\JWTAuth\Middleware\RefreshToken',
         'jwt.v2.verify' => \App\Http\Middleware\JwtV2Middleware::class,
+        'nocache' => \App\Http\Middleware\NoCacheHeaders::class,
     ];
 }
