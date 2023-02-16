@@ -63,6 +63,7 @@
                         @foreach ($quotationDetails as $val)
                             <tr class="something">
                                 <td class="col-md-1">{{ $val->item_no }}</td>
+                                <td class="col-md-2">{{ $val->pos_item_no }}</td>
                                 <td class="col-md-2">
                                     @if (!$val->combination_name)
                                         <span class="redtext">該商品異常</span>
@@ -70,7 +71,6 @@
                                         {{ $val->combination_name }}
                                     @endif
                                 </td>
-                                <td class="col-md-2">{{ $val->pos_item_no }}</td>
                                 <td class="col-md-1">{{ $val->original_unit_price }}</td>
                                 <td class="col-md-1">{{ $val->min_purchase_qty }}</td>
                                 <td class="col-md-5" style="word-break: break-all">{{$val->requisitions_purchase_number}}</td>
