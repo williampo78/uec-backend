@@ -1847,7 +1847,7 @@ class APIOrderService
      */
     public function convertUtm($order)
     {
-        if(isset($order['utm']) && !isset($order['utm']['content']) && !isset($order['utm']['agency'])) {
+        if((isset($order['utm']) && count($order['utm']) > 0) && !isset($order['utm']['content']) && !isset($order['utm']['agency'])) {
             $tmp=$order['utm'];
             //四參數，對應欄位的數值轉換
             switch($order['utm']['source']) {
@@ -1856,7 +1856,7 @@ class APIOrderService
                 $tmp['agency'] = $order['utm']['medium'];
                 $tmp['medium'] = "line";
                 $tmp['campaign'] = null;
-                $tmp['sales'] = $order['utm']['sales'];
+                $tmp['sales'] = $order['utm']['sales'] ?? null;
                 $tmp['content'] = $order['utm']['source'];
                 break;
               case 'appointment':
@@ -1864,8 +1864,8 @@ class APIOrderService
                 $tmp['agency'] = $order['utm']['medium'];
                 $tmp['medium'] = "appointment";
                 $tmp['campaign'] = null;
-                $tmp['sales'] = $order['utm']['sales'];
-                $tmp['content'] = $order['utm']['campaign'];
+                $tmp['sales'] = $order['utm']['sales'] ?? null;
+                $tmp['content'] = $order['utm']['campaign'] ?? null;
                 break;
               case 'shopdradvice':
                 $tmp['source'] = "pharmacy";
@@ -1885,8 +1885,8 @@ class APIOrderService
                     $tmp['medium'] = "sales";
                     break;
                 }
-                $tmp['sales'] = $order['utm']['sales'];
-                $tmp['campaign'] = $order['utm']['campaign'];
+                $tmp['sales'] = $order['utm']['sales'] ?? null;
+                $tmp['campaign'] = $order['utm']['campaign'] ?? null;
                 $tmp['content'] = null;
                 break;
             }
