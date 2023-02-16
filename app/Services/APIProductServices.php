@@ -1502,6 +1502,7 @@ class APIProductServices
                                 'product_name' => $products[$product_id]->product_name,
                                 'product_unit' => $products[$product_id]->uom,
                                 'list_price' => $products[$product_id]->list_price,
+                                'start_launched_at'=>$products[$product_id]->start_launched_at,
                                 'selling_price' => $products[$product_id]->selling_price,
                                 'product_photo' => ($products[$product_id]->displayPhoto ? $s3 . $products[$product_id]->displayPhoto : null),
                                 'promotion_desc' => $promotion_desc,
@@ -1517,7 +1518,7 @@ class APIProductServices
                 }
             }
             $searchResult = self::getPages($product_info, $size, $page);
-
+            $searchResult['list'] = collect($searchResult['list'])->sortBy('start_launched_at')->sortBy('selling_price')->toArray();
             if (isset($searchResult)) {
                 $searchResult['bannerPhotoDesktop'] = $photoDesktop;
                 $searchResult['bannerPhotoMobile'] = $photoMobile;
