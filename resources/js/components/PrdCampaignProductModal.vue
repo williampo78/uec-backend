@@ -352,12 +352,20 @@
                             <hr style="border-top: 1px solid gray" />
                             <div class="row">
                                 <div class="col-sm-12">
-                                    <label class="radio-inline">
-                                        <input name="checkAllProducts" type="radio" @change="checkAll" value="checkValue"> 全勾選
-                                    </label>
-                                    <label class="radio-inline">
-                                        <input name="checkAllProducts" type="radio" @change="cancelAll" value="checkValue"> 全取消
-                                    </label>
+                                        <button
+                                        type="button"
+                                        class="btn btn-primary"
+                                        @click="checkAll"
+                                    >
+                                        <i class="fa-solid fa-check"></i> 全勾選
+                                    </button>
+                                        <button
+                                        type="button"
+                                        class="btn btn-primary"
+                                        @click="cancelAll"
+                                    >
+                                        <i class="fa-solid fa-xmark"></i> 全取消
+                                    </button>
                                 </div>
                             </div>
                             <br />
