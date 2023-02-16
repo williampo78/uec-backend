@@ -1892,6 +1892,7 @@ class PromotionalCampaignService
                     $tmpCampaignProduct['launch_status'] = $campaignProduct->product->launch_status;
                     $tmpCampaignProduct['gross_margin'] = $campaignProduct->product->gross_margin;
                     $tmpCampaignProduct['created_at'] = Carbon::parse($campaignProduct->created_at)->format('Y-m-d H:i:s');
+                    $tmpCampaignProduct['start_selling_at'] = $campaignProduct->product->start_selling_at;
 
                     // 上架時間起
                     if (isset($campaignProduct->product->start_launched_at)) {
