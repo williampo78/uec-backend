@@ -167,7 +167,7 @@ class QuotationController extends Controller
                     $obj->brands_name = $obj->productItem->product->brand->brand_name ?? '';
                     $obj->item_no = $obj->productItem->item_no ?? '';
                     $obj->product_name = $obj->productItem->product->product_name ;
-                    $obj->combination_name = "{$obj->item_no}-{$obj->brands_name}-{$obj->product_name}";
+                    $obj->combination_name = "{$obj->brands_name}-{$obj->product_name}";
 
                     if ($obj->spec_1_value !== '') {
                         $obj->combination_name .= '-' . $obj->productItem->spec_1_value;
