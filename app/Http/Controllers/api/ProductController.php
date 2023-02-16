@@ -14,6 +14,9 @@ class ProductController extends Controller
 {
     //
     private $apiProductService;
+    private $apiService;
+    private $apiProductAttributeLovService;
+    private $universalService;
 
     public function __construct(APIProductServices $apiProductService, APIService $apiService, ProductAttributeLovService $apiProductAttributeLovService, UniversalService $universalService)
     {

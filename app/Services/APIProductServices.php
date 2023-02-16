@@ -3,31 +3,32 @@
 
 namespace App\Services;
 
-use App\Models\InstallmentInterestRate;
-use App\Models\Product;
-use App\Models\PromotionalCampaignGiveaway;
-use App\Models\PromotionalCampaignProduct;
-use App\Models\PromotionalCampaignThreshold;
-use App\Models\WebCategoryHierarchy;
 use Carbon\Carbon;
+use App\Models\Product;
 use App\Models\ProductItem;
 use App\Models\ProductPhoto;
 use GuzzleHttp\Psr7\Request;
 use App\Models\RelatedProduct;
 use App\Services\APIWebService;
 use App\Services\BrandsService;
+use App\Models\ProductAttribute;
 use App\Services\APICartServices;
-use App\Services\UniversalService;
 use App\Services\SysConfigService;
+use App\Services\UniversalService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use App\Models\PromotionalCampaign;
+use App\Models\WebCategoryHierarchy;
 use Illuminate\Support\Facades\Auth;
+use App\Models\InstallmentInterestRate;
 use App\Services\WebShippingInfoService;
 use App\Services\ShippingFeeRulesService;
-use App\Services\WebCategoryHierarchyService;
+use App\Models\PromotionalCampaignProduct;
+use App\Models\PromotionalCampaignGiveaway;
 use phpDocumentor\Reflection\Types\Integer;
 use phpDocumentor\Reflection\Types\String_;
+use App\Models\PromotionalCampaignThreshold;
+use App\Services\WebCategoryHierarchyService;
 
 class APIProductServices
 {
@@ -35,6 +36,12 @@ class APIProductServices
     private $apiWebCategory;
     private $apiWebService;
     private $apiCartService;
+    private $brandsService;
+    private $shippingFeeService;
+    private $universalService;
+    private $webShippingInfoService;
+    private $ProductAttributeLovService;
+    private $sysConfigService;
 
     public function __construct(
         WebCategoryHierarchyService $apiWebCategory,
@@ -413,7 +420,9 @@ class APIProductServices
         if ($attribute) {//進階篩選條件
             $attribute = explode(',', $attribute);
             $attribute = array_unique($attribute);
-            $products = $products->whereIn('product_attributes.product_attribute_lov_id', $attribute);
+            if(!$filter){
+                $products = $products->whereIn('product_attributes.product_attribute_lov_id', $attribute);
+            }
         }
 
         if ($order_by == 'launched') {
