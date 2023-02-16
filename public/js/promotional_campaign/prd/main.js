@@ -475,6 +475,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     modal: {
@@ -2209,29 +2217,31 @@ var render = function () {
                 _vm._v(" "),
                 _c("div", { staticClass: "row" }, [
                   _c("div", { staticClass: "col-sm-12" }, [
-                    _c("label", { staticClass: "radio-inline" }, [
-                      _c("input", {
-                        attrs: {
-                          name: "checkAllProducts",
-                          type: "radio",
-                          value: "checkValue",
-                        },
-                        on: { change: _vm.checkAll },
-                      }),
-                      _vm._v(" 全勾選\n                                "),
-                    ]),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "button" },
+                        on: { click: _vm.checkAll },
+                      },
+                      [
+                        _c("i", { staticClass: "fa-solid fa-check" }),
+                        _vm._v(" 全勾選\n                                "),
+                      ]
+                    ),
                     _vm._v(" "),
-                    _c("label", { staticClass: "radio-inline" }, [
-                      _c("input", {
-                        attrs: {
-                          name: "checkAllProducts",
-                          type: "radio",
-                          value: "checkValue",
-                        },
-                        on: { change: _vm.cancelAll },
-                      }),
-                      _vm._v(" 全取消\n                                "),
-                    ]),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-primary",
+                        attrs: { type: "button" },
+                        on: { click: _vm.cancelAll },
+                      },
+                      [
+                        _c("i", { staticClass: "fa-solid fa-xmark" }),
+                        _vm._v(" 全取消\n                                "),
+                      ]
+                    ),
                   ]),
                 ]),
                 _vm._v(" "),
