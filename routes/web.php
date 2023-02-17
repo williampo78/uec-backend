@@ -93,6 +93,7 @@ Route::group(['prefix' => 'backend', 'middleware' => ['admin','nocache']], funct
 
     // 商品主檔 - 基本資訊管理
     Route::post('/products/ajax', [ProductController::class, 'ajax']);
+    Route::post('/products/export', [ProductController::class, 'export']);
     Route::resource('/products', ProductController::class, ['names' => ['index' => 'products']]);
 
     // 商品主檔 - 批次上傳
