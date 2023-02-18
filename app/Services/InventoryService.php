@@ -28,6 +28,7 @@ class InventoryService
         $select = "w.name, pi.item_no, p.product_name, pi.spec_1_value, pi.spec_2_value, pi.pos_item_no,
         p.stock_type, pi.safty_qty, ws.stock_qty,
         p.selling_price, p.item_cost, p.gross_margin,
+        p.launched_status_desc,
         (p.item_cost * ws.stock_qty) as stock_amount,
         (case when w.number = '${configValue}' and ws.stock_qty < pi.safty_qty then 1 else 0 end) as `is_dangerous`";
 
@@ -171,6 +172,7 @@ class InventoryService
                 (string) $inventory->stock_type,
                 (string) $inventory->safty_qty,
                 (string) $inventory->stock_qty,
+                (string) $inventory->launched_status_desc,
                 $inventory->selling_price,
                 $inventory->item_cost,
                 (string) $inventory->gross_margin,
