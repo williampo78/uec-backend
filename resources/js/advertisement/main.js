@@ -881,37 +881,23 @@ window.addProductBlockCategory = (
 window.enableSlotColorCode = () => {
     $("#slot_color_code").prop("disabled", false);
 
-    if ($("#slot_color_code").prev("label").find("span").length < 1) {
-        $("#slot_color_code")
-            .prev("label")
-            .append(' <span style="color:red;">*</span>');
-    }
+    $(".slot_color_code_star").text("*");
 
     validate.validateSlotColorCode();
 };
 // 啟用版位標題色
 window.enableTitleleColorCode = () => {
     $("#slot_title_color").prop("disabled", false);
-    if ($("#slot_title_color").prev("label").find("span").length < 1) {
-        $("#slot_title_color")
-            .prev("label")
-            .append('<span style="color:red;">*</span>');
-    }
+
+    $(".slot_title_color_star").text("*");
+
     validate.validateTitleColorCode();
 };
 // 啟用版位icon
 window.enableSlotIconName = () => {
     $("#slot_icon_name").prop("disabled", false);
 
-    if (
-        $("#slot_icon_name").closest(".form-group").find("label > span")
-            .length < 1
-    ) {
-        $("#slot_icon_name")
-            .closest(".form-group")
-            .find("label")
-            .append(' <span style="color:red;">*</span>');
-    }
+    $(".slot_icon_name_star").text("*");
 
     validate.validateSlotIconName();
 };
@@ -920,11 +906,7 @@ window.enableSlotIconName = () => {
 window.enableSlotTitle = () => {
     $("#slot_title").prop("disabled", false);
 
-    if ($("#slot_title").prev("label").find("span").length < 1) {
-        $("#slot_title")
-            .prev("label")
-            .append(' <span style="color:red;">*</span>');
-    }
+    $('.slot_title_star').text("*")
 
     validate.validateSlotTitle();
 };
@@ -938,6 +920,8 @@ window.disableSlotColorCode = () => {
         .find("span")
         .remove();
 
+    $(".slot_color_code_star").text("");
+
     validate.removeSlotColorCodeValidation();
 };
 
@@ -949,7 +933,7 @@ window.disableTitleColorCode= () => {
         .prev("label")
         .find("span")
         .remove();
-
+    $(".slot_title_color_star").text("");
     validate.removeTitleColorCodeValidation();
 };
 
@@ -961,7 +945,7 @@ window.disableSlotIconName = () => {
         .prev("label")
         .find("span")
         .remove();
-
+    $('.slot_icon_name_star').text("")
     validate.removeSlotIconNameValidation();
 };
 

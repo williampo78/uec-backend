@@ -732,62 +732,49 @@ window.addProductBlockCategory = function (product_category_select_options) {
 
 window.enableSlotColorCode = function () {
   $("#slot_color_code").prop("disabled", false);
-
-  if ($("#slot_color_code").prev("label").find("span").length < 1) {
-    $("#slot_color_code").prev("label").append(' <span style="color:red;">*</span>');
-  }
-
+  $(".slot_color_code_star").text("*");
   _validate__WEBPACK_IMPORTED_MODULE_0__.validateSlotColorCode();
 }; // 啟用版位標題色
 
 
 window.enableTitleleColorCode = function () {
   $("#slot_title_color").prop("disabled", false);
-
-  if ($("#slot_title_color").prev("label").find("span").length < 1) {
-    $("#slot_title_color").prev("label").append('<span style="color:red;">*</span>');
-  }
-
+  $(".slot_title_color_star").text("*");
   _validate__WEBPACK_IMPORTED_MODULE_0__.validateTitleColorCode();
 }; // 啟用版位icon
 
 
 window.enableSlotIconName = function () {
   $("#slot_icon_name").prop("disabled", false);
-
-  if ($("#slot_icon_name").closest(".form-group").find("label > span").length < 1) {
-    $("#slot_icon_name").closest(".form-group").find("label").append(' <span style="color:red;">*</span>');
-  }
-
+  $(".slot_icon_name_star").text("*");
   _validate__WEBPACK_IMPORTED_MODULE_0__.validateSlotIconName();
 }; // 啟用版位標題
 
 
 window.enableSlotTitle = function () {
   $("#slot_title").prop("disabled", false);
-
-  if ($("#slot_title").prev("label").find("span").length < 1) {
-    $("#slot_title").prev("label").append(' <span style="color:red;">*</span>');
-  }
-
+  $('.slot_title_star').text("*");
   _validate__WEBPACK_IMPORTED_MODULE_0__.validateSlotTitle();
 }; // 停用版位主色
 
 
 window.disableSlotColorCode = function () {
   $("#slot_color_code").prop("disabled", true).val("").prev("label").find("span").remove();
+  $(".slot_color_code_star").text("");
   _validate__WEBPACK_IMPORTED_MODULE_0__.removeSlotColorCodeValidation();
 }; // 停用版位標題色
 
 
 window.disableTitleColorCode = function () {
   $("#slot_title_color").prop("disabled", true).val("").prev("label").find("span").remove();
+  $(".slot_title_color_star").text("");
   _validate__WEBPACK_IMPORTED_MODULE_0__.removeTitleColorCodeValidation();
 }; // 停用版位icon
 
 
 window.disableSlotIconName = function () {
   $("#slot_icon_name").prop("disabled", true).val("").prev("label").find("span").remove();
+  $('.slot_icon_name_star').text("");
   _validate__WEBPACK_IMPORTED_MODULE_0__.removeSlotIconNameValidation();
 }; // 停用版位標題
 

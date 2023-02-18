@@ -85,7 +85,7 @@
             <div class="form-group">
                 <div class="col-sm-3">
                     <label class="label-container">
-                        <span>版位標題色</span>
+                        <span>版位標題色<span class="slot_title_color_star" style="color:red;"></span></span>
                         <span>(例：#00BB00)</span>
                     </label>
                 </div>
@@ -99,7 +99,7 @@
             <div class="form-group">
                 <div class="col-sm-3">
                     <label class="label-container">
-                        <span>版位背景色</span>
+                        <span>版位背景色<span class="slot_color_code_star" style="color:red;"></span></span>
                         <span>(例：#DAF7CD)</span>
                     </label>
                 </div>
@@ -114,7 +114,7 @@
         <div class="col-sm-6">
             <div class="form-group">
                 <div class="col-sm-3">
-                    <label class="control-label">版位標題</label>
+                    <label class="control-label">版位標題<span class="slot_title_star" style="color:red;"></span></label>
                 </div>
                 <div class="col-sm-9">
                     <input class="form-control" type="text" id="slot_title" name="slot_title" value=""
@@ -125,7 +125,7 @@
         <div class="col-sm-6">
             <div class="form-group">
                 <div class="col-sm-3">
-                    <label class="control-label">版位icon</label>
+                    <label class="control-label">版位icon<span class="slot_icon_name_star" style="color:red;"></span></label>
                 </div>
                 <div style="padding-left:0" class="col-sm-9">
                     <div class="row">
