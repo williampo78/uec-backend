@@ -618,9 +618,9 @@ class APIProductServices
     /*
      * 取得行銷促案資訊
      */
-    public function getPromotion($type = null, $event = null)
+    public function getPromotion($type = null, $event = null , $oderBys = [])
     {
-        $strSQL = "select pcp.product_id, p.approval_status, pc.*
+        $strSQL = "select pcp.product_id,p.selling_price,p.approval_status, pc.*
                 from promotional_campaigns pc
                 inner join  promotional_campaign_products pcp on pcp.promotional_campaign_id=pc.id
                 inner join frontend_products_v p on p.id=pcp.product_id
@@ -630,7 +630,15 @@ class APIProductServices
         if ($event) {
             $strSQL .= " and pc.id=" . (int)$event;
         }
-        $strSQL .= " order by pcp.product_id, pc.promotional_label";
+        if(!empty($oderBys)){
+            $strSQL .= ' order by ' ;
+            foreach($oderBys as $key => $oderBy){
+                $comma = count($oderBys)-1 == $key ? '' : ','; 
+                $strSQL .= $oderBy['key'] ." ". $oderBy['type'] .' '.$comma;
+            }
+        }else{
+            $strSQL .= " order by pcp.product_id, pc.promotional_label";
+        }
         $promotional = DB::select($strSQL);
         $data = [];
         $label = '';
@@ -1462,7 +1470,17 @@ class APIProductServices
         $product_info = [];
 
         //取得目前滿額活動
-        $campaigns = $this->getPromotion('product_card', $id);
+        // 即  order by products.start_launched_at desc, products.selling_price asc 
+        $campaigns = $this->getPromotion('product_card', $id ,[
+                        [
+                            'key'=>'p.start_launched_at',
+                            'type'=> 'desc'
+                        ],
+                        [   
+                            'key'=>'p.selling_price',
+                            'type'=>'asc'
+                        ],
+                      ]);
         if (count($campaigns) > 0) {
             //排列產品卡 - 並確認產品有分類
             foreach ($campaigns as $product_id => $campaign) {
@@ -1518,7 +1536,6 @@ class APIProductServices
                 }
             }
             $searchResult = self::getPages($product_info, $size, $page);
-            $searchResult['list'] = collect($searchResult['list'])->sortBy('start_launched_at')->sortBy('selling_price')->toArray();
             if (isset($searchResult)) {
                 $searchResult['bannerPhotoDesktop'] = $photoDesktop;
                 $searchResult['bannerPhotoMobile'] = $photoMobile;
