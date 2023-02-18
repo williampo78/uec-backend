@@ -91,50 +91,84 @@ class APITapPayService
     public function tapPayNotifyLog($input)
     {
         $status = false;
+        $pay_log_id = null;
+
         DB::beginTransaction();
         try {
             //先把TapPay回傳的資料都寫入
             $pay_log_id = TapPayPayLog::insertGetId($input);
-            $info = TapPayPayLog::where('id', '=', $pay_log_id)->first();
-            //交易代碼status成功時才檢查回傳交易資料跟訂單是否符合
-            //調整為成立訂單時就產生出貨單
-            if ($input['status'] == 0) {
-                $orderPayment = $this->getOrderPayment($info);
-                if ($orderPayment) { //符合資料後，查詢tappay的交易紀錄
-                    $data['partner_key'] = config('tappay.partner_key');
-                    $data['filters'] = array('rec_trade_id' => $info->rec_trade_id);
-                    $record = $this->tradeRecords($data);
-                    $record = json_decode($record, true);
-                    if ($record['status'] == 2) { //tappay打回來的最後資料
-                        //檢查該筆資料的交易紀錄的狀態
-                        foreach ($record['trade_records'] as $trade) {
-                            if ($trade['record_status'] == 1 || $trade['record_status'] == 0) { //交易完成..更新金流狀態
-                                if (config('uec.cart_p_discount_split') == 1) {
-                                    $result = $this->updateOrder($orderPayment);
-                                } else {
-                                    $result = $this->setShipment($orderPayment);
-                                }
-                            }
-                        }
-                    }
-                    if ($result) {
-                        DB::commit();
-                        $status = true;
-                    } else {
-                        Log::channel('tappay_api_log')->error('3D驗證交易完成，更新金流狀態失敗 ! rec_trade_id :' . $info->rec_trade_id);
-                        DB::rollBack();
-                        $status = false;
-                    }
-                } else {
-                    //等排程檢查出貨
-                }
-            }
-
+            DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
             Log::info($e->getMessage());
-            $status = false;
         }
+
+        if ($pay_log_id != null) {
+            DB::beginTransaction();
+            try {
+                $info = TapPayPayLog::where('id', '=', $pay_log_id)->first();
+                $orderPayment = $this->getOrderPayment($info);
+                //交易代碼status成功時才檢查回傳交易資料跟訂單是否符合
+                //調整為成立訂單時就產生出貨單
+                if ($input['status'] == 0) {
+                    if ($orderPayment) { //符合資料後，查詢tappay的交易紀錄
+                        $data['partner_key'] = config('tappay.partner_key');
+                        $data['filters'] = array('rec_trade_id' => $info->rec_trade_id);
+                        $record = $this->tradeRecords($data);
+                        $record = json_decode($record, true);
+                        if ($record['status'] == 2) { //tappay打回來的最後資料
+                            //檢查該筆資料的交易紀錄的狀態
+                            foreach ($record['trade_records'] as $trade) {
+                                if ($trade['record_status'] == 1 || $trade['record_status'] == 0) { //交易完成..更新金流狀態
+                                    if (config('uec.cart_p_discount_split') == 1) {
+                                        $result = $this->updateOrder($orderPayment);
+                                    }
+                                }
+                            }
+                        }
+                        if ($result) {
+                            DB::commit();
+                            $status = true;
+                        } else {
+                            Log::channel('tappay_api_log')->error('3D驗證交易完成，更新金流狀態失敗 ! rec_trade_id :' . $info->rec_trade_id);
+                            DB::rollBack();
+                            $status = false;
+                        }
+                    } else {
+                        //等排程檢查出貨
+                        DB::rollBack();
+                        Log::info($e->getMessage());
+                        $status = false;
+                    }
+                } elseif (($input['status'] == 924 || $input['status'] == 925 || $input['status'] == 10003) ||
+                    ($input['status'] == 10023 && (isset($input['bank_result_code']) && ($input['bank_result_code'] == 1292 || $input['bank_result_code'] == 'L140' || $input['bank_result_code'] == 'M040')))) {
+                    if ($orderPayment) { //符合資料後，查詢tappay的交易紀錄
+                        $result = $this->updateOrderFailed($orderPayment);
+                        if ($result) {
+                            DB::commit();
+                            $status = true;
+                        } else {
+                            Log::channel('tappay_api_log')->error('授權失敗! rec_trade_id :' . $info->rec_trade_id);
+                            DB::rollBack();
+                            $status = false;
+                        }
+                    } else {
+                        DB::rollBack();
+                        Log::info($e->getMessage());
+                        $status = false;
+                    }
+                } else {
+                    DB::rollBack();
+                    Log::info($e->getMessage());
+                    $status = false;
+                }
+            } catch (\Exception $e) {
+                DB::rollBack();
+                Log::info($e->getMessage());
+                $status = false;
+            }
+        }
+
         return $status;
     }
 
@@ -321,4 +355,44 @@ class APITapPayService
         return $result;
     }
 
+    /**
+     * 授權失敗時更新商城訂單與訂單金流單
+     * @return bool
+     */
+    public function updateOrderFailed($data)
+    {
+        $result = false;
+        $now = Carbon::now();
+
+        DB::beginTransaction();
+        try {
+            $order = Order::where('id', '=', $data->source_table_id)
+                ->update([
+                    'pay_status' => 'FAILED',
+                    'is_paid' => 0,
+                    'paid_at' => null,
+                    'updated_at' => $now,
+                    'updated_by' => -1
+                ]);
+
+            $order_payment = OrderPayment::where('id', '=', $data->id)
+                ->update([
+                    'payment_status' => 'FAILED',
+                    'latest_api_status' => 'E',
+                    'updated_at' => $now,
+                    'updated_by' => -1
+                ]);
+
+            if ($order && $order_payment) {
+                DB::commit();
+                $result = true;
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::info($e);
+            $result = false;
+        }
+
+        return $result;
+    }
 }
