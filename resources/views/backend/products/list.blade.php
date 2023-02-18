@@ -285,10 +285,9 @@
                                     <div class="col-sm-3"></div>
                                     <div class="col-sm-9 text-right">
                                         @if ($share_role_auth['auth_export'])
-                                            <a class="btn btn-primary" target="_blank" href='{{ $excel_url ?? '' }} '
-                                                {{ $excel_url ?? 'disabled' }}>
+                                            <button class="btn btn-primary downloadExcel" type="button" target="_blank">
                                                 <i class="fa-solid fa-file-excel"></i> 匯出EXCEL
-                                            </a>
+                                            </button>
                                         @endif
 
                                         @if ($share_role_auth['auth_query'])
@@ -352,7 +351,9 @@
                                             <td>{{ $key += 1 }}</td>
                                             <td class="text-nowrap">{{ $val->supplier_name }}</td>
                                             <td>{{ $val->product_no }}</td>
-                                            <td style="display:inline-block;width:300px;min-height:40px;white-space:pre-wrap">{{ $val->product_name }}</td>
+                                            <td
+                                                style="display:inline-block;width:300px;min-height:40px;white-space:pre-wrap">
+                                                {{ $val->product_name }}</td>
                                             <td>{{ $val->selling_price }}</td>
                                             <td>{{ $val->item_cost }}</td>
                                             <td>{{ $val->gross_margin }}</td>
@@ -443,6 +444,36 @@
                 $('#stock_type, #selling_channel, #lgst_method, #product_type, #supplier_id, #approval_status, #web_category_hierarchy_id')
                     .trigger('change');
             });
+            $(".downloadExcel").click(function() {
+                var $form = $("#search-form");
+                var data = getFormData($form);
+                axios({
+                        method: "post",
+                        url: `/backend/products/export`,
+                        params: data,
+                        responseType: "blob",
+                    })
+                    .then(response => {
+                        saveAs(response.data, `商品主檔${moment().format("YYYYMMDD")}.xlsx`);
+                    })
+                    .catch(error => {
+                        console.log(error.response);
+                    })
+                    .finally(() => {
+                        this.exportCertificateButtonDisabled = false;
+                    });
+            })
+
+            function getFormData($form) {
+                var unindexed_array = $form.serializeArray();
+                var indexed_array = {};
+
+                $.map(unindexed_array, function(n, i) {
+                    indexed_array[n['name']] = n['value'];
+                });
+
+                return indexed_array;
+            }
         });
     </script>
 @endsection

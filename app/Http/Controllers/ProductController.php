@@ -55,11 +55,7 @@ class ProductController extends Controller
             $this->productService->restructureProducts($result['products']);
 
         }
-        $q = empty($in) ? '?' : '&';
-        $result['excel_url'] = url("/") . $request->getRequestUri() . $q . 'export=true';
-        if (isset($in['export'])) { //匯出報表
-            return $this->export($in);
-        }
+
         $result['supplier'] = $this->supplierService->getSuppliers(); //供應商
         $result['pos'] = $this->webCategoryHierarchyService->getCategoryHierarchyContents(); //供應商
 
@@ -280,8 +276,9 @@ class ProductController extends Controller
         ]);
     }
 
-    public function export($in)
+    public function export(Request $request)
     {
+        $in = $request->input() ; 
         $data = $this->productService->getItemsJoinProducts($in);
         $pos = $this->categoriesSerivce->getPosCategories()->keyBy('id');
         $this->productService->restructureItemsProducts($data, $pos);
