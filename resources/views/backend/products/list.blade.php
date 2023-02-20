@@ -351,9 +351,7 @@
                                             <td>{{ $key += 1 }}</td>
                                             <td class="text-nowrap">{{ $val->supplier_name }}</td>
                                             <td>{{ $val->product_no }}</td>
-                                            <td
-                                                style="display:inline-block;width:300px;min-height:40px;white-space:pre-wrap">
-                                                {{ $val->product_name }}</td>
+                                            <td style="display:inline-block;width:300px;min-height:40px;white-space:pre-wrap">{{ $val->product_name }}</td>
                                             <td>{{ $val->selling_price }}</td>
                                             <td>{{ $val->item_cost }}</td>
                                             <td>{{ $val->gross_margin }}</td>
