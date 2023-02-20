@@ -350,11 +350,21 @@ class APIProductServices
         $products = $products->leftJoin('product_attributes', 'product_attributes.product_id', '=', 'p.id')
             ->leftJoin('product_attribute_lov', 'product_attribute_lov.id', '=', 'product_attributes.product_attribute_lov_id')
             ->leftJoin("brands", 'brands.id', '=', 'p.brand_id');
-
-        $products = $products->select("web_category_products.web_category_hierarchy_id", 'p.*'
-            , DB::raw("(select photo_name from product_photos where p.id = product_photos.product_id order by sort limit 0, 1) as displayPhoto")
-            , "product_attribute_lov.id as attribute_id", "product_attribute_lov.attribute_type"
+        if($filter){
+            $products = $products->leftJoin('product_attributes as pa', 'pa.product_id', '=', 'p.id');
+        }
+        $products = $products->select("web_category_products.web_category_hierarchy_id", 
+            'p.*', 
+            DB::raw("(select photo_name from product_photos where p.id = product_photos.product_id order by sort limit 0, 1) as displayPhoto"),
+            "product_attribute_lov.id as attribute_id",
+            "product_attribute_lov.attribute_type",
         );
+        if($filter){
+            $products->addSelect(
+             "pa.product_attribute_lov_id as pa_product_attribute_lov_id",
+             "pa.attribute_type as pa_attribute_type",
+            );
+        }
 
         if ($config_levels == 3) {
             $products = $products->addSelect("cate1.category_name as L3", "cate2.category_name as L2", "cate3.category_name as L1");
@@ -420,9 +430,7 @@ class APIProductServices
         if ($attribute) {//進階篩選條件
             $attribute = explode(',', $attribute);
             $attribute = array_unique($attribute);
-            if(!$filter){
-                $products = $products->whereIn('product_attributes.product_attribute_lov_id', $attribute);
-            }
+            $products = $products->whereIn('product_attributes.product_attribute_lov_id', $attribute);
         }
 
         if ($order_by == 'launched') {
@@ -443,7 +451,7 @@ class APIProductServices
 
         if ($filter) {
             foreach ($products as $product) {
-                $data[$product->web_category_hierarchy_id][$product->id][$product->attribute_id ?? 0] = $product;
+                $data[$product->web_category_hierarchy_id][$product->id][$product->pa_product_attribute_lov_id ?? 0] = $product;
             }
         } else {
             foreach ($products as $product) {
@@ -1746,12 +1754,11 @@ class APIProductServices
         $sort_flag = 'ASC';
         $attribute = '';
         $attribute .= ($request['group'] ? $request['group'] : '');
-        $attribute .= ($attribute != '' && $request['ingredient'] != '' ? ', ' : '') . ($request['ingredient'] ? $request['ingredient'] : '');
-        $attribute .= ($attribute != '' && $request['dosage_form'] != '' ? ', ' : '') . ($request['dosage_form'] ? $request['dosage_form'] : '');
-        $attribute .= ($attribute != '' && $request['certificate'] != '' ? ', ' : '') . ($request['certificate'] ? $request['certificate'] : '');
+        $attribute .= ($attribute != '' && $request['ingredient'] != '' ? ',' : '') . ($request['ingredient'] ? $request['ingredient'] : '');
+        $attribute .= ($attribute != '' && $request['dosage_form'] != '' ? ',' : '') . ($request['dosage_form'] ? $request['dosage_form'] : '');
+        $attribute .= ($attribute != '' && $request['certificate'] != '' ? ',' : '') . ($request['certificate'] ? $request['certificate'] : '');
         $brand = '';
         $brand .= ($request['brand'] ? $request['brand'] : '');
-
         $brands = $this->brandsService->getBrandForSearch();
         $attributeLov = $this->ProductAttributeLovService->getAttributeForSearch();
         $merge = array_merge($brands, $attributeLov);
@@ -1777,9 +1784,9 @@ class APIProductServices
                         if (!key_exists($product->brand_id, $attribute_array['BRAND'])) $attribute_array['BRAND'][$product->brand_id][$product->id] = 0;
                         $attribute_array['BRAND'][$product->brand_id][$product->id] = 1;
                         //屬性(商品)
-                        if (isset($attribute_array[$product->attribute_type])) {
-                            if (!key_exists($product->attribute_id, $attribute_array[$product->attribute_type])) $attribute_array[$product->attribute_type][$product->attribute_id][$product->id] = 0;
-                            $attribute_array[$product->attribute_type][$product->attribute_id][$product->id] = 1;
+                        if (isset($attribute_array[$product->pa_attribute_type])) {
+                            if (!key_exists($product->pa_product_attribute_lov_id, $attribute_array[$product->pa_attribute_type])) $attribute_array[$product->pa_attribute_type][$product->pa_product_attribute_lov_id][$product->id] = 0;
+                            $attribute_array[$product->pa_attribute_type][$product->pa_product_attribute_lov_id][$product->id] = 1;
                         }
                     }
                 }
