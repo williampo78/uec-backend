@@ -34,6 +34,7 @@ class InventoryExport implements FromCollection, WithHeadings, WithColumnWidths,
             '庫存類型',
             '安全庫存量',
             '庫存量',
+            '上下架狀態',
             '售價(含稅)',
             '平均成本(含稅)',
             '毛利率',
@@ -59,6 +60,7 @@ class InventoryExport implements FromCollection, WithHeadings, WithColumnWidths,
             'L' => 10,
             'M' => 15,
             'N' => 15,
+            'O' => 15,
         ];
     }
 
@@ -66,7 +68,7 @@ class InventoryExport implements FromCollection, WithHeadings, WithColumnWidths,
     {
         // 對齊方式
         $alignment_datas = [
-            'left' => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'N'],
+            'left' => ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'N','O'],
             'center' => [],
             'right' => ['H', 'I', 'J', 'K', 'L', 'M'],
         ];
@@ -114,7 +116,7 @@ class InventoryExport implements FromCollection, WithHeadings, WithColumnWidths,
         }
 
         return [
-            'A1:N1' => [
+            'A1:O1' => [
                 'alignment' => [
                     'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
                 ],
@@ -122,7 +124,7 @@ class InventoryExport implements FromCollection, WithHeadings, WithColumnWidths,
                     'bold' => true,
                 ],
             ],
-            "A1:N{$this->total_rows}" => [
+            "A1:O{$this->total_rows}" => [
                 'alignment' => [
                     'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
                 ],

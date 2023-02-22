@@ -179,6 +179,7 @@
                                         <th class="text-nowrap">庫存類型</th>
                                         <th class="text-nowrap">安全庫存量</th>
                                         <th class="text-nowrap">庫存量</th>
+                                        <th class="text-nowrap">上下架狀態</th>
                                         <th class="text-nowrap">售價(含稅)</th>
                                         <th class="text-nowrap">平均成本(含稅)</th>
                                         <th class="text-nowrap">毛利率</th>
@@ -206,6 +207,7 @@
                                                     {{ $inventory->stock_qty }}
                                                 @endif
                                             </td>
+                                            <td class="text-right">{{ $inventory->launched_status_desc }}</td>
                                             <td class="text-right">{{ $inventory->selling_price }}</td>
                                             <td class="text-right">{{ $inventory->item_cost }}</td>
                                             <td class="text-right">{{ $inventory->gross_margin }}</td>
