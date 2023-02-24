@@ -1425,10 +1425,47 @@
                     list_price: {
                         required: true,
                         digits: true,
+                        betweenValues: {
+                            param: function(element) {
+                                return {
+                                    valueMin: 1,
+                                    signMin: ">=",
+                                    valueMax: 999999,
+                                    signMax: "<=",
+                                };
+                            },
+                        },
                     },
                     selling_price: {
                         required: true,
                         digits: true,
+                        notOnlyZero: function() {
+                            if ($('input[name=product_type]:checked').val() == 'N') {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        },
+                        needZero: function() {
+                            if ($('input[name=product_type]:checked').val() == 'G') {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        },
+                        betweenValues: {
+                            param: function(element) {
+                                return {
+                                    valueMin: 1,
+                                    signMin: ">=",
+                                    valueMax: 999999,
+                                    signMax: "<=",
+                                };
+                            },
+                            depends: function(element) {
+                                return $('input[name=product_type]:checked').val() == 'N';
+                            },
+                        },
                     }, //重量
                     weight: {
                         required: function() {
@@ -1496,6 +1533,14 @@
                             return $("input[name=stock_type]:checked").val() != 'T' ? "只可輸入正整數" : "只可輸入0或正整數";
                         },
                     },
+                    //市價
+                    list_price: {
+                        betweenValues: '請輸入正確的數值'
+                    },
+                    //售價
+                    selling_price: {
+                        betweenValues: '請輸入正確的數值'
+					},
                     warranty_days: {
                         digits: "只可輸入正整數",
                         min: function() {
