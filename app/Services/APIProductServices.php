@@ -1801,15 +1801,16 @@ class APIProductServices
             }
         }
         $filter_display = [];
-
         foreach ($filter as $type => $data) {
             foreach ($data as $info) {
-                $filter_display[$type][] = array(
-                    'id' => $info['id'],
-                    'code' => $info['code'],
-                    'name' => $info['name'],
-                    'count' => $info['count']
-                );
+                if(isset($info['id'])){
+                    $filter_display[$type][] = array(
+                        'id' => $info['id'],
+                        'code' => $info['code'],
+                        'name' => $info['name'],
+                        'count' => $info['count']
+                    );
+                }
             }
         }
         if ($filter) {
