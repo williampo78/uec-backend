@@ -1239,7 +1239,7 @@ class ProductService
 
         // //限制筆數
         if (isset($request['limit'])) {
-            $query = $query->limit(1000);
+            $query = $query->limit($request['limit']);
         }
 
         $query = $query->get();
