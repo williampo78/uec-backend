@@ -202,8 +202,8 @@ class ProductBatchService
                     'warranty_days' => $productBasice['warranty_days'] ?? '0',
                     'warranty_scope' => $productBasice['warranty_scope'] ?? '',
                     'promotion_desc' => $productBasice['promotion_desc'] ?? '',
-                    'promotion_start_at' => $productBasice['promotion_start_at'] ?? '',
-                    'promotion_end_at' => $productBasice['promotion_end_at'] ?? '',
+                    'promotion_start_at' => $productBasice['promotion_start_at'] ?? false,
+                    'promotion_end_at' => $productBasice['promotion_end_at'] ?? false,
                     'has_expiry_date_text' => $productBasice['has_expiry_date'] ?? '',
                     'has_expiry_date' => $productBasice['has_expiry_date'] == 'Y' ? '1' : '0',
                     'expiry_days' => $productBasice['expiry_days'] ?? 0,
@@ -423,17 +423,23 @@ class ProductBatchService
                         if (!empty($productBasice['purchase_price']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['purchase_price'])) {
                             $errorMessage[] = '「成本」須為正整數';
                         }
-                        # code...
+                        // 一般品「售價」必須介於1~999,999
+                        if ((int)$productBasice['selling_price'] < 1 || (int)$productBasice['selling_price'] > 999999) {
+                            $errorMessage[] = '「商品類型」填寫N時 「售價」請輸入正確的數值';
+                        }
+                        // 一般品「成本」必須介於1~999,999
+                        if ((int)$productBasice['purchase_price'] < 1 || (int)$productBasice['purchase_price'] > 999999) {
+                            $errorMessage[] = '「商品類型」填寫N時 「成本」請輸入正確的數值';
+                        }
                         break;
                     case 'G': //贈品
-                        //「成本」須為0、「售價」須為0
-                        // 「售價」須為正整數
+                        // 「成本」須為0
                         if (!empty($productBasice['selling_price']) && $productBasice['selling_price'] != 0) {
-                            $errorMessage[] = '「成本」須為0';
+                            $errorMessage[] = '「商品類型」填寫G時 「成本」必須為0';
                         }
-                        // 「成本」須為正整數
+                        // 「售價」須為0
                         if (!empty($productBasice['purchase_price']) && $productBasice['purchase_price'] != 0) {
-                            $errorMessage[] = '「售價」須為0';
+                            $errorMessage[] = '「商品類型」填寫G時 「售價」必須為0';
                         }
                         break;
                     case 'A': //加購品
@@ -454,6 +460,10 @@ class ProductBatchService
                 // 「市價」須為正整數
                 if (!empty($productBasice['list_price']) && !preg_match("/^[1-9][0-9]*$/", $productBasice['list_price'])) {
                     $errorMessage[] = '「市價」須為正整數';
+                }
+                // 「市價」必須介於1~999,999
+                if ((int)$productBasice['list_price'] < 1 || (int)$productBasice['list_price'] > 999999) {
+                    $errorMessage[] = '「市價」請輸入正確的數值';
                 }
 
                 // 「商品簡述1」不可超過60個字
@@ -477,15 +487,22 @@ class ProductBatchService
                 if ($productBasice['promotion_start_at'] === false) {
                     $errorMessage[] = '「促銷小標-生效時間起」格式錯誤';
                 }
+                // 「促銷小標-生效時間起」有效性檢核
+                if (date('Y-m-d H:i', strtotime($productBasice['promotion_start_at'])) != $productBasice['promotion_start_at']) {
+                    $errorMessages[] = '「促銷小標-生效時間起」請輸入正確且有效的日期';
+                }
                 //如果有輸入生效時間起，促銷小標-生效時間訖則為必填
                 if (!empty($productBasice['promotion_start_at']) && empty($productBasice['promotion_end_at'])) {
                     $errorMessage[] = '如果有輸入「促銷小標-生效時間起」，「促銷小標-生效時間訖」為必填';
                 }
                 //「促銷小標-生效時間訖」格式錯誤
-                if ($productBasice['promotion_start_at'] === false) {
-                    $errorMessage[] = ' 「促銷小標-生效時間訖」格式錯誤';
+                if ($productBasice['promotion_end_at'] === false) {
+                    $errorMessage[] = '「促銷小標-生效時間訖」格式錯誤';
                 }
-
+                // 「促銷小標-生效時間訖」有效性檢核
+                if (date('Y-m-d H:i', strtotime($productBasice['promotion_end_at'])) != $productBasice['promotion_end_at']) {
+                    $errorMessages[] = '「促銷小標-生效時間訖」請輸入正確且有效的日期';
+                }
                 //「促銷小標-生效時間起」不能大於「促銷小標-生效時間訖」
                 if (!empty($productBasice['promotion_start_at']) && !empty($productBasice['promotion_end_at'])) {
                     if ($productBasice['promotion_start_at']->gt($productBasice['promotion_end_at'])) {
@@ -638,7 +655,7 @@ class ProductBatchService
                         $productBasice['storage_temperature'] = 'NORMAL';
                         break;
                 }
-                
+
                 foreach ($product['productItems'] as $item) {
                     if (in_array($stockType, ['A', 'B'])) {
                         // 「安全庫存量」未填寫
@@ -679,7 +696,7 @@ class ProductBatchService
                     $checkProductPhoto = false ;//photos頁籤查無相同「廠商料號」
                     foreach($productPhoto as $photo){
                         //有指定照片再去檢查
-                        if($photo['supplier_product_no'] == $supplier_product_no && !empty($item['photo_name']) && !in_array($item['photo_name'],$photo['photos'])){ 
+                        if($photo['supplier_product_no'] == $supplier_product_no && !empty($item['photo_name']) && !in_array($item['photo_name'],$photo['photos'])){
                             $errorMessage[] = '「Item圖示」不存在';
                         }
                         if($photo['supplier_product_no'] == $supplier_product_no){
@@ -918,7 +935,7 @@ class ProductBatchService
                         # code...
                         break;
                 }
-                // 「最小入庫量」未填寫 int 
+                // 「最小入庫量」未填寫 int
                 if($productBasice['min_purchase_qty'] == ''){
                     $productBasice['min_purchase_qty'] = 0;
                 }
