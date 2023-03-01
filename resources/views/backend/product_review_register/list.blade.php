@@ -223,7 +223,7 @@
                     <div class="panel-body">
                         <hr>
                         <div class="overflow-auto">
-                            <table class="table table-striped table-bordered table-hover" style="width: max-content;" id="table_data">
+                            <table class="table table-striped table-bordered table-hover" id="table_data">
                                 <thead>
                                     <tr>
                                         <th style="width: auto">功能</th>
