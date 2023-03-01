@@ -356,6 +356,8 @@
 
             let start_selling_at_flatpickr = flatpickr("#start_selling_at_flatpickr", {
                 dateFormat: "Y-m-d H:i:S",
+                enableTime: true,
+                enableSeconds: true,
                 defaultHour: 0,
                 defaultMinute: 0,
                 defaultSeconds: 0,
@@ -385,7 +387,7 @@
                                 form.submit()
                             }
                         } else {
-                            form.submit() ; 
+                            form.submit() ;
                         }
                     }
                     axios.post('/backend/product_review_register/ajax', {
