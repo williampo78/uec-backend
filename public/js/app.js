@@ -7760,7 +7760,82 @@ jQuery.validator.addMethod("compareValues", function (value1, element, params) {
 
   $.validator.messages.compareValues = "".concat(errorMessage, " ").concat(params.value2);
   return result;
-}, $.validator.messages.compareValues); // 比較輸入的兩個日期或兩個數字
+}, $.validator.messages.compareValues); // 比較輸入值(介於兩值之間)
+
+jQuery.validator.addMethod("betweenValues", function (value1, element, params) {
+  var defaultParams = {
+    valueMin: 0,
+    signMin: ">=",
+    valueMax: 999999,
+    signMax: "<=",
+    dataType: "number",
+    TypeName: null
+  };
+  var result;
+  var errorMinMessage = "";
+  var errorMaxMessage = "";
+  params = Object.assign({}, defaultParams, params);
+
+  switch (params.dataType) {
+    case "string":
+      value1 = String(value1);
+      params.valueMin = String(params.valueMin);
+      params.valueMax = String(params.valueMax);
+      break;
+
+    default:
+      value1 = Number(value1);
+      params.valueMin = Number(params.valueMin);
+      params.valueMax = Number(params.valueMax);
+      break;
+  }
+
+  switch (params.signMin) {
+    case "=":
+      result = value1 == params.valueMin;
+      errorMinMessage = "\u5FC5\u9700\u7B49\u65BC";
+      break;
+
+    case ">":
+      result = value1 > params.valueMin;
+      errorMinMessage = "\u5FC5\u9700\u5927\u65BC";
+      break;
+
+    case ">=":
+      result = value1 >= params.valueMin;
+      errorMinMessage = "\u5FC5\u9700\u5927\u65BC\u7B49\u65BC";
+      break;
+  }
+
+  switch (params.signMax) {
+    case "<":
+      result = value1 < params.valueMax;
+      errorMaxMessage = "\u5FC5\u9700\u5C0F\u65BC";
+      break;
+
+    case "<=":
+      result = value1 <= params.valueMax;
+      errorMaxMessage = "\u5FC5\u9700\u5C0F\u65BC\u7B49\u65BC";
+      break;
+
+    case "=":
+      result = value1 == params.valueMax;
+      errorMaxMessage = "\u5FC5\u9700\u7B49\u65BC";
+      break;
+  }
+
+  if (params.cnMinName && params.cnMaxName) {
+    $.validator.messages.betweenValues = "".concat(errorMinMessage, " ").concat(params.cnMinName, ", ").concat(errorMaxMessage, " ").concat(params.cnMaxName);
+  } else if (params.cnMinName) {
+    $.validator.messages.betweenValues = "".concat(errorMinMessage, " ").concat(params.cnMinName);
+  } else if (params.cnMaxName) {
+    $.validator.messages.betweenValues = "".concat(errorMaxMessage, " ").concat(params.cnMaxName);
+  } else {
+    $.validator.messages.betweenValues = "".concat(errorMinMessage, " ").concat(params.valueMin, ", ").concat(errorMaxMessage, " ").concat(params.valueMax);
+  }
+
+  return result;
+}, $.validator.messages.betweenValues); // 比較輸入的兩個日期或兩個數字
 
 jQuery.validator.addMethod("greaterThan", function (value, element, params) {
   if (!/Invalid|NaN/.test(new Date(value))) {
@@ -7951,6 +8026,13 @@ jQuery.validator.addMethod("notOnlyZero", function (value, element, params) {
     return true;
   }
 }, "不能為 0");
+jQuery.validator.addMethod("needZero", function (value, element, params) {
+  if (params) {
+    return value == 0;
+  } else {
+    return true;
+  }
+}, "只能為 0");
 
 /***/ }),
 

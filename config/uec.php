@@ -81,9 +81,9 @@ return [
     //付款方式有的預設鎖死不能更改
     'payment_method_options_lock' => [
         'TAPPAY_CREDITCARD' => true, //信用卡一次付清
-        'TAPPAY_LINEPAY' => true,//LINE Pay
+        'TAPPAY_LINEPAY' => false,//LINE Pay
         'TAPPAY_INSTAL' => false,//分期付款
-        'TAPPAY_JKOPAY' => true,//街口支付
+        'TAPPAY_JKOPAY' => false,//街口支付
     ],
 
     // 物流方式

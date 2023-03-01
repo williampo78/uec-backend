@@ -122,6 +122,87 @@ jQuery.validator.addMethod(
     $.validator.messages.compareValues
 );
 
+// 比較輸入值(介於兩值之間)
+jQuery.validator.addMethod(
+    "betweenValues",
+    function (value1, element, params) {
+        let defaultParams = {
+            valueMin: 0,
+            signMin: ">=",
+            valueMax: 999999,
+            signMax: "<=",
+            dataType: "number",
+            TypeName: null,
+        };
+        let result;
+        let errorMinMessage = "";
+        let errorMaxMessage = "";
+
+        params = Object.assign({}, defaultParams, params);
+
+        switch (params.dataType) {
+            case "string":
+                value1 = String(value1);
+                params.valueMin = String(params.valueMin);
+                params.valueMax = String(params.valueMax);
+                break;
+
+            default:
+                value1 = Number(value1);
+                params.valueMin = Number(params.valueMin);
+                params.valueMax = Number(params.valueMax);
+                break;
+        }
+
+        switch (params.signMin) {
+            case "=":
+                result = value1 == params.valueMin;
+                errorMinMessage = `必需等於`;
+                break;
+
+            case ">":
+                result = value1 > params.valueMin;
+                errorMinMessage = `必需大於`;
+                break;
+
+            case ">=":
+                result = value1 >= params.valueMin;
+                errorMinMessage = `必需大於等於`;
+                break;
+        }
+
+        switch (params.signMax) {
+            case "<":
+                result = value1 < params.valueMax;
+                errorMaxMessage = `必需小於`;
+                break;
+
+            case "<=":
+                result = value1 <= params.valueMax;
+                errorMaxMessage = `必需小於等於`;
+                break;
+
+            case "=":
+                result = value1 == params.valueMax;
+                errorMaxMessage = `必需等於`;
+                break;
+        }
+
+        if (params.cnMinName && params.cnMaxName) {
+            $.validator.messages.betweenValues = `${errorMinMessage} ${params.cnMinName}, ${errorMaxMessage} ${params.cnMaxName}`;
+        } else if (params.cnMinName) {
+            $.validator.messages.betweenValues = `${errorMinMessage} ${params.cnMinName}`;
+        } else if (params.cnMaxName) {
+            $.validator.messages.betweenValues = `${errorMaxMessage} ${params.cnMaxName}`;
+        } else {
+            $.validator.messages.betweenValues = `${errorMinMessage} ${params.valueMin}, ${errorMaxMessage} ${params.valueMax}`;
+        }
+
+        return result;
+    },
+    $.validator.messages.betweenValues
+);
+
 // 比較輸入的兩個日期或兩個數字
 jQuery.validator.addMethod(
     "greaterThan",
@@ -408,10 +489,22 @@ jQuery.validator.addMethod(
     "notOnlyZero",
     function (value, element, params) {
         if(params){
-            return this.optional(element) || parseInt(value) > 0; 
+            return this.optional(element) || parseInt(value) > 0;
         }else{
             return true ;
-        }        
+        }
     },
     "不能為 0"
+);
+
+jQuery.validator.addMethod(
+    "needZero",
+    function (value, element, params) {
+        if(params){
+            return value == 0;
+        }else{
+            return true ;
+        }
+    },
+    "只能為 0"
 );
