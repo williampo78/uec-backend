@@ -651,7 +651,7 @@ class APIProductServices
             $strSQL .= ' order by ' ;
             foreach($oderBys as $key => $oderBy){
                 $comma = count($oderBys)-1 == $key ? '' : ','; 
-                $strSQL .= $oderBy['key'] ." ". $oderBy['type'] .' '.$comma;
+                $strSQL .= $oderBy['select'] ." ". $oderBy['type'] .' '.$comma;
             }
         }else{
             $strSQL .= " order by pcp.product_id, pc.promotional_label";
@@ -1490,11 +1490,11 @@ class APIProductServices
         // 即  order by products.start_launched_at desc, products.selling_price asc 
         $campaigns = $this->getPromotion('product_card', $id ,[
                         [
-                            'key'=>'p.start_launched_at',
+                            'select'=>'p.start_launched_at',
                             'type'=> 'desc'
                         ],
                         [   
-                            'key'=>'p.selling_price',
+                            'select'=>'p.selling_price',
                             'type'=>'asc'
                         ],
                       ]);
