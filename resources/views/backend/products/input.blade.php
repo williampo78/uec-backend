@@ -483,13 +483,15 @@
                                                 @if ($payment_method_options_lock[$key])
                                                     <input class="payment_method" type="checkbox" name="payment_method[]" value="{{ $key }}" checked onclick="return false">
                                                     {{ $val }}
+                                                @elseif (in_array($key, ['TAPPAY_LINEPAY', 'TAPPAY_JKOPAY']))
+                                                    <input class="payment_method" type="checkbox" name="payment_method[]" value="{{ $key }}" checked>
+                                                    {{ $val }}
                                                 @else
-                                                    <input class="payment_method" type="checkbox" name="payment_method[]"
-                                                        value="{{ $key }}">
+                                                    <input class="payment_method" type="checkbox" name="payment_method[]" value="{{ $key }}">
                                                     {{ $val }}
                                                 @endif
                                             </label>
-                                            </div>
+                                        </div>
                                         @endforeach
                                     </div>
                                 </div>
