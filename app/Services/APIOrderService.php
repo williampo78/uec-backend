@@ -1000,7 +1000,17 @@ class APIOrderService
             $prod_info_detail = [];
             $point_discount = 0;
             $detail_p_discount = 0;
+
+            // Has OrderItems 整理資料
             $hasOrderItems = [];
+            // TODO：多一次購物車產品列表 foreach ，增加時間效能，後序需修正調整
+            foreach ($cart['list'] as $products) {
+                foreach ($products['itemList'] as $item) {
+                    $itemId = $item['itemId'];
+                    $hasOrderItems[$itemId] = $item['itemQty'];
+                }
+            }
+
             foreach ($cart['list'] as $products) {
                 foreach ($products['itemList'] as $item) {
                     //售價*數量-單品折抵(itemDiscount) = 單品折抵後的小計($tmp_subtotal)
@@ -1041,8 +1051,6 @@ class APIOrderService
                         $point_rate = 1;
                     }
 
-                    $itemId = $item['itemId'];
-                    $hasOrderItems[$itemId] = $item['itemQty'];
                     $details[$seq] = [
                         "order_id" => $newOrder->id,
                         "seq" => $seq,
