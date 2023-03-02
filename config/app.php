@@ -202,6 +202,11 @@ return [
          */
         App\Providers\Plugin\ExtendedLocalServiceProvider::class,
         App\Providers\Plugin\ExtendedS3ServiceProvider::class,
+
+        /**
+         * Carbon Providers
+         */
+        App\Providers\CarbonProviders\isValidDateServiceProvider::class,
     ],
 
     /*

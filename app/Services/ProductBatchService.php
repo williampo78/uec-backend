@@ -9,6 +9,7 @@ use App\Models\ProductItem;
 use Illuminate\Support\Str;
 use App\Jobs\ProductImportJob;
 use App\Models\BatchUploadLog;
+use Illuminate\Support\Carbon;
 use App\Services\BrandsService;
 use App\Models\TertiaryCategory;
 use App\Models\SupplierStockType;
@@ -483,31 +484,37 @@ class ProductBatchService
                 if (!empty($productBasice['warranty_scope']) && mb_strlen($productBasice['warranty_scope']) > 250) {
                     $errorMessage[] = '「保固範圍」不可超過250個字';
                 }
+
                 //「促銷小標-生效時間起」格式錯誤
-                if ($productBasice['promotion_start_at'] === false) {
+                if ($productBasice['promotion_start_at']['status'] === false) {
                     $errorMessage[] = '「促銷小標-生效時間起」格式錯誤';
                 }
-                // 「促銷小標-生效時間起」有效性檢核
-                if (date('Y-m-d H:i', strtotime($productBasice['promotion_start_at'])) != $productBasice['promotion_start_at']) {
-                    $errorMessages[] = '「促銷小標-生效時間起」請輸入正確且有效的日期';
-                }
                 //如果有輸入生效時間起，促銷小標-生效時間訖則為必填
-                if (!empty($productBasice['promotion_start_at']) && empty($productBasice['promotion_end_at'])) {
+                if (!empty($productBasice['promotion_start_at']['date']) && empty($productBasice['promotion_end_at']['date'])) {
                     $errorMessage[] = '如果有輸入「促銷小標-生效時間起」，「促銷小標-生效時間訖」為必填';
                 }
                 //「促銷小標-生效時間訖」格式錯誤
-                if ($productBasice['promotion_end_at'] === false) {
-                    $errorMessage[] = '「促銷小標-生效時間訖」格式錯誤';
+                if ($productBasice['promotion_start_at']['status'] === false) {
+                    $errorMessage[] = ' 「促銷小標-生效時間訖」格式錯誤';
                 }
-                // 「促銷小標-生效時間訖」有效性檢核
-                if (date('Y-m-d H:i', strtotime($productBasice['promotion_end_at'])) != $productBasice['promotion_end_at']) {
-                    $errorMessages[] = '「促銷小標-生效時間訖」請輸入正確且有效的日期';
-                }
+
                 //「促銷小標-生效時間起」不能大於「促銷小標-生效時間訖」
-                if (!empty($productBasice['promotion_start_at']) && !empty($productBasice['promotion_end_at'])) {
-                    if ($productBasice['promotion_start_at']->gt($productBasice['promotion_end_at'])) {
+                if (!empty($productBasice['promotion_start_at']['date']) && !empty($productBasice['promotion_end_at']['date'])) {
+                    if ($productBasice['promotion_start_at']['date']->gt($productBasice['promotion_end_at']['date'])) {
                         $errorMessage[] = '「促銷小標-生效時間起」不能大於「促銷小標-生效時間訖」';
                     }
+                }
+                if(!empty($productBasice['promotion_start_at']['old_date']) && Carbon::isValidDate($productBasice['promotion_start_at']['old_date']) == false ){
+                        $errorMessage[] = '「促銷小標-生效時間起」請輸入正確且有效的日期';
+                }
+
+                if(!empty($productBasice['promotion_end_at']['old_date']) && Carbon::isValidDate($productBasice['promotion_end_at']['old_date']) == false ){
+                        $errorMessage[] = '「促銷小標-生效時間訖」請輸入正確且有效的日期';
+                }
+                //沒有錯誤內容的化纖將promotion_start_at promotion_end_at 改為後面function 可用的格式
+                if(count($errorMessage) == 0){
+                    $productBasice['promotion_start_at'] = $productBasice['promotion_start_at']['date'] ;
+                    $productBasice['promotion_end_at']   = $productBasice['promotion_end_at']['date'] ;
                 }
                 //「效期控管」未填寫
                 if (empty($productBasice['has_expiry_date_text'])) {

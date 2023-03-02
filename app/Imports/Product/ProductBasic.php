@@ -90,21 +90,28 @@ class ProductBasic implements ToCollection, WithMapping, WithStartRow, WithColum
             $index += 1;
         }
         foreach ($datekey as $key) {
+            $date = [] ;
+            $date['status']   = true ;
+            $date['date']     = ''   ; 
+            $date['old_date'] = $row[$key] ; 
+
             if ($row[$key] == null) {
-                $row[$key] = '';
+                $date['date'] = '';
             } elseif (is_string($row[$key])) {
                 try {
-                    $row[$key] = Carbon::createFromFormat('Y-m-d H:i', $row[$key]);
+                    $date['date']   = Carbon::createFromFormat('Y-m-d H:i', $row[$key]);
                 } catch (\Throwable $th) {
-                    $row[$key] = false;
+                    $date['status'] = false;
                 }
             } else {
                 try {
-                    $row[$key] = Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[$key]));
+                    $date['old_date'] = Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[$key]))->format('Y-m-d H:i') ;
+                    $date['date']     = Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($row[$key]));
                 } catch (\Throwable $th) {
-                    $row[$key] = false;
+                    $date['status'] = false;
                 }
             }
+            $row[$key] = $date ;
         }
 
         $values = collect($row)->values();
