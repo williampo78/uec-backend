@@ -1138,6 +1138,9 @@ class APIOrderService
                                             if ( !empty($hasOrderItems[$giftStockInfoId])) {
                                                 $stockInfo['stockQty'] = $stockInfo['stockQty'] - $hasOrderItems[$giftStockInfoId];
                                             }
+                                            if ($stockInfo['stockQty'] <= 0) {
+                                                continue;
+                                            }
                                             $currentQty = $remainingQty <= $stockInfo['stockQty'] ? $remainingQty : $stockInfo['stockQty'];
 
                                             $details[$seq] = [
@@ -1247,6 +1250,9 @@ class APIOrderService
                         $giftStockInfoId = $stockInfo['id'];
                         if ( !empty($hasOrderItems[$giftStockInfoId])) {
                             $stockInfo['stockQty'] = $stockInfo['stockQty'] - $hasOrderItems[$giftStockInfoId];
+                        }
+                        if ($stockInfo['stockQty'] <= 0) {
+                            continue;
                         }
                         $currentQty = $remainingQty <= $stockInfo['stockQty'] ? $remainingQty : $stockInfo['stockQty'];
 
@@ -1461,6 +1467,9 @@ class APIOrderService
                                                 $giftStockInfoId = $stockInfo['id'];
                                                 if ( !empty($hasOrderItems[$giftStockInfoId])) {
                                                     $stockInfo['stockQty'] = $stockInfo['stockQty'] - $hasOrderItems[$giftStockInfoId];
+                                                }
+                                                if ($stockInfo['stockQty'] <= 0) {
+                                                    continue;
                                                 }
                                                 $currentQty = $remainingQty <= $stockInfo['stockQty'] ? $remainingQty : $stockInfo['stockQty'];
 
