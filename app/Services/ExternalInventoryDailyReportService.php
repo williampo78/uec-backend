@@ -67,7 +67,7 @@ class ExternalInventoryDailyReportService
             (case when section_key = 'N' and goods_summary.goods_qty < i.safty_qty then 1 else 0 end) as is_dangerous /* 良品倉需比對是否低於安全庫存 */";
 
         $select2 = "ci.counting_date, w.number as warehouse_code, w.name as warehouse_name, ci.section_key, pi.item_no, ci.product_item_id,
-            p.product_name, pi.spec_1_value, pi.spec_2_value, pi.pos_item_no,
+            p.product_name, pi.spec_1_value, pi.spec_2_value, ci.sku as pos_item_no,
             p.stock_type, s.name as supplier_name, ci.expiry_date,
             pi.is_additional_purchase, pi.safty_qty, ci.qty as stock_qty,
             (case when p.tax_type = 'TABLEABLE' then round(p.selling_price/1.05, 2) else selling_price end) as selling_price,
@@ -85,9 +85,9 @@ class ExternalInventoryDailyReportService
                 $builder = $query->from('choice_inventory as ci')
                     ->selectRaw($select2)
                     ->join('warehouse as w', 'w.id', '=', 'ci.warehouse_id')
-                    ->join('products as p', 'p.id', '=', 'ci.product_id')
-                    ->join('product_items as pi', 'pi.id', '=', 'ci.product_item_id')
-                    ->join('supplier as s', 's.id', '=', 'p.supplier_id');
+                    ->leftJoin('products as p', 'p.id', '=', 'ci.product_id')
+                    ->leftJoin('product_items as pi', 'pi.id', '=', 'ci.product_item_id')
+                    ->leftJoin('supplier as s', 's.id', '=', 'p.supplier_id');
 
                 return $this->handleBuilder($builder, $request);
             }, 'i')
