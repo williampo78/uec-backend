@@ -138,9 +138,8 @@ class MemberInfoController extends Controller
         $data['utmSource'] = $request['utm_source'];
         $data['utmMedium'] = $request['utm_medium'];
         $data['utmCampaign'] = $request['utm_campaign'];
-        $data['utmSales'] = $request['utm_sales'];
         $data['utmContent'] = $request['utm_content'];
-        $data['utmAgency'] = $request['utm_agency'];
+        $data['utmTerm'] = $request['utm_term'];
         if ($request['pwd'] != '') { //for 未手機驗證會員使用-可更新此欄位
             $data['password'] = $request['pwd'];
         }
