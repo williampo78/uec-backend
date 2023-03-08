@@ -1870,7 +1870,9 @@ class APIOrderService
                 $tmp['content'] = null;
                 break;
             }
-            $tmp['term'] = $order['utm']['term'];
+            if(isset($order['utm']['term'])) {
+                $tmp['term'] = $order['utm']['term'];
+            }
             $order['utm'] = $tmp;
         }
     }
