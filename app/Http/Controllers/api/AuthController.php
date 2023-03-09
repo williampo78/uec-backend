@@ -279,9 +279,8 @@ class AuthController extends Controller
         $data['utmSource'] = $request['utm_source'];
         $data['utmMedium'] = $request['utm_medium'];
         $data['utmCampaign'] = $request['utm_campaign'];
-        $data['utmSales'] = $request['utm_sales'];
         $data['utmContent'] = $request['utm_content'];
-        $data['utmAgency'] = $request['utm_agency'];
+        $data['utmTerm'] = $request['utm_term'];
         $token = $request->server->getHeaders()['AUTHORIZATION'];
         $response = $this->apiService->memberRegistration($data, $token);
         $result = json_decode($response, true);
