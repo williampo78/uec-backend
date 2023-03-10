@@ -36,13 +36,14 @@ final class ApiResponseErrorsEnum
         'utm.source'        => 1030,
         'utm.medium'        => 1031,
         'utm.campaign'      => 1032,
-        'utm.sales'         => 1033,
+        'utm.content'       => 1033,
         'utm.time'          => 1034,
         'stock_type'        => 1035,
         'installment_info.bank_id' => 1036,
         'installment_info.number_of_installments' => 1037,
         'installment_info.fee_of_installments' => 1038,
-        'buyer_remark'      => 1039
+        'buyer_remark'      => 1039,
+        'utm.term'       => 1040,
     ];
 
 }

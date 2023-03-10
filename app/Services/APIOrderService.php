@@ -776,7 +776,6 @@ class APIOrderService
         $utm_info = [];
         foreach ($utms as $utm) {
             if(isset($utm['utm_source'])) {
-                //四參數，對應欄位的數值轉換
                 switch($utm['utm_source']) {
                   case 'lineclinic':
                     $utm['utm_source'] = "clinic";
@@ -784,11 +783,34 @@ class APIOrderService
                     $utm['utm_campaign'] = $utm['utm_campaign'];
                     $utm['utm_content'] = null;
                     break;
+                  case 'zsmhltc':
+                  case 'tmuhltc':
+                    $utm['utm_source'] = "homecare";
+                    $utm['utm_medium'] = "dm_".$utm['utm_medium'];
+                    $utm['utm_campaign'] = null;
+                    $utm['utm_content'] = null;
+                    break;
                   case 'appointment':
                     $utm['utm_source'] = "clinic";
                     $utm['utm_medium'] = "appointment_".$utm['utm_medium'];
                     $utm['utm_campaign'] = null;
                     $utm['utm_content'] = $utm['utm_campaign'];
+                    break;
+                  case 'functional':
+                    $utm['utm_source'] = $utm['utm_source'];
+                    if(strpos($utm['utm_medium'],'sales')<>0) {
+                        $utm['utm_medium'] = "sales_".$utm['utm_medium'];
+                    }
+                    $utm['utm_campaign'] = $utm['utm_campaign'];
+                    $utm['utm_content'] = null;
+                    break;
+                  case 'exhibition':
+                    $utm['utm_source'] = $utm['utm_source'];
+                    if(strpos($utm['utm_medium'],'dm')<>0) {
+                      $utm['utm_medium'] = "dm_".$utm['utm_medium'];
+                    }
+                    $utm['utm_campaign'] = $utm['utm_campaign'];
+                    $utm['utm_content'] = null;
                     break;
                   case 'shopdradvice':
                     $utm['utm_source'] = "pharmacy";
@@ -805,7 +827,7 @@ class APIOrderService
                         break;
                       default:
                         $utm['utm_medium'] = "sales_".$utm['utm_medium'];
-                        $utm['utm_campaign'] = "999999_introduction";
+                        $utm['utm_campaign'] = null;
                         break;
                     }
                     $utm['utm_campaign'] = $utm['utm_campaign'];
@@ -1834,39 +1856,68 @@ class APIOrderService
     {
         if((isset($order['utm']) && count($order['utm']) > 0)) {
             $tmp=$order['utm'];
-            //四參數，對應欄位的數值轉換
             switch($order['utm']['source']) {
-              case 'lineclinic':
-                $tmp['source'] = "clinic";
-                $tmp['medium'] = "line_".$order['utm']['medium'];;
-                $tmp['campaign'] = $order['utm']['campaign'];
-                $tmp['content'] = null;
-                break;
               case 'appointment':
                 $tmp['source'] = "clinic";
                 $tmp['medium'] = "appointment_".$order['utm']['medium'];
                 $tmp['campaign'] = null;
                 $tmp['content'] = $order['utm']['campaign'];
                 break;
+              case 'lineclinic':
+                $tmp['source'] = "clinic";
+                $tmp['medium'] = "line_".$order['utm']['medium'];;
+                $tmp['campaign'] = $order['utm']['campaign'];
+                $tmp['content'] = null;
+                break;
+              case 'zsmhltc':
+              case 'tmuhltc':
+                $tmp['utm_source'] = "homecare";
+                $tmp['utm_medium'] = "dm_".$order['utm_medium'];
+                $tmp['utm_campaign'] = null;
+                $tmp['utm_content'] = null;
+                break;
+              case 'functional':
+                $tmp['utm_source'] = $order['utm_source'];
+                if(strpos($order['utm_medium'],'sales')<>0) {
+                    $tmp['utm_medium'] = "sales_".$order['utm_medium'];
+                } else {
+                    $tmp['utm_medium'] = $order['utm_medium'];
+                }
+                $tmp['utm_campaign'] = $order['utm_campaign'];
+                $tmp['utm_content'] = null;
+                break;
+              case 'exhibition':
+                  $tmp['utm_source'] = $order['utm_source'];
+                  if(strpos($order['utm_medium'],'dm')<>0) {
+                    $tmp['utm_medium'] = "dm_".$order['utm_medium'];
+                  } else {
+                    $tmp['utm_medium'] = $order['utm_medium'];
+                  }
+                  $tmp['utm_campaign'] = $order['utm_campaign'];
+                  $tmp['utm_content'] = null;
+                  break;
               case 'shopdradvice':
                 $tmp['source'] = "pharmacy";
                 $sales = str_contains($order['utm']['medium'],'_') ? explode('_',$order['utm']['medium'])[1] : '';
                 switch($sales) {
                   case 'line':
                     $tmp['medium'] = "line_".$order['utm']['medium'];
+                    $tmp['campaign'] = null;
                     break;
                   case 'DM':
                     $tmp['medium'] = "dm_".$order['utm']['medium'];
+                    $tmp['campaign'] = $order['utm']['campaign'];
                     break;
                   case 'display':
                     $tmp['medium'] = "box_".$order['utm']['medium'];
+                    $tmp['campaign'] = $order['utm']['campaign'];
                     break;
                   default:
                     $tmp['medium'] = "sales_".$order['utm']['medium'];
-                    $tmp['campaign'] = "999999_introduction";
+                    $tmp['campaign'] = null;
                     break;
                 }
-                $tmp['campaign'] = $order['utm']['campaign'];
+                
                 $tmp['content'] = null;
                 break;
             }

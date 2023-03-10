@@ -2616,6 +2616,12 @@ class APICartServices
     {
         if(isset($utm['utm_source'])) {
             switch($input['utm_source']) {
+              case 'appointment':
+                $input['utm_source'] = "clinic";
+                $input['utm_medium'] = "appointment_".$input['utm_medium'];
+                $input['utm_campaign'] = null;
+                $input['utm_content'] = $input['utm_campaign'];
+                break;
               case 'lineclinic':
                 $input['utm_source'] = "clinic";
                 $input['utm_medium'] = "line_".$input['utm_medium'];
@@ -2629,12 +2635,22 @@ class APICartServices
                 $input['utm_campaign'] = null;
                 $input['utm_content'] = null;
                 break;
-              case 'appointment':
-                $input['utm_source'] = "clinic";
-                $input['utm_medium'] = "appointment_".$input['utm_medium'];
-                $input['utm_campaign'] = null;
-                $input['utm_content'] = $input['utm_campaign'];
+              case 'functional':
+                $input['utm_source'] = $input['utm_source'];
+                if(strpos($input['utm_medium'],'sales')<>0) {
+                    $input['utm_medium'] = "sales_".$input['utm_medium'];
+                }
+                $input['utm_campaign'] = $input['utm_campaign'];
+                $input['utm_content'] = null;
                 break;
+              case 'exhibition':
+                  $input['utm_source'] = $input['utm_source'];
+                  if(strpos($input['utm_medium'],'dm')<>0) {
+                    $input['utm_medium'] = "dm_".$input['utm_medium'];
+                  }
+                  $input['utm_campaign'] = $input['utm_campaign'];
+                  $input['utm_content'] = null;
+                  break;
               case 'shopdradvice':
                 $input['utm_source'] = "pharmacy";
                 $sales = str_contains($input['utm_medium'],'_') ? explode('_',$input['utm_medium'])[1] : '';
@@ -2650,10 +2666,9 @@ class APICartServices
                     break;
                   default:
                     $input['utm_medium'] = "sales_".$input['utm_medium'];
-                    $input['utm_campaign'] = "999999_introduction";
+                    $input['utm_campaign'] = null;
                     break;
                 }
-                $input['utm_sales'] = $input['utm_sales'];
                 $input['utm_campaign'] = $input['utm_campaign'];
                 $input['utm_content'] = null;
                 break;
