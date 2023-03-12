@@ -3,6 +3,8 @@
 
 namespace App\Services;
 
+use App\Enums\CacheSaveSecEnum;
+use App\Repositories\WebCategoryProductsRepository;
 use Carbon\Carbon;
 use App\Models\Product;
 use App\Models\ProductItem;
@@ -42,6 +44,7 @@ class APIProductServices
     private $webShippingInfoService;
     private $ProductAttributeLovService;
     private $sysConfigService;
+    private $webCategoryProductsRepository;
 
     public function __construct(
         WebCategoryHierarchyService $apiWebCategory,
@@ -52,7 +55,8 @@ class APIProductServices
         UniversalService $universalService,
         WebShippingInfoService $webShippingInfoService,
         ProductAttributeLovService $attributeLovService,
-        SysConfigService $sysConfigService
+        SysConfigService $sysConfigService,
+        WebCategoryProductsRepository $webCategoryProductsRepository
     )
     {
         $this->apiWebCategory = $apiWebCategory;
@@ -63,7 +67,8 @@ class APIProductServices
         $this->universalService = $universalService;
         $this->webShippingInfoService = $webShippingInfoService;
         $this->ProductAttributeLovService = $attributeLovService;
-        $this->sysConfigService = $sysConfigService ; 
+        $this->sysConfigService = $sysConfigService ;
+        $this->webCategoryProductsRepository = $webCategoryProductsRepository;
     }
 
     public function getCategory($keyword = null)
@@ -74,37 +79,7 @@ class APIProductServices
 
         //根據階層顯示層級資料
         if ($config_levels == '3') {
-            $categorys = DB::table("web_category_products as cate_prod")
-                ->join('frontend_products_v as prod', 'prod.id', '=', 'cate_prod.product_id')
-                ->join("web_category_hierarchy as cate", function ($join) {
-                    $join->on("cate.id", "=", "cate_prod.web_category_hierarchy_id")
-                        ->where("cate.category_level", "=", 3);
-                })
-                ->join('web_category_hierarchy as cate1', 'cate1.id', '=', 'cate.parent_id')
-                ->join('web_category_hierarchy as cate2', 'cate2.id', '=', 'cate1.parent_id')
-                ->select(DB::raw("cate2.`lft` L1_LFT,cate1.`lft` L2_LFT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
-                    '' as campaign_name, '' as url_code, '' as campaign_brief, cate2.`category_short_name` as L1_short_name, cate2.`icon_name` as L1_icon_name"))
-                ->where('prod.approval_status', 'APPROVED')
-                ->where('prod.start_launched_at', '<=', now())
-                ->where('prod.end_launched_at', '>=', now())
-                ->where('prod.product_type', 'N')
-                ->where('cate.active', 1);
-            if ($keyword) {
-                $categorys = $categorys->where(function ($query) use ($keyword) {
-                    $query->where('prod.product_name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('prod.product_no', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('prod.keywords', 'like', '%' . $keyword . '%')
-                        ->orWhere('prod.brand_name', 'like', '%' . $keyword . '%')
-                        ->orWhere('cate.category_name', 'like', '%' . $keyword . '%')
-                        ->orWhere('cate1.category_name', 'like', '%' . $keyword . '%')
-                        ->orWhere('cate2.category_name', 'like', '%' . $keyword . '%');
-                });
-            }
-            $categorys = $categorys->groupBy("cate.id")
-                ->orderBy("cate2.lft", "asc")
-                ->orderBy("cate1.lft", "asc")
-                ->orderBy("cate.lft", "asc")
-                ->get();
+            $categorys = $this->prepareLevel3Category($keyword);
         } elseif ($config_levels == '2') {
             $categorys = DB::table("web_category_products as cate_prod")
                 ->join('frontend_products_v as prod', 'prod.id', '=', 'cate_prod.product_id')
@@ -307,6 +282,45 @@ class APIProductServices
         }
     }
 
+    private function prepareLevel3Category($keyword)
+    {
+        $cacheSec = CacheSaveSecEnum::Level3Category;
+        return \Cache::remember('level3Category_' . $keyword ?? '', $cacheSec, function () use ($keyword) {
+            $categorys = DB::table("web_category_products as cate_prod")
+                ->join('frontend_products_v as prod', 'prod.id', '=', 'cate_prod.product_id')
+                ->join("web_category_hierarchy as cate", function ($join) {
+                    $join->on("cate.id", "=", "cate_prod.web_category_hierarchy_id")
+                        ->where("cate.category_level", "=", 3);
+                })
+                ->join('web_category_hierarchy as cate1', 'cate1.id', '=', 'cate.parent_id')
+                ->join('web_category_hierarchy as cate2', 'cate2.id', '=', 'cate1.parent_id')
+                ->select(DB::raw("cate2.`lft` L1_LFT,cate1.`lft` L2_LFT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
+                    '' as campaign_name, '' as url_code, '' as campaign_brief, cate2.`category_short_name` as L1_short_name, cate2.`icon_name` as L1_icon_name"))
+                ->where('prod.approval_status', 'APPROVED')
+                ->where('prod.start_launched_at', '<=', now())
+                ->where('prod.end_launched_at', '>=', now())
+                ->where('prod.product_type', 'N')
+                ->where('cate.active', 1);
+            if ($keyword) {
+                $categorys = $categorys->where(function ($query) use ($keyword) {
+                    $query->where('prod.product_name', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('prod.product_no', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('prod.keywords', 'like', '%' . $keyword . '%')
+                        ->orWhere('prod.brand_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('cate.category_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('cate1.category_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('cate2.category_name', 'like', '%' . $keyword . '%');
+                });
+            }
+            return $categorys->groupBy("cate.id")
+                ->orderBy("cate2.lft", "asc")
+                ->orderBy("cate1.lft", "asc")
+                ->orderBy("cate.lft", "asc")
+                ->get();
+        });
+
+    }
+
     /*
      * 取得商品資訊 (上架審核通過 & 上架期間內)
      */
@@ -336,115 +350,9 @@ class APIProductServices
      */
     public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag = null, $attribute = null, $brand = null, $filter = null)
     {
-        //分類總覽階層
-        $config_levels = config('uec.web_category_hierarchy_levels');
-        $products = DB::table('web_category_products')
-            ->join('frontend_products_v as p', 'p.id', '=', 'web_category_products.product_id')
-            ->join('web_category_hierarchy as cate1', 'cate1.id', '=', 'web_category_products.web_category_hierarchy_id')
-            ->join('web_category_hierarchy as cate2', 'cate2.id', '=', 'cate1.parent_id');
+        $this->webCategoryProductsRepository->setParams($category, $selling_price_min, $selling_price_max, $keyword, $id, $order_by, $sort_flag, $attribute, $brand, $filter);
+        $products = $this->webCategoryProductsRepository->getProducts();
 
-        if ($config_levels == 3) {
-            $products = $products->join('web_category_hierarchy as cate3', 'cate3.id', '=', 'cate2.parent_id');
-        }
-
-        $products = $products->leftJoin('product_attributes', 'product_attributes.product_id', '=', 'p.id')
-            ->leftJoin('product_attribute_lov', 'product_attribute_lov.id', '=', 'product_attributes.product_attribute_lov_id')
-            ->leftJoin("brands", 'brands.id', '=', 'p.brand_id');
-        if($filter){
-            $products = $products->leftJoin('product_attributes as pa', 'pa.product_id', '=', 'p.id');
-        }
-        $products = $products->select("web_category_products.web_category_hierarchy_id", 
-            'p.*', 
-            DB::raw("(select photo_name from product_photos where p.id = product_photos.product_id order by sort limit 0, 1) as displayPhoto"),
-            "product_attribute_lov.id as attribute_id",
-            "product_attribute_lov.attribute_type",
-        );
-        if($filter){
-            $products->addSelect(
-             "pa.product_attribute_lov_id as pa_product_attribute_lov_id",
-             "pa.attribute_type as pa_attribute_type",
-            );
-        }
-
-        if ($config_levels == 3) {
-            $products = $products->addSelect("cate1.category_name as L3", "cate2.category_name as L2", "cate3.category_name as L1");
-        } else {
-            $products = $products->addSelect("cate1.category_name as L2", "cate2.category_name as L1");
-        }
-
-        $products = $products->where('p.approval_status', 'APPROVED')
-            ->where('p.start_launched_at', '<=', now())
-            ->where('p.end_launched_at', '>=', now())
-            ->where('p.product_type', 'N')
-            ->where('cate1.active', 1);
-
-        if (($keyword)) { //依關鍵字搜尋
-            if ($config_levels == 3) {
-                $products = $products->where(function ($query) use ($keyword) {
-                    $query->where('p.product_name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('p.product_no', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('p.keywords', 'like', '%' . $keyword . '%')
-                        ->orWhere('p.brand_name', 'like', '%' . $keyword . '%')
-                        ->orWhere('cate1.category_name', 'like', '%' . $keyword . '%')
-                        ->orWhere('cate2.category_name', 'like', '%' . $keyword . '%')
-                        ->orWhere('cate3.category_name', 'like', '%' . $keyword . '%');
-                });
-            } else {
-                $products = $products->where(function ($query) use ($keyword) {
-                    $query->where('p.product_name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('p.product_no', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('p.keywords', 'like', '%' . $keyword . '%')
-                        ->orWhere('p.brand_name', 'like', '%' . $keyword . '%')
-                        ->orWhere('cate1.category_name', 'like', '%' . $keyword . '%')
-                        ->orWhere('cate2.category_name', 'like', '%' . $keyword . '%');
-                });
-            }
-        }
-
-        if ($selling_price_min >= 0 && $selling_price_max > 0) {//價格區間
-            $products = $products->whereBetween('p.selling_price', [$selling_price_min, $selling_price_max]);
-        }
-
-        if ($category) {//依分類搜尋
-            if ($config_levels == 3) {
-                $hasChild = $this->apiWebCategory->hasChildCategories($category);
-                if ($hasChild) {
-                    $products = $products->where('cate3.id', '=', $category);
-                } else {
-                    $products = $products->where('web_category_products.web_category_hierarchy_id', '=', $category);
-                }
-            } else {
-                $products = $products->where('web_category_products.web_category_hierarchy_id', '=', $category);
-            }
-        }
-
-        if ($id) {//依產品編號找相關分類
-            $products = $products->where('web_category_products.product_id', '=', $id);
-            $products = $products->orderBy('web_category_products.sort', 'asc');
-        }
-
-        if ($brand) { //品牌
-            $brand = explode(',', $brand);
-            $products = $products->whereIn('p.brand_id', $brand);
-        }
-        if ($attribute) {//進階篩選條件
-            $attribute = explode(',', $attribute);
-            $attribute = array_unique($attribute);
-            $products = $products->whereIn('product_attributes.product_attribute_lov_id', $attribute);
-        }
-
-        if ($order_by == 'launched') {
-            $products = $products->orderBy('p.start_launched_at', $sort_flag);
-        } else if ($order_by == 'price') {
-            $products = $products->orderBy('p.selling_price', $sort_flag);
-        } else if ($order_by == 'attribute') {
-            $products = $products->orderBy('brands.id', 'asc');
-            $products = $products->orderBy('product_attribute_lov.id', 'asc');
-        } else {
-            $products = $products->orderBy('p.id', 'asc');
-        }
-
-        $products = $products->get();
         $data = [];
         $product_id = 0;
         $web_category_hierarchy_id = 0;
