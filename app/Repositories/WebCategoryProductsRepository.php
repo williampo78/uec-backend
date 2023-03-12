@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Enums\CacheSaveSecEnum;
 use App\Services\WebCategoryHierarchyService;
 use Illuminate\Support\Facades\DB;
 
@@ -10,7 +11,7 @@ class WebCategoryProductsRepository
     /*
      * cache Sec 為暫存秒數，此 Class 由程式限定，依目前需使用的情境暫定為 3 分鐘，依情況條整
      */
-    private int $cacheSec = 60 * 3;
+    private int $cacheSec = CacheSaveSecEnum::WebCategoryProducts;
     private $configLevels;
     private int $useQueryType = 0;
 

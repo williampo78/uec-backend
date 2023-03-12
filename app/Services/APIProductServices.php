@@ -3,6 +3,7 @@
 
 namespace App\Services;
 
+use App\Enums\CacheSaveSecEnum;
 use App\Repositories\WebCategoryProductsRepository;
 use Carbon\Carbon;
 use App\Models\Product;
@@ -78,37 +79,7 @@ class APIProductServices
 
         //根據階層顯示層級資料
         if ($config_levels == '3') {
-            $categorys = DB::table("web_category_products as cate_prod")
-                ->join('frontend_products_v as prod', 'prod.id', '=', 'cate_prod.product_id')
-                ->join("web_category_hierarchy as cate", function ($join) {
-                    $join->on("cate.id", "=", "cate_prod.web_category_hierarchy_id")
-                        ->where("cate.category_level", "=", 3);
-                })
-                ->join('web_category_hierarchy as cate1', 'cate1.id', '=', 'cate.parent_id')
-                ->join('web_category_hierarchy as cate2', 'cate2.id', '=', 'cate1.parent_id')
-                ->select(DB::raw("cate2.`lft` L1_LFT,cate1.`lft` L2_LFT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
-                    '' as campaign_name, '' as url_code, '' as campaign_brief, cate2.`category_short_name` as L1_short_name, cate2.`icon_name` as L1_icon_name"))
-                ->where('prod.approval_status', 'APPROVED')
-                ->where('prod.start_launched_at', '<=', now())
-                ->where('prod.end_launched_at', '>=', now())
-                ->where('prod.product_type', 'N')
-                ->where('cate.active', 1);
-            if ($keyword) {
-                $categorys = $categorys->where(function ($query) use ($keyword) {
-                    $query->where('prod.product_name', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('prod.product_no', 'LIKE', '%' . $keyword . '%')
-                        ->orWhere('prod.keywords', 'like', '%' . $keyword . '%')
-                        ->orWhere('prod.brand_name', 'like', '%' . $keyword . '%')
-                        ->orWhere('cate.category_name', 'like', '%' . $keyword . '%')
-                        ->orWhere('cate1.category_name', 'like', '%' . $keyword . '%')
-                        ->orWhere('cate2.category_name', 'like', '%' . $keyword . '%');
-                });
-            }
-            $categorys = $categorys->groupBy("cate.id")
-                ->orderBy("cate2.lft", "asc")
-                ->orderBy("cate1.lft", "asc")
-                ->orderBy("cate.lft", "asc")
-                ->get();
+            $categorys = $this->prepareLevel3Category($keyword);
         } elseif ($config_levels == '2') {
             $categorys = DB::table("web_category_products as cate_prod")
                 ->join('frontend_products_v as prod', 'prod.id', '=', 'cate_prod.product_id')
@@ -309,6 +280,45 @@ class APIProductServices
             }
             return $data;
         }
+    }
+
+    private function prepareLevel3Category($keyword)
+    {
+        $cacheSec = CacheSaveSecEnum::Level3Category;
+        return \Cache::remember('level3Category_' . $keyword ?? '', $cacheSec, function () use ($keyword) {
+            $categorys = DB::table("web_category_products as cate_prod")
+                ->join('frontend_products_v as prod', 'prod.id', '=', 'cate_prod.product_id')
+                ->join("web_category_hierarchy as cate", function ($join) {
+                    $join->on("cate.id", "=", "cate_prod.web_category_hierarchy_id")
+                        ->where("cate.category_level", "=", 3);
+                })
+                ->join('web_category_hierarchy as cate1', 'cate1.id', '=', 'cate.parent_id')
+                ->join('web_category_hierarchy as cate2', 'cate2.id', '=', 'cate1.parent_id')
+                ->select(DB::raw("cate2.`lft` L1_LFT,cate1.`lft` L2_LFT, cate2.`id` L1ID , cate2.`category_name` L1_NAME, cate1.`id` L2ID , cate1.`category_name` L2_NAME, cate.*, count(cate_prod.`product_id`) as pCount,
+                    '' as campaign_name, '' as url_code, '' as campaign_brief, cate2.`category_short_name` as L1_short_name, cate2.`icon_name` as L1_icon_name"))
+                ->where('prod.approval_status', 'APPROVED')
+                ->where('prod.start_launched_at', '<=', now())
+                ->where('prod.end_launched_at', '>=', now())
+                ->where('prod.product_type', 'N')
+                ->where('cate.active', 1);
+            if ($keyword) {
+                $categorys = $categorys->where(function ($query) use ($keyword) {
+                    $query->where('prod.product_name', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('prod.product_no', 'LIKE', '%' . $keyword . '%')
+                        ->orWhere('prod.keywords', 'like', '%' . $keyword . '%')
+                        ->orWhere('prod.brand_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('cate.category_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('cate1.category_name', 'like', '%' . $keyword . '%')
+                        ->orWhere('cate2.category_name', 'like', '%' . $keyword . '%');
+                });
+            }
+            return $categorys->groupBy("cate.id")
+                ->orderBy("cate2.lft", "asc")
+                ->orderBy("cate1.lft", "asc")
+                ->orderBy("cate.lft", "asc")
+                ->get();
+        });
+
     }
 
     /*
