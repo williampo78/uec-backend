@@ -817,13 +817,13 @@ class APIOrderService
                     $sales = str_contains($utm['utm_medium'],'_') ? explode('_',$utm['utm_medium'])[1] : '';
                     switch($sales) {
                       case 'line':
-                        $utm['utm_medium'] = "line_".$utm['utm_medium'];
+                        $utm['utm_medium'] = "line_".str_replace('_line','',$input['utm_medium']);
                         break;
                       case 'DM':
-                        $utm['utm_medium'] = "dm_".$utm['utm_medium'];
+                        $utm['utm_medium'] = "dm_".str_replace('_DM','',$input['utm_medium']);
                         break;
                       case 'display':
-                        $utm['utm_medium'] = "box_".$utm['utm_medium'];
+                        $utm['utm_medium'] = "box_".str_replace('_display','',$input['utm_medium']);
                         break;
                       default:
                         $utm['utm_medium'] = "sales_".$utm['utm_medium'];
@@ -1918,15 +1918,15 @@ class APIOrderService
                 $sales = str_contains($order['utm']['medium'],'_') ? explode('_',$order['utm']['medium'])[1] : '';
                 switch($sales) {
                   case 'line':
-                    $tmp['medium'] = "line_".$order['utm']['medium'];
+                    $tmp['medium'] = "line_".str_replace('_line','',$order['utm']['medium']);
                     $tmp['campaign'] = null;
                     break;
                   case 'DM':
-                    $tmp['medium'] = "dm_".$order['utm']['medium'];
+                    $tmp['medium'] = "dm_".str_replace('_DM','',$order['utm']['medium']);
                     $tmp['campaign'] = $order['utm']['campaign'];
                     break;
                   case 'display':
-                    $tmp['medium'] = "box_".$order['utm']['medium'];
+                    $tmp['medium'] = "box_".str_replace('_display','',$order['utm']['medium']);
                     $tmp['campaign'] = $order['utm']['campaign'];
                     break;
                   default:
