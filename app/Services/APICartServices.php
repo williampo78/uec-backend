@@ -2656,13 +2656,13 @@ class APICartServices
                 $sales = str_contains($input['utm_medium'],'_') ? explode('_',$input['utm_medium'])[1] : '';
                 switch($sales) {
                   case 'line':
-                    $input['utm_medium'] = "line_".$input['utm_medium'];
+                    $input['utm_medium'] = "line_".str_replace('_line','',$input['utm_medium']);
                     break;
                   case 'DM':
-                    $input['utm_medium'] = "dm_".$input['utm_medium'];
+                    $input['utm_medium'] = "dm_".str_replace('_DM','',$input['utm_medium']);
                     break;
                   case 'display':
-                    $input['utm_medium'] = "box_".$input['utm_medium'];
+                    $input['utm_medium'] = "box_".str_replace('_display','',$input['utm_medium']);
                     break;
                   default:
                     $input['utm_medium'] = "sales_".$input['utm_medium'];
