@@ -11,44 +11,31 @@ class PurchaseService
 {
     public function getPurchase($in)
     {
-        $purchase = Purchase::select(
-            DB::raw('purchase.*'),
-            DB::raw('order_supplier.number as order_supplier_number'),
-            DB::raw('supplier.name as supplier_name'),
-
-        )
-            ->leftJoin('supplier', 'supplier.id', '=', 'purchase.supplier_id')
-            ->leftJoin('order_supplier', 'order_supplier.id', '=', 'purchase.order_supplier_id');
-
-        // 供應商
-        if (isset($in['supplier']) && $in['supplier']) {
-            $purchase->where('purchase.supplier_id', $in['supplier']);
-        }
-
-        // 供應商統編
-        if (isset($in['company_number']) && $in['company_number']) {
-            $purchase->where('supplier.company_number', $in['company_number']);
-        }
-
-        // 採購單單號
-        if (isset($in['order_supplier_number']) && $in['order_supplier_number']) {
-            $purchase->where('order_supplier.number', $in['order_supplier_number']);
-        }
-
-        // 進貨日期
-        if (isset($in['trade_date_start']) && $in['trade_date_start'] && isset($in['trade_date_end']) && $in['trade_date_end']) {
-            $purchase->whereBetween('purchase.trade_date', [$in['trade_date_start'] . ' 00:00:00', $in['trade_date_end'] . ' 23:59:59']);
-        }
-
-        // 進貨單號
-        if (isset($in['number']) && $in['number']) {
-            $purchase->where('purchase.number', $in['number']);
-        }
-
-        if (isset($in['id']) && $in['id']) {
-            $purchase->where('purchase.id', $in['id']);
-            return $purchase->first();
-        }
+        $purchase = Purchase::with([
+            'purchaseDetail',
+            'purchaseDetail.warehouse',
+            'purchaseDetail.productItem',
+            'purchaseDetail.productItem.product',
+            'purchaseDetail.productItem.product.brand',
+            'supplier',
+        ])
+            ->whereHas('orderSupplier', function ($query) use ($in) {
+                if (!empty($in['order_supplier_number'])) {
+                    $query = $query->where('number', $in['order_supplier_number']);
+                }
+                return $query;
+            })
+            ->when(!empty($in['supplier']), function ($query) use ($in) {
+                $query->where('supplier_id', $in['supplier']);
+            })->when(!empty($in['company_number']), function ($query) use ($in) {
+            $query->where('company_number', $in['company_number']);
+        })->when(!empty($in['trade_date_start'] && !empty($in['trade_date_end'])), function ($query) use ($in) {
+            $query->whereBetween('purchase.trade_date', [$in['trade_date_start'] . ' 00:00:00', $in['trade_date_end'] . ' 23:59:59']);
+        })->when(!empty($in['number'] && !empty($in['number'])), function ($query) use ($in) {
+            $query->where('number', $in['number']);
+        })->when(!empty($in['id']), function ($query) use ($in) {
+            $query->where('id', $in['id']);
+        });
 
         return $purchase->get();
     }

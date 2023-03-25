@@ -14,13 +14,13 @@
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <div class="col-sm-3"><label> 進貨單號</label></div>
-                                <div class="col-sm-9" id="show_number"></div>
+                                <div class="col-sm-9"> @{{invoiceForm.number}}</div>
                             </div>
                         </div>
                         <div class="col-sm-6">
                             <div class="form-group">
                                 <div class="col-sm-3"><label> 採購單號</label></div>
-                                <div class="col-sm-9" id="show_order_supplier_number"></div>
+                                <div class="col-sm-9">@{{invoiceForm.order_supplier_number}}</div>
                             </div>
                         </div>
                     </div>
@@ -31,7 +31,7 @@
 
                                 <div class="col-sm-3"><label class="control-label"> 發票號碼</label> <span class="text-red">*</span></div>
                                 <div class="col-sm-9">
-                                        <input type='text' class="form-control" name="invoice_number" id="invoice_number" onkeyup="value=value.replace(/[^\w=@#]|_/ig,'')" value="" />
+                                        <input type='text' class="form-control" name="invoice_number" id="invoice_number" v-model="invoiceForm.invoice_number" onkeyup="value=value.replace(/[^\w=@#]|_/ig,'')" value="" />
 
                                 </div>
 
@@ -47,7 +47,7 @@
                                 </div>
                                 <div class="col-sm-9">
                                     <div class="input-group" id="invoice_date_flatpickr">
-                                        <input type="text" class="form-control" name="invoice_date" id="invoice_date" value="" autocomplete="off" data-input />
+                                        <input type="text" class="form-control" name="invoice_date" id="invoice_date" v-model="invoiceForm.invoice_date" autocomplete="off" data-input />
                                         <span class="input-group-btn" data-toggle>
                                             <button class="btn btn-default" type="button">
                                                 <i class="fa-solid fa-calendar-days"></i>
