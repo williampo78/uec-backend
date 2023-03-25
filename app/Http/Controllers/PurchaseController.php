@@ -5,18 +5,24 @@ namespace App\Http\Controllers;
 use App\Services\BrandsService;
 use App\Services\PurchaseService;
 use App\Services\SupplierService;
+use App\Http\Resources\Purchase\PurchaseResource;
 use Illuminate\Http\Request;
 
 class PurchaseController extends Controller
 {
+    private $supplierService ;
+    private $purchaseService ;
+    private $brandsService ;
+
     public function __construct(
         SupplierService $supplierService,
         PurchaseService $purchaseService,
-        BrandsService $brandsService
+        BrandsService $brandsService,
     ) {
         $this->supplierService = $supplierService;
         $this->purchaseService = $purchaseService;
         $this->brandsService = $brandsService;
+    
     }
 
     /**
@@ -38,9 +44,8 @@ class PurchaseController extends Controller
         $result['supplier'] = $this->supplierService->getSuppliers();
 
         if (!empty($payload)) {
-            $result['purchase'] = $this->purchaseService->getPurchase($payload);
+            $result['purchase_data'] = PurchaseResource::collection($this->purchaseService->getPurchase($payload));
         }
-
         return view('backend.purchase.list', $result);
     }
 
@@ -114,32 +119,6 @@ class PurchaseController extends Controller
     {
         $req = $request->input();
         switch ($req['type']) {
-            case 'showPurchase':
-                $data = [];
-                $data['purchase'] = $this->purchaseService->getPurchase($req);
-                $brands = $this->brandsService->getBrands()->keyBy('id')->toArray();
-                $data['purchase_detail'] = $this->purchaseService->getPurchaseDetail(['purchase_id' => $req['id']])->transform(function ($obj, $key) use ($brands) {
-
-                    $brandsName = isset($brands[$obj->brand_id]['brand_name']) ? $brands[$obj->brand_id]['brand_name'] : '品牌已被刪除';
-
-                    $obj->combination_name = $brandsName . '-' . $obj->product_name;
-
-                    if ($obj->spec_1_value !== '') {
-                        $obj->combination_name .= '-' . $obj->spec_1_value;
-                    }
-                    if ($obj->spec_2_value !== '') {
-                        $obj->combination_name .= '-' . $obj->spec_2_value;
-                    }
-                    if ($obj->product_name == '') {
-                        $obj->combination_name = false;
-                    }
-                    $obj->brands_name = $brandsName; //不做join key find val
-
-                    return $obj;
-                });
-                return view('backend.purchase.show', $data);
-                break;
-
             case 'update_invoice':
                 $result = $this->purchaseService->updateInvoice($req);
                 return response()->json([
