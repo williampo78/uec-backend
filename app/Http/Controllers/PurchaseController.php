@@ -17,7 +17,7 @@ class PurchaseController extends Controller
     public function __construct(
         SupplierService $supplierService,
         PurchaseService $purchaseService,
-        BrandsService $brandsService,
+        BrandsService $brandsService
     ) {
         $this->supplierService = $supplierService;
         $this->purchaseService = $purchaseService;
