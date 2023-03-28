@@ -21,23 +21,3 @@
     <!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
-
-<script>
-    function row_detail(id)
-    {
-        $('#DivAddRow').html("");
-        var data_id = id;
-        $("#get_modal_id").val(data_id);
-        $.ajax(
-            {
-                url: "/backend/quotation/ajax",
-                type: "POST",
-                data: {"get_type":"showQuotation" , "id": data_id, _token:'{{ csrf_token() }}' },
-                enctype: 'multipart/form-data',
-            })
-            .done(function( data )
-            {
-                $('#ajaxHtmlappendthis').html(data) ;
-            });
-    }
-</script>

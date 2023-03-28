@@ -32,9 +32,9 @@
                                 </div>
 
                                 <div class="mb-4 custom-title">
-                                        <label>供應商統編</label>
-                                        <input class="form-control" name="company_number" id="company_number"
-                                            value="{{ request()->input('company_number') }}">
+                                    <label>供應商統編</label>
+                                    <input class="form-control" name="company_number" id="company_number"
+                                        value="{{ request()->input('company_number') }}">
                                 </div>
 
                                 <div class="mb-4 custom-title">
@@ -64,7 +64,10 @@
                                     <div class="d-flex align-items-center">
                                         <div class="form-group mb-0">
                                             <div class="input-group" id="select_start_date_flatpickr">
-                                                <input type="text" class="form-control" name="select_start_date" id="select_start_date" value="{{ request()->input('select_start_date') }}" autocomplete="off" data-input />
+                                                <input type="text" class="form-control" name="select_start_date"
+                                                    id="select_start_date"
+                                                    value="{{ request()->input('select_start_date') }}" autocomplete="off"
+                                                    data-input />
                                                 <span class="input-group-btn" data-toggle>
                                                     <button class="btn btn-default" type="button">
                                                         <i class="fa-solid fa-calendar-days"></i>
@@ -75,7 +78,9 @@
                                         <span>～</span>
                                         <div class="form-group mb-0">
                                             <div class="input-group" id="select_end_date_flatpickr">
-                                                <input type="text" class="form-control" name="select_end_date" id="select_end_date" value="{{ request()->input('select_end_date') }}" autocomplete="off" data-input />
+                                                <input type="text" class="form-control" name="select_end_date"
+                                                    id="select_end_date" value="{{ request()->input('select_end_date') }}"
+                                                    autocomplete="off" data-input />
                                                 <span class="input-group-btn" data-toggle>
                                                     <button class="btn btn-default" type="button">
                                                         <i class="fa-solid fa-calendar-days"></i>
@@ -94,7 +99,8 @@
 
                                 <div class="text-right">
                                     @if ($share_role_auth['auth_query'])
-                                        <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i></i> 查詢</button>
+                                        <button class="btn btn-warning"><i class="fa-solid fa-magnifying-glass"></i></i>
+                                            查詢</button>
                                         <button type="button" class="btn btn-danger" id="btn-reset">
                                             <i class="fa-solid fa-eraser"></i> 清除
                                         </button>
@@ -138,8 +144,7 @@
                                     <tr>
                                         <td>
                                             @if ($share_role_auth['auth_query'])
-                                                <button class="btn btn-info btn-sm" data-toggle="modal"
-                                                    data-target="#row_detail" data-id="{{ $v['id'] }}"
+                                                <button class="btn btn-info btn-sm" data-id="{{ $v['id'] }}"
                                                     onclick="row_detail({{ $v['id'] }});">
                                                     <i class="fa-solid fa-magnifying-glass"></i>
                                                 </button>
@@ -155,7 +160,7 @@
                                                     onclick="del({{ $v['id'] }} , '{{ $v['doc_number'] }}' );">刪除</button>
                                             @endif
                                         </td>
-                                        <td>{{date('Y-m-d', strtotime($v['trade_date']));}}</td>
+                                        <td>{{ date('Y-m-d', strtotime($v['trade_date'])) }}</td>
                                         <td>{{ $v['doc_number'] }}</td>
                                         <td>{{ $v['supplier_name'] }}</td>
                                         <td>
@@ -163,15 +168,19 @@
                                                 @case('DRAFTED')
                                                     草稿
                                                 @break
+
                                                 @case('REVIEWING')
                                                     簽核中
                                                 @break
+
                                                 @case('APPROVED')
                                                     已核准
                                                 @break
+
                                                 @case('REJECTED')
                                                     已駁回
                                                 @break
+
                                                 @default
                                             @endswitch
                                         </td>
@@ -189,6 +198,25 @@
     @include('backend.quotation.detail')
     @section('js')
         <script>
+            function row_detail(id) {
+                $('#DivAddRow').html("");
+                var data_id = id;
+                $("#get_modal_id").val(data_id);
+                $.ajax({
+                        url: "/backend/quotation/ajax",
+                        type: "POST",
+                        data: {
+                            "get_type": "showQuotation",
+                            "id": data_id,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        enctype: 'multipart/form-data',
+                    })
+                    .done(function(data) {
+                        $('#ajaxHtmlappendthis').html(data);
+                        $('#row_detail').modal('show');
+                    });
+            }
             $(function() {
                 let select_start_date_flatpickr = flatpickr("#select_start_date_flatpickr", {
                     dateFormat: "Y-m-d",
