@@ -166,29 +166,29 @@ class QuotationController extends Controller
                     $obj->pos_item_no = $obj->productItem->pos_item_no ?? '';
                     $obj->brands_name = $obj->productItem->product->brand->brand_name ?? '';
                     $obj->item_no = $obj->productItem->item_no ?? '';
-                    $obj->product_name = $obj->productItem->product->product_name ;
-                    $obj->combination_name = "{$obj->brands_name}-{$obj->product_name}";
-
-                    if ($obj->spec_1_value !== '') {
+                    $obj->product_name = $obj->productItem->product->product_name ?? '' ;
+                    if($obj->brands_name && $obj->product_name){
+                        $obj->combination_name = "{$obj->brands_name}-{$obj->product_name}";
+                    }
+                    // dd($obj->spec_1_value) ;
+                    if ($obj->spec_1_value) {
                         $obj->combination_name .= '-' . $obj->productItem->spec_1_value;
                     }
 
-                    if ($obj->spec_2_value !== '') {
+                    if ($obj->spec_2_value) {
                         $obj->combination_name .= '-' . $obj->productItem->spec_2_value;
                     }
 
                     $obj->min_purchase_qty = $obj->productItem->product->min_purchase_qty ?? '';
                     $obj->requisitions_purchase_number = '';
                     $tmp = [];
-                    if(!is_null($obj->productItem->requisitionsPurchaseDetails)){
+                    if($obj->productItem && $obj->productItem->requisitionsPurchaseDetails){
                         foreach($obj->productItem->requisitionsPurchaseDetails as $key=>$val){
                             array_push($tmp, $val->requisitionsPurchase->number);
                         }
                         $tmp = array_unique($tmp);
                         $obj->requisitions_purchase_number = implode(',', $tmp);
                     }
-                    // dd($obj->productItem->requisitionsPurchaseDetails);
-                    // forach($obj->productItem->requisitionsPurchaseDetails)
                     return $obj;
                 });
                 $data['quotationReviewLog'] = $this->quotationService->getQuotationReviewLog($in['id']);

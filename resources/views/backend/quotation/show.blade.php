@@ -66,7 +66,7 @@
                                 <td class="col-md-2">{{ $val->pos_item_no }}</td>
                                 <td class="col-md-2">
                                     @if (!$val->combination_name)
-                                        <span class="redtext">該商品異常</span>
+                                        <span class="redtext"></span>
                                     @else
                                         {{ $val->combination_name }}
                                     @endif
