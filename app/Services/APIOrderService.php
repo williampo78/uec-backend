@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\ShoppingCartErrorLogTypeEnum;
 use App\Models\Order;
 use App\Models\OrderCampaignDiscount;
 use App\Models\OrderDetail;
@@ -24,18 +25,21 @@ use Illuminate\Support\Facades\Crypt;
 class APIOrderService
 {
     private $sysConfigService;
+    private $shoppingCartErrorLogService;
 
     public function __construct(
         APITapPayService $apiTapPayService,
         StockService $stockService,
         APIService $apiService,
-        SysConfigService $sysConfigService
+        SysConfigService $sysConfigService,
+        ShoppingCartErrorLogService $shoppingCartErrorLogService
     )
     {
         $this->apiTapPayService = $apiTapPayService;
         $this->stockService = $stockService;
         $this->apiService = $apiService;
         $this->sysConfigService = $sysConfigService;
+        $this->shoppingCartErrorLogService = $shoppingCartErrorLogService;
     }
 
     /**
@@ -705,7 +709,15 @@ class APIOrderService
                     $result['payment_url'] = null;
                     Log::channel('changepoint')->error('扣點異常 ! webdata :' . json_encode($webData) . 'req:' . json_encode($pointData) . 'rep:' . json_encode($pointStatus));
                     DB::rollBack();
-                    return $result;
+                    // 寫入錯誤記錄至資料庫
+                    $this->shoppingCartErrorLogService->writeErrorLog(
+                        __FUNCTION__,
+                        $member_id,
+                        $member_id,
+                        $webData['order_no'],
+                        ShoppingCartErrorLogTypeEnum::CRM,
+                        '扣點異常 ! webdata :' . json_encode($webData) . 'req:' . json_encode($pointData) . 'rep:' . json_encode($pointStatus)
+                    );
                     $isTapPay = 0;
                 }
             } else {
@@ -1654,6 +1666,15 @@ class APIOrderService
                                 $result['payment_url'] = null;
                                 Log::channel('tappay_api_log')->error('加密資料失敗' . json_encode($tapPayResult));
                                 DB::rollBack();
+                                // TapPay加密資料失敗寫入log table
+                                $this->shoppingCartErrorLogService->writeErrorLog(
+                                    __FUNCTION__,
+                                    $member_id,
+                                    $member_id,
+                                    $webData['order_no'],
+                                    ShoppingCartErrorLogTypeEnum::TAPPAY,
+                                    '加密資料失敗' . json_encode($tapPayResult)
+                                );
                                 return $result;
                             }
                         } else {
@@ -1665,6 +1686,15 @@ class APIOrderService
                         $result['payment_url'] = null;
                         Log::channel('tappay_api_log')->error('597:tappay error!' . json_encode($tapPayResult));
                         DB::rollBack();
+                        // TapPay Error寫入log table
+                        $this->shoppingCartErrorLogService->writeErrorLog(
+                            __FUNCTION__,
+                            $member_id,
+                            $member_id,
+                            $webData['order_no'],
+                            ShoppingCartErrorLogTypeEnum::TAPPAY,
+                            '597:tappay error!' . json_encode($tapPayResult)
+                        );
                         return $result;
                     }
                 } else {
@@ -1673,6 +1703,15 @@ class APIOrderService
                     $result['tappay_msg'] = $tapPayResult['status'] . ":" . $tapPayResult['msg'];
                     Log::channel('tappay_api_log')->error($tapPayResult['status'] . ':tappay error!' . json_encode($tapPayResult));
                     DB::rollBack();
+                    // TapPay Error寫入log table
+                    $this->shoppingCartErrorLogService->writeErrorLog(
+                        __FUNCTION__,
+                        $member_id,
+                        $member_id,
+                        $webData['order_no'],
+                        ShoppingCartErrorLogTypeEnum::TAPPAY,
+                        $tapPayResult['status'] . ':tappay error!' . json_encode($tapPayResult)
+                    );
                     return $result;
                 }
             }
@@ -1685,6 +1724,15 @@ class APIOrderService
                 $result['status'] = 405;
                 $result['payment_url'] = null;
                 DB::rollBack();
+                // 建立出貨單失敗寫入log table
+                $this->shoppingCartErrorLogService->writeErrorLog(
+                    __FUNCTION__,
+                    $member_id,
+                    $member_id,
+                    $webData['order_no'],
+                    ShoppingCartErrorLogTypeEnum::EC,
+                    '建立出貨單異常'
+                );
                 return $result;
             }
 
