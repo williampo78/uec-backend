@@ -790,8 +790,7 @@
                         </tr>`;
                 index++;
             });
-
-            $('#return_details_content').append(list);
+            $('#return_details_content')[0].innerHTML = list;
             //退款明細 end
         }
 
@@ -814,8 +813,7 @@
                         </tr>`;
                 index++;
             })
-
-            $('#return_information_content').append(list);
+            $('#return_information_content')[0].innerHTML = list;
             //處理退貨明細資料 end
         }
     </script>
