@@ -311,7 +311,11 @@
                                     <tr>
                                         <th>取消 / 作廢時間</th>
                                         <td id="modal-cancelled-voided-at"></td>
-                                        <td id="modal-cancelled-reason"></td>
+                                        <td id="modal-cancelled-reason">
+                                            <p id="cancel_req_reason_code"></p>
+                                            <br>
+                                            <p id="cancel_req_remark"></p>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <th>出貨時間</th>

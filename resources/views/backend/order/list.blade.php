@@ -600,17 +600,18 @@
                             });
                         }
 
-                        let cancelled_reason = '';
+                        let cancel_req_reason_code = '';
+                        let cancel_req_remark = '' ;
                         if (order.cancel_req_reason_code != null) {
-                            cancelled_reason += '取消原因:' + order.cancel_req_reason_code
+                            cancel_req_reason_code += '取消原因:' + order.cancel_req_reason_code
                         }
                         if (order.cancel_req_remark != null) {
-                            cancelled_reason += '<br />取消備註:' + order.cancel_req_remark
+                            cancel_req_remark += '取消備註:' + order.cancel_req_remark
                         }
-
                         // 物流資訊
                         $('#modal-cancelled-voided-at').empty().text(order.cancelled_voided_at);
-                        $('#modal-cancelled-reason').empty().html(cancelled_reason);
+                        $('#cancel_req_reason_code').empty().text(cancel_req_reason_code);
+                        $('#cancel_req_remark').empty().text(cancel_req_remark);
                         $('#modal-shipped-at').empty().text(order.shipped_at);
                         $('#modal-arrived-store-at').empty().text(order.arrived_store_at);
                         $('#modal-home-dilivered-at').empty().text(order.home_dilivered_at);
