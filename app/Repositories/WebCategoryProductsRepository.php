@@ -220,7 +220,7 @@ class WebCategoryProductsRepository
         if($this->filter){
             $products->addSelect(
                 "pa.product_attribute_lov_id as pa_product_attribute_lov_id",
-                "pa.attribute_type as pa_attribute_type",
+                "product_attribute_lov.attribute_type as pa_attribute_type",
             );
         }
 
