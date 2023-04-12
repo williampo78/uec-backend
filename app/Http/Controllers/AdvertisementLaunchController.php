@@ -83,8 +83,24 @@ class AdvertisementLaunchController extends Controller
         $inputData = $request->except('_token');
         // 驗證檔案格式
         $validatedData = $request->validate([
-            'slot_icon_name' => 'mimes:jpeg,png,jpg',
+            'slot_icon_name' => 'mimes:jpeg,png,jpg,gif,webp,svg,bmp',
         ]);
+        
+        $allowFileTypes = [
+            'jpeg',
+            'png',
+            'jpg',
+            'gif',
+            'webp',
+            'bmp',
+        ];
+
+        foreach($inputData['image_block_image_name'] as $file){
+            $fileType = $file->extension() ;
+            if(!in_array($fileType,$allowFileTypes)){
+                return back()->withErrors(['message' => '檔案格式錯誤不允許使用'.$fileType]);
+            };
+        }
         if (!$this->advertisementService->addSlotContents($inputData)) {
             return back()->withErrors(['message' => '儲存失敗']);
         }
@@ -253,11 +269,25 @@ class AdvertisementLaunchController extends Controller
         $inputData['slot_content_id'] = $slot_content_id;
 
         $validatorFile = Validator::make($request->all(), [
-            'slot_icon_name' => 'mimes:jpeg,png,jpg',
+            'slot_icon_name' => 'mimes:jpeg,png,jpg,gif,webp,svg,bmp',
         ]);
 
         if ($validatorFile->fails()) {
             return back()->withErrors(['message' => '檔案格式錯誤']);
+        }
+        $allowFileTypes = [
+            'jpeg',
+            'png',
+            'jpg',
+            'gif',
+            'webp',
+            'bmp',
+        ];
+        foreach($inputData['image_block_image_name'] as $file){
+            $fileType = $file->extension() ;
+            if(!in_array($fileType,$allowFileTypes)){
+                return back()->withErrors(['message' => '檔案格式錯誤不允許使用'.$fileType]);
+            };
         }
 
         if (!$this->advertisementService->updateSlotContents($inputData)) {
