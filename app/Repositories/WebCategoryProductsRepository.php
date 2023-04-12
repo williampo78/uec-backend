@@ -283,7 +283,7 @@ class WebCategoryProductsRepository
 
         if ($this->brand) { //品牌
             $brand = explode(',', $this->brand);
-            $products = $products->whereIn('p.brand_id', $this->brand);
+            $products = $products->whereIn('p.brand_id', $brand);
         }
         if ($this->attribute) {//進階篩選條件
             $attribute = explode(',', $this->attribute);
