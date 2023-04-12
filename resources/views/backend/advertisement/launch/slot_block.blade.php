@@ -125,12 +125,14 @@
         <div class="col-sm-6">
             <div class="form-group">
                 <div class="col-sm-3">
-                    <label class="control-label">版位icon<span class="slot_icon_name_star" style="color:red;"></span></label>
+                    <label class="control-label" style="text-align:left;">版位icon<span class="slot_icon_name_star" style="color:red;"></span>
+                    <br>
+                    <span style="color:red;">副檔名須為jpeg/jpg/png/gif/webp/svg/bmp</span></label>
                 </div>
                 <div style="padding-left:0" class="col-sm-9">
                     <div class="row">
                         <div class="col-sm-5">
-                            <input type="{{$share_type_file}}" id="slot_icon_name" name="slot_icon_name" accept="image/png, image/jpeg" disabled />
+                            <input type="{{$share_type_file}}" id="slot_icon_name" name="slot_icon_name" accept="image/png,image/jpeg,image/gif,image/webp,image/svg,image/bmp" disabled />
                         </div>
                         <div class="col-sm-3">
                             <img src="" id="img_slot_icon_name" class="img-responsive" width="100"

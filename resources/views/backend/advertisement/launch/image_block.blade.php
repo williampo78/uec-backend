@@ -20,5 +20,6 @@
         </table>
     </div>
     <button type="button" class="btn btn-warning" id="btn-new-image"><i class="fa-solid fa-plus"></i> 新增圖檔</button>
+    <span style="color:red;">副檔名須為jpeg/jpg/png/gif/webp/bmp</span>
     <hr style="border-top: 1px solid gray;" />
 </div>
