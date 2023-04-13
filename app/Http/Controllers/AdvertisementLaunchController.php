@@ -94,12 +94,13 @@ class AdvertisementLaunchController extends Controller
             'webp',
             'bmp',
         ];
-
-        foreach($inputData['image_block_image_name'] as $file){
-            $fileType = $file->extension() ;
-            if(!in_array($fileType,$allowFileTypes)){
-                return back()->withErrors(['message' => '檔案格式錯誤不允許使用'.$fileType]);
-            };
+        if(isset($inputData['image_block_image_name'])){
+            foreach($inputData['image_block_image_name'] as $file){
+                $fileType = $file->extension() ;
+                if(!in_array($fileType,$allowFileTypes)){
+                    return back()->withErrors(['message' => '檔案格式錯誤不允許使用'.$fileType]);
+                };
+            }
         }
         if (!$this->advertisementService->addSlotContents($inputData)) {
             return back()->withErrors(['message' => '儲存失敗']);
@@ -283,11 +284,14 @@ class AdvertisementLaunchController extends Controller
             'webp',
             'bmp',
         ];
-        foreach($inputData['image_block_image_name'] as $file){
-            $fileType = $file->extension() ;
-            if(!in_array($fileType,$allowFileTypes)){
-                return back()->withErrors(['message' => '檔案格式錯誤不允許使用'.$fileType]);
-            };
+        
+        if(isset($inputData['image_block_image_name'])){
+            foreach($inputData['image_block_image_name'] as $file){
+                $fileType = $file->extension() ;
+                if(!in_array($fileType,$allowFileTypes)){
+                    return back()->withErrors(['message' => '檔案格式錯誤不允許使用'.$fileType]);
+                };
+            }
         }
 
         if (!$this->advertisementService->updateSlotContents($inputData)) {
