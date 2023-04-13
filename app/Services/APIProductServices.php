@@ -363,9 +363,6 @@ class APIProductServices
             }
         } else {
             foreach ($products as $product) {
-                if (!$id) {//依產品編號找相關分類不進此判斷
-                    if ($product->id == $product_id && $product->web_category_hierarchy_id == $web_category_hierarchy_id) continue;
-                }
                 $data[$product->web_category_hierarchy_id][] = $product;
                 $product_id = $product->id;
                 $web_category_hierarchy_id = $product->web_category_hierarchy_id;
@@ -393,9 +390,9 @@ class APIProductServices
         //$sort_flag = $input['sort'] == 'ASC' ? SORT_ASC : SORT_DESC;
         $attribute = '';
         $attribute .= ($input['group'] ? $input['group'] : '');
-        $attribute .= ($attribute != '' && $input['ingredient'] != '' ? ', ' : '') . ($input['ingredient'] ? $input['ingredient'] : '');
-        $attribute .= ($attribute != '' && $input['dosage_form'] != '' ? ', ' : '') . ($input['dosage_form'] ? $input['dosage_form'] : '');
-        $attribute .= ($attribute != '' && $input['certificate'] != '' ? ', ' : '') . ($input['certificate'] ? $input['certificate'] : '');
+        $attribute .= ($attribute != '' && $input['ingredient'] != '' ? ',' : '') . ($input['ingredient'] ? $input['ingredient'] : '');
+        $attribute .= ($attribute != '' && $input['dosage_form'] != '' ? ',' : '') . ($input['dosage_form'] ? $input['dosage_form'] : '');
+        $attribute .= ($attribute != '' && $input['certificate'] != '' ? ',' : '') . ($input['certificate'] ? $input['certificate'] : '');
         $brand = '';
         $brand .= ($input['brand'] ? $input['brand'] : '');
         $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand);
@@ -445,6 +442,17 @@ class APIProductServices
                     $is_collection = json_decode($response, true);
                 }
             }
+            $attributeFilter = [] ;
+            $attributeAry = explode(',', $attribute);
+            $attributeAry = array_unique($attributeAry);
+            if(!empty($attributeAry)){
+                foreach ($products as $cateID => $prod) {
+                    foreach ($prod as $product) {
+                        $attributeFilter[$product->id][] = (string)$product->attribute_id;
+                    }
+                }
+            }
+
             $product_id = 0;
             foreach ($products as $cateID => $prod) {
                 foreach ($prod as $product) {
@@ -463,24 +471,48 @@ class APIProductServices
                             }
                         }
                     }
-                    if ($product->id != $product_id) {
-                        $data[$product->id] = array(
-                            'product_id' => $product->id,
-                            'product_no' => $product->product_no,
-                            'product_name' => $product->product_name,
-                            'list_price' => $product->list_price,
-                            'selling_price' => $product->selling_price,
-                            'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
-                            'promotion_desc' => $promotion_desc,
-                            'promotion_label' => (isset($promotional[$product->id]) ? $promotional[$product->id] : null),
-                            'collections' => $collection,
-                            'cart' => $cart,
-                            'selling_channel' => $product->selling_channel,
-                            'start_selling' => $product->start_selling_at,
-                            'gtm' => isset($gtm[$product->id]) ? $gtm[$product->id] : "",
-                            'start_launched_at' => $product->start_launched_at //為了排序而加
-                        );
 
+                    if ($product->id != $product_id) {
+                        if(!empty($attributeFilter)){ //篩選掉不要的分類
+                            $arrayDiff = array_diff($attributeAry,array_unique($attributeFilter[$product->id]));
+                            if(isset($attributeFilter[$product->id]) && empty($arrayDiff)){
+                                $data[$product->id] = array(
+                                    'product_id' => $product->id,
+                                    'product_no' => $product->product_no,
+                                    'product_name' => $product->product_name,
+                                    'list_price' => $product->list_price,
+                                    'selling_price' => $product->selling_price,
+                                    'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
+                                    'promotion_desc' => $promotion_desc,
+                                    'promotion_label' => (isset($promotional[$product->id]) ? $promotional[$product->id] : null),
+                                    'collections' => $collection,
+                                    'cart' => $cart,
+                                    'selling_channel' => $product->selling_channel,
+                                    'start_selling' => $product->start_selling_at,
+                                    'gtm' => isset($gtm[$product->id]) ? $gtm[$product->id] : "",
+                                    'start_launched_at' => $product->start_launched_at //為了排序而加
+                                );
+                            }
+                        }else{
+                            $data[$product->id] = array(
+                                'product_id' => $product->id,
+                                'product_no' => $product->product_no,
+                                'product_name' => $product->product_name,
+                                'list_price' => $product->list_price,
+                                'selling_price' => $product->selling_price,
+                                'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
+                                'promotion_desc' => $promotion_desc,
+                                'promotion_label' => (isset($promotional[$product->id]) ? $promotional[$product->id] : null),
+                                'collections' => $collection,
+                                'cart' => $cart,
+                                'selling_channel' => $product->selling_channel,
+                                'start_selling' => $product->start_selling_at,
+                                'gtm' => isset($gtm[$product->id]) ? $gtm[$product->id] : "",
+                                'start_launched_at' => $product->start_launched_at //為了排序而加
+                            );
+
+                        }
+                      
                         $product_id = $product->id;
                     }
 
