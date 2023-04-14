@@ -430,7 +430,6 @@ class APIProductServices
             $cart = false;
             $is_collection = [];
             $is_cart = [];
-            $data = [];
             if ($login) {
                 $member_id = Auth::guard('api')->user()->member_id;
                 if ($member_id > 0) {
@@ -438,17 +437,6 @@ class APIProductServices
                     $is_collection = json_decode($response, true);
                 }
             }
-            $attributeFilter = [] ;
-            $attributeAry = explode(',', $attribute);
-            $attributeAry = array_unique($attributeAry);
-            if(!empty($attributeAry) && $attribute !== ''){
-                foreach ($products as $cateID => $prod) {
-                    foreach ($prod as $product) {
-                        $attributeFilter[$product->id][] = (string)$product->attribute_id;
-                    }
-                }
-            }
-
             $product_id = 0;
             foreach ($products as $cateID => $prod) {
                 foreach ($prod as $product) {
@@ -467,48 +455,24 @@ class APIProductServices
                             }
                         }
                     }
-
                     if ($product->id != $product_id) {
-                        if(!empty($attributeFilter)){ //篩選掉不要的分類
-                            $arrayDiff = array_diff($attributeAry,array_unique($attributeFilter[$product->id]));
-                            if(isset($attributeFilter[$product->id]) && empty($arrayDiff)){
-                                $data[$product->id] = array(
-                                    'product_id' => $product->id,
-                                    'product_no' => $product->product_no,
-                                    'product_name' => $product->product_name,
-                                    'list_price' => $product->list_price,
-                                    'selling_price' => $product->selling_price,
-                                    'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
-                                    'promotion_desc' => $promotion_desc,
-                                    'promotion_label' => (isset($promotional[$product->id]) ? $promotional[$product->id] : null),
-                                    'collections' => $collection,
-                                    'cart' => $cart,
-                                    'selling_channel' => $product->selling_channel,
-                                    'start_selling' => $product->start_selling_at,
-                                    'gtm' => isset($gtm[$product->id]) ? $gtm[$product->id] : "",
-                                    'start_launched_at' => $product->start_launched_at //為了排序而加
-                                );
-                            }
-                        }else{
-                            $data[$product->id] = array(
-                                'product_id' => $product->id,
-                                'product_no' => $product->product_no,
-                                'product_name' => $product->product_name,
-                                'list_price' => $product->list_price,
-                                'selling_price' => $product->selling_price,
-                                'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
-                                'promotion_desc' => $promotion_desc,
-                                'promotion_label' => (isset($promotional[$product->id]) ? $promotional[$product->id] : null),
-                                'collections' => $collection,
-                                'cart' => $cart,
-                                'selling_channel' => $product->selling_channel,
-                                'start_selling' => $product->start_selling_at,
-                                'gtm' => isset($gtm[$product->id]) ? $gtm[$product->id] : "",
-                                'start_launched_at' => $product->start_launched_at //為了排序而加
-                            );
+                        $data[$product->id] = array(
+                            'product_id' => $product->id,
+                            'product_no' => $product->product_no,
+                            'product_name' => $product->product_name,
+                            'list_price' => $product->list_price,
+                            'selling_price' => $product->selling_price,
+                            'product_photo' => ($product->displayPhoto ? $s3 . $product->displayPhoto : null),
+                            'promotion_desc' => $promotion_desc,
+                            'promotion_label' => (isset($promotional[$product->id]) ? $promotional[$product->id] : null),
+                            'collections' => $collection,
+                            'cart' => $cart,
+                            'selling_channel' => $product->selling_channel,
+                            'start_selling' => $product->start_selling_at,
+                            'gtm' => isset($gtm[$product->id]) ? $gtm[$product->id] : "",
+                            'start_launched_at' => $product->start_launched_at //為了排序而加
+                        );
 
-                        }
-                      
                         $product_id = $product->id;
                     }
 
@@ -1713,46 +1677,16 @@ class APIProductServices
         }
         $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand, 1);
         if ($products) {
-            $attributeFilter = [] ;
-            $attributeAry = explode(',', $attribute);
-            $attributeAry = array_unique($attributeAry);
-            //把所有屬性的product id 整理進來
-            if(!empty($attributeAry) && $attribute !== ''){
-                foreach ($products as $cateID => $prod) {
-                    foreach ($prod as $attribute) {
-                        foreach ($attribute as $product) {
-                            $attributeFilter[$product->id][] = (string)$product->pa_product_attribute_lov_id;
-                        }
-                    }
-                }
-            }
-            //將重複屬性的ID 排除
-            $abf = [] ;
-            if(!empty($attributeFilter)){
-                foreach($attributeFilter as $k => $v){
-                    $arrayDiff = array_diff($attributeAry,array_unique($v));
-                    if(empty($arrayDiff)){
-                        $abf[$k] = 0 ;
-                    }
-                }
-            }
-            $attributeFilter = $abf ;
             foreach ($products as $cateID => $prod) {
                 foreach ($prod as $attribute) {
                     foreach ($attribute as $product) {
                         //品牌(商品)
-                        if(!empty($attributeFilter) ){
-                            if (isset($attributeFilter[$product->id]) && !key_exists($product->brand_id, $attribute_array['BRAND'])) $attribute_array['BRAND'][$product->brand_id][$product->id] = 0;
-                            if(isset($attributeFilter[$product->id])){
-                                $attribute_array['BRAND'][$product->brand_id][$product->id] = 1;
-                            }
-                        }else{
-                            if (!key_exists($product->brand_id, $attribute_array['BRAND'])) $attribute_array['BRAND'][$product->brand_id][$product->id] = 0;
-                            $attribute_array['BRAND'][$product->brand_id][$product->id] = 1;
-                        }
-                        if (isset($attribute_array[$product->pa_attribute_type])) {
-                            if (!key_exists($product->pa_product_attribute_lov_id, $attribute_array[$product->pa_attribute_type])) $attribute_array[$product->pa_attribute_type][$product->pa_product_attribute_lov_id][$product->id] = 0;
-                            $attribute_array[$product->pa_attribute_type][$product->pa_product_attribute_lov_id][$product->id] = 1;
+                        if (!key_exists($product->brand_id, $attribute_array['BRAND'])) $attribute_array['BRAND'][$product->brand_id][$product->id] = 0;
+                        $attribute_array['BRAND'][$product->brand_id][$product->id] = 1;
+                        //屬性(商品)
+                        if (isset($attribute_array[$product->attribute_type])) {
+                            if (!key_exists($product->attribute_id, $attribute_array[$product->attribute_type])) $attribute_array[$product->attribute_type][$product->attribute_id][$product->id] = 0;
+                            $attribute_array[$product->attribute_type][$product->attribute_id][$product->id] = 1;
                         }
                     }
                 }
@@ -1767,16 +1701,15 @@ class APIProductServices
             }
         }
         $filter_display = [];
+
         foreach ($filter as $type => $data) {
             foreach ($data as $info) {
-                if(isset($info['id'])){
-                    $filter_display[$type][] = array(
-                        'id' => $info['id'],
-                        'code' => $info['code'],
-                        'name' => $info['name'],
-                        'count' => $info['count']
-                    );
-                }
+                $filter_display[$type][] = array(
+                    'id' => $info['id'],
+                    'code' => $info['code'],
+                    'name' => $info['name'],
+                    'count' => $info['count']
+                );
             }
         }
         if ($filter) {
