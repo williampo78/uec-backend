@@ -127,7 +127,7 @@
                 <div class="col-sm-3">
                     <label class="control-label" style="text-align:left;">版位icon<span class="slot_icon_name_star" style="color:red;"></span>
                     <br>
-                    <span style="color:red;">副檔名須為jpeg/jpg/png/gif/webp/svg/bmp</span></label>
+                    <span style="color:red;">副檔名須為jpeg/jpg/png/gif/webp/svg/bmp/jfif</span></label>
                 </div>
                 <div style="padding-left:0" class="col-sm-9">
                     <div class="row">

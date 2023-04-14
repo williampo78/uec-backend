@@ -82,10 +82,12 @@ class AdvertisementLaunchController extends Controller
     {
         $inputData = $request->except('_token');
         // 驗證檔案格式
-        $validatedData = $request->validate([
+        $validatorFile = Validator::make($request->all(), [
             'slot_icon_name' => 'mimes:jpeg,png,jpg,gif,webp,svg,bmp',
         ]);
-        
+        if ($validatorFile->fails()) {
+            return back()->withErrors(['message' => '檔案格式錯誤']);
+        }
         $allowFileTypes = [
             'jpeg',
             'png',
@@ -93,6 +95,7 @@ class AdvertisementLaunchController extends Controller
             'gif',
             'webp',
             'bmp',
+            'jfif'
         ];
         if(isset($inputData['image_block_image_name'])){
             foreach($inputData['image_block_image_name'] as $file){
@@ -283,6 +286,7 @@ class AdvertisementLaunchController extends Controller
             'gif',
             'webp',
             'bmp',
+            'jfif'
         ];
         
         if(isset($inputData['image_block_image_name'])){
