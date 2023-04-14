@@ -435,6 +435,7 @@ class APIProductServices
             $cart = false;
             $is_collection = [];
             $is_cart = [];
+            $data = [];
             if ($login) {
                 $member_id = Auth::guard('api')->user()->member_id;
                 if ($member_id > 0) {
@@ -445,7 +446,7 @@ class APIProductServices
             $attributeFilter = [] ;
             $attributeAry = explode(',', $attribute);
             $attributeAry = array_unique($attributeAry);
-            if(!empty($attributeAry)){
+            if(!empty($attributeAry) && $attribute !== ''){
                 foreach ($products as $cateID => $prod) {
                     foreach ($prod as $product) {
                         $attributeFilter[$product->id][] = (string)$product->attribute_id;
