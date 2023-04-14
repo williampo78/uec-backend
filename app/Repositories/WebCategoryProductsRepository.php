@@ -288,7 +288,11 @@ class WebCategoryProductsRepository
         if ($this->attribute) {//進階篩選條件
             $attribute = explode(',', $this->attribute);
             $attribute = array_unique($attribute);
-            $products = $products->whereIn('product_attributes.product_attribute_lov_id', $attribute);
+            if($this->filter){
+                $products = $products->where('product_attributes.product_attribute_lov_id', $attribute[0]);
+            }else{
+                $products = $products->whereIn('product_attributes.product_attribute_lov_id', $attribute);
+            }
         }
 
         if ($this->orderBy == 'launched') {
