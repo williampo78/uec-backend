@@ -354,9 +354,6 @@ class APIProductServices
         $products = $this->webCategoryProductsRepository->getProducts();
 
         $data = [];
-        $product_id = 0;
-        $web_category_hierarchy_id = 0;
-
         if ($filter) {
             foreach ($products as $product) {
                 $data[$product->web_category_hierarchy_id][$product->id][$product->pa_product_attribute_lov_id ?? 0] = $product;
@@ -364,8 +361,6 @@ class APIProductServices
         } else {
             foreach ($products as $product) {
                 $data[$product->web_category_hierarchy_id][] = $product;
-                $product_id = $product->id;
-                $web_category_hierarchy_id = $product->web_category_hierarchy_id;
             }
         }
         return $data;
@@ -1718,13 +1713,43 @@ class APIProductServices
         }
         $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand, 1);
         if ($products) {
+            $attributeFilter = [] ;
+            $attributeAry = explode(',', $attribute);
+            $attributeAry = array_unique($attributeAry);
+            //把所有屬性的product id 整理進來
+            if(!empty($attributeAry) && $attribute !== ''){
+                foreach ($products as $cateID => $prod) {
+                    foreach ($prod as $attribute) {
+                        foreach ($attribute as $product) {
+                            $attributeFilter[$product->id][] = (string)$product->pa_product_attribute_lov_id;
+                        }
+                    }
+                }
+            }
+            //將重複屬性的ID 排除
+            $abf = [] ;
+            if(!empty($attributeFilter)){
+                foreach($attributeFilter as $k => $v){
+                    $arrayDiff = array_diff($attributeAry,array_unique($v));
+                    if(empty($arrayDiff)){
+                        $abf[$k] = 0 ;
+                    }
+                }
+            }
+            $attributeFilter = $abf ;
             foreach ($products as $cateID => $prod) {
                 foreach ($prod as $attribute) {
                     foreach ($attribute as $product) {
                         //品牌(商品)
-                        if (!key_exists($product->brand_id, $attribute_array['BRAND'])) $attribute_array['BRAND'][$product->brand_id][$product->id] = 0;
-                        $attribute_array['BRAND'][$product->brand_id][$product->id] = 1;
-                        //屬性(商品)
+                        if(!empty($attributeFilter) ){
+                            if (isset($attributeFilter[$product->id]) && !key_exists($product->brand_id, $attribute_array['BRAND'])) $attribute_array['BRAND'][$product->brand_id][$product->id] = 0;
+                            if(isset($attributeFilter[$product->id])){
+                                $attribute_array['BRAND'][$product->brand_id][$product->id] = 1;
+                            }
+                        }else{
+                            if (!key_exists($product->brand_id, $attribute_array['BRAND'])) $attribute_array['BRAND'][$product->brand_id][$product->id] = 0;
+                            $attribute_array['BRAND'][$product->brand_id][$product->id] = 1;
+                        }
                         if (isset($attribute_array[$product->pa_attribute_type])) {
                             if (!key_exists($product->pa_product_attribute_lov_id, $attribute_array[$product->pa_attribute_type])) $attribute_array[$product->pa_attribute_type][$product->pa_product_attribute_lov_id][$product->id] = 0;
                             $attribute_array[$product->pa_attribute_type][$product->pa_product_attribute_lov_id][$product->id] = 1;
