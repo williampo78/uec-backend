@@ -66,10 +66,6 @@ Route::get('/', function () {
     return redirect()->route('backend_home');
 });
 
-Route::get('/token', function () {
-    return csrf_token();
-});
-
 // 未登入的user才能造訪
 Route::group(['middleware' => ['guest']], function () {
     Route::get('/login', [AuthController::class, 'showLoginPage'])->name('login.show');
