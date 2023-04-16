@@ -31,6 +31,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::get('/token', function () {
+    return csrf_token();
+});
+
 Route::group(['prefix' => 'v1'], function () {
     Route::get('/footer', [IndexController::class, 'index']);
     Route::get('/footer/{id}', [IndexController::class, 'getContent']);
