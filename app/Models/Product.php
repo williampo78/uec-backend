@@ -121,4 +121,12 @@ class Product extends Model
     {
         return config('uec.options.storage_temperatures')[$this->storage_temperature] ?? null;
     }
+
+    /**
+     * 屬性關聯
+     * 
+     */
+    public function productAttribute(){
+        return $this->hasMany(ProductAttribute::class,'product_id');
+    }
 }
