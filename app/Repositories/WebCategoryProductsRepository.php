@@ -3,8 +3,9 @@
 namespace App\Repositories;
 
 use App\Enums\CacheSaveSecEnum;
-use App\Services\WebCategoryHierarchyService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Query\Builder;
+use App\Services\WebCategoryHierarchyService;
 
 class WebCategoryProductsRepository
 {
@@ -28,6 +29,7 @@ class WebCategoryProductsRepository
     private $attribute = null;
     private $brand = null;
     private $filter = null;
+    private $attributeAry = null;
 
     /**
      * @param WebCategoryHierarchyService $apiWebCategory
@@ -55,7 +57,7 @@ class WebCategoryProductsRepository
      *
      * @return void
      */
-    public function setParams($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag = null, $attribute = null, $brand = null, $filter = null)
+    public function setParams($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag = null, $attribute = null, $brand = null, $filter = null, $attributeAry = null)
     {
         if ( !empty($category) || !empty($selling_price_min) || !empty(($selling_price_max)) || !empty($keyword) || !empty($order_by) || !empty($sort_flag) || !empty($attribute) || !empty($brand) || !empty($filter)) {
             $this->useQueryType = 2;
@@ -70,6 +72,7 @@ class WebCategoryProductsRepository
             $this->brand = $brand;
             $this->filter = $filter;
             $this->id = $id;
+            $this->attributeAry = $attributeAry ;
         } elseif ( !empty($id)) {
             $this->useQueryType = 1;
 
@@ -200,7 +203,7 @@ class WebCategoryProductsRepository
             ->join('frontend_products_v as p', 'p.id', '=', 'web_category_products.product_id')
             ->join('web_category_hierarchy as cate1', 'cate1.id', '=', 'web_category_products.web_category_hierarchy_id')
             ->join('web_category_hierarchy as cate2', 'cate2.id', '=', 'cate1.parent_id');
-
+            
         if ($this->configLevels == 3) {
             $products = $products->join('web_category_hierarchy as cate3', 'cate3.id', '=', 'cate2.parent_id');
         }
@@ -233,8 +236,7 @@ class WebCategoryProductsRepository
         $products = $products->where('p.approval_status', 'APPROVED')
             ->where('p.start_launched_at', '<=', now())
             ->where('p.end_launched_at', '>=', now())
-            ->where('p.product_type', 'N')
-            ->where('cate1.active', 1);
+            ->where('p.product_type', 'N');
 
         if (($this->keyword)) { //依關鍵字搜尋
             if ($this->configLevels == 3) {
@@ -245,7 +247,9 @@ class WebCategoryProductsRepository
                         ->orWhere('p.brand_name', 'like', '%' . $this->keyword . '%')
                         ->orWhere('cate1.category_name', 'like', '%' . $this->keyword . '%')
                         ->orWhere('cate2.category_name', 'like', '%' . $this->keyword . '%')
-                        ->orWhere('cate3.category_name', 'like', '%' . $this->keyword . '%');
+                        ->orWhere('cate3.category_name', 'like', '%' . $this->keyword . '%')
+                        ->where('cate3.active', 1)
+                        ;
                 });
             } else {
                 $products = $products->where(function ($query) {
@@ -254,7 +258,8 @@ class WebCategoryProductsRepository
                         ->orWhere('p.keywords', 'like', '%' . $this->keyword . '%')
                         ->orWhere('p.brand_name', 'like', '%' . $this->keyword . '%')
                         ->orWhere('cate1.category_name', 'like', '%' . $this->keyword . '%')
-                        ->orWhere('cate2.category_name', 'like', '%' . $this->keyword . '%');
+                        ->orWhere('cate2.category_name', 'like', '%' . $this->keyword . '%')
+                        ->where('cate2.active', 1);
                 });
             }
         }
@@ -285,16 +290,65 @@ class WebCategoryProductsRepository
             $brand = explode(',', $this->brand);
             $products = $products->whereIn('p.brand_id', $brand);
         }
-        if ($this->attribute) {//進階篩選條件
+        if($this->attributeAry){
+            //適用族群
+            if ($this->attributeAry['group']) {
+                $group = explode(',', $this->attributeAry['group']);
+                $products = $products->whereExists(function (Builder $query) use ($group) {
+                    $query->select('*')
+                          ->from('product_attributes')
+                          ->whereColumn('product_attributes.product_id', 'p.id')
+                          ->whereIn('product_attributes.product_attribute_lov_id', $group);
+                });
+            }
+            
+            
+         
+            //成分
+            if ($this->attributeAry['ingredient']) {
+                $ingredient = explode(',', $this->attributeAry['ingredient']);
+                $products = $products->whereExists(function (Builder $query) use ($ingredient) {
+                    $query->select('*')
+                          ->from('product_attributes')
+                          ->whereColumn('product_attributes.product_id', 'p.id')
+                          ->whereIn('product_attributes.product_attribute_lov_id', $ingredient);
+                });
+            }
+            //認證
+            if ($this->attributeAry['certificate']) {
+                $certificate = explode(',', $this->attributeAry['certificate']);
+                $products = $products->whereExists(function (Builder $query) use ($certificate) {
+                    $query->select('*')
+                          ->from('product_attributes')
+                          ->whereColumn('product_attributes.product_id', 'p.id')
+                          ->whereIn('product_attributes.product_attribute_lov_id', $certificate);
+                });
+            }
+            //劑型
+            if($this->attributeAry['dosage_form']){
+                if ($this->attributeAry['dosage_form']) {
+                    $dosage_form = explode(',', $this->attributeAry['dosage_form']);
+                    $products = $products->whereExists(function (Builder $query) use ($dosage_form) {
+                        $query->select('*')
+                              ->from('product_attributes')
+                              ->whereColumn('product_attributes.product_id', 'p.id')
+                              ->whereIn('product_attributes.product_attribute_lov_id', $dosage_form);
+                    });
+                }
+            }
+        }else if($this->attribute) {//進階篩選條件
             $attribute = explode(',', $this->attribute);
             $attribute = array_unique($attribute);
-            if($this->filter){
-                $products = $products->where('product_attributes.product_attribute_lov_id', $attribute[0]);
-            }else{
                 $products = $products->whereIn('product_attributes.product_attribute_lov_id', $attribute);
-            }
+                $products = $products->whereIn('product_attributes.product_attribute_lov_id', $attribute);
+            $products = $products->whereIn('product_attributes.product_attribute_lov_id', $attribute);
         }
-
+        // foreach($products->get() as $p){
+        //     dump("product_name:{$p->product_name}|pa_product_attribute_lov_id:{$p->pa_product_attribute_lov_id}") ;
+        // }
+        // dd($products->get());
+        // dd($this->attributeAry) ;
+        // dd('STOP');
         if ($this->orderBy == 'launched') {
             $products = $products->orderBy('p.start_launched_at', $this->sortFlag);
         } else if ($this->orderBy == 'price') {

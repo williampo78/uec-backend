@@ -12,4 +12,8 @@ class ProductAttribute extends Model
     protected $table = 'product_attributes';
     protected $guarded = [];
 
+    public function product(){
+        return $this->belongsTo(Product::class,'product_id') ;
+    }
+
 }

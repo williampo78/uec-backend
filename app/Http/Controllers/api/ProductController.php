@@ -9,21 +9,23 @@ use App\Services\APIService;
 use Validator;
 use App\Services\ProductAttributeLovService;
 use App\Services\UniversalService;
+use App\Services\Api\SelectFilterService; 
 
 class ProductController extends Controller
 {
-    //
     private $apiProductService;
     private $apiService;
     private $apiProductAttributeLovService;
     private $universalService;
+    private $selectFilterService ; 
 
-    public function __construct(APIProductServices $apiProductService, APIService $apiService, ProductAttributeLovService $apiProductAttributeLovService, UniversalService $universalService)
+    public function __construct(APIProductServices $apiProductService,APIService $apiService, ProductAttributeLovService $apiProductAttributeLovService, UniversalService $universalService,SelectFilterService $selectFilterService)
     {
         $this->apiProductService = $apiProductService;
         $this->apiService = $apiService;
         $this->apiProductAttributeLovService = $apiProductAttributeLovService;
         $this->universalService = $universalService;
+        $this->selectFilterService = $selectFilterService ; 
     }
 
     /*
@@ -333,8 +335,8 @@ class ProductController extends Controller
         if ($v->fails()) {
             return response()->json(['status' => false, 'error_code' => '401', 'error_msg' => $error_code[401], 'result' => $v->errors()]);
         }
-        $result = $this->apiProductService->getProductFilter($request);
-
+        // $result = $this->apiProductService->getProductFilter($request);
+        $result = $this->selectFilterService->getFilter($request) ;
         if ($result == '404') {
             $status = false;
             $err = '404';

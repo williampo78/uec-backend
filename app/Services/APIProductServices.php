@@ -348,9 +348,9 @@ class APIProductServices
     /*
      * 取得分類總覽的商品資訊 (上架審核通過 & 上架期間內)
      */
-    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag = null, $attribute = null, $brand = null, $filter = null)
+    public function getWebCategoryProducts($category = null, $selling_price_min = null, $selling_price_max = null, $keyword = null, $id = null, $order_by = null, $sort_flag = null, $attribute = null, $brand = null, $filter = null ,$attributeAry = null)
     {
-        $this->webCategoryProductsRepository->setParams($category, $selling_price_min, $selling_price_max, $keyword, $id, $order_by, $sort_flag, $attribute, $brand, $filter);
+        $this->webCategoryProductsRepository->setParams($category, $selling_price_min, $selling_price_max, $keyword, $id, $order_by, $sort_flag, $attribute, $brand, $filter ,$attributeAry);
         $products = $this->webCategoryProductsRepository->getProducts();
 
         $data = [];
@@ -388,9 +388,15 @@ class APIProductServices
         $attribute .= ($attribute != '' && $input['ingredient'] != '' ? ',' : '') . ($input['ingredient'] ? $input['ingredient'] : '');
         $attribute .= ($attribute != '' && $input['dosage_form'] != '' ? ',' : '') . ($input['dosage_form'] ? $input['dosage_form'] : '');
         $attribute .= ($attribute != '' && $input['certificate'] != '' ? ',' : '') . ($input['certificate'] ? $input['certificate'] : '');
+        $attributeAry = [
+            'group' => $input['group'],
+            'ingredient' => $input['ingredient'],
+            'dosage_form' => $input['dosage_form'],
+            'certificate' => $input['certificate'],
+        ];
         $brand = '';
         $brand .= ($input['brand'] ? $input['brand'] : '');
-        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand);
+        $products = self::getWebCategoryProducts($category, $selling_price_min, $selling_price_max, $keyword, null, $order_by, $sort_flag, $attribute, $brand ,null , $attributeAry);
         $product_info = $this->getProducts();
         $gtm = $this->getProductItemForGTM($product_info);
         if ($products) {
