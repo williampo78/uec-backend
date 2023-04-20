@@ -26,11 +26,13 @@ $(function() {
         }
     });
 
-    var url = window.location;
+    var url = location.protocol + '//' + location.host + location.pathname;
     var element = $('ul.nav a').filter(function() {
-        return this.href == url || url.href.indexOf(this.href) == 0;
-    }).addClass('active').parent().parent().addClass('in').parent();
+        return this.href == url ;
+    }).addClass('active').addClass('in').parent();
+    console.log(element.parent()) ;
     if (element.is('li')) {
         element.addClass('active');
+        element.parent().parent().addClass('active');
     }
 });

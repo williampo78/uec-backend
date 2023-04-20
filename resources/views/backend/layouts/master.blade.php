@@ -40,7 +40,7 @@
     </div>
 
     <script src="{{ mix('js/app.js') }}"></script>
-    <script src="{{ asset('asset/js/template/dist/js/sb-admin-2.js') }}"></script>
+    <script src="{{ asset('asset/js/template/dist/js/sb-admin-2.js?v=2023042001') }}"></script>
     <script src="{{ asset('asset/js/build/ckeditor.js?v=2023032501') }}"></script>
     <script src="{{ asset('asset/js/template/bower_components/metisMenu/dist/metisMenu.min.js') }}"></script>
     <script src="{{ asset('asset/js/bootstrap-colorpicker.min.js') }}"></script>
